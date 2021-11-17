@@ -1,16 +1,17 @@
 package Api
 
-import com.fasterxml.jackson.annotation.JsonFormat
-import com.fasterxml.jackson.databind.util.StdDateFormat
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.typesafe.config.{Config, ConfigFactory}
 import objectMapper._
 import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
+import org.apache.http.NameValuePair
+import org.apache.http.message.BasicNameValuePair
 
 import java.io.{BufferedWriter, File, FileWriter}
 import java.text.SimpleDateFormat
 import java.time.{Instant, LocalDateTime, ZoneId}
+import java.util
 import java.util.TimeZone
 import scala.io.Source
 import scala.util.Try
@@ -29,6 +30,7 @@ class alpha {
   val config: Config = ConfigFactory.load()
   var username = config.getString("alphaess.username")
   var password = config.getString("alphaess.password")
+  var sys_sn = config.getString("alphaess.system_sn")
 
   val eplBaseHost = "https://www.alphaess.com"
   val tokenFile = new File(getClass.getResource("/lastToken.txt").getFile())
@@ -46,10 +48,12 @@ class alpha {
           //token expired - lets refresh
           println("Token is Expired")
           //refreshToken()
+         //TODO figure out fresh toke command
+          Login();
           run()
         }
         else{
-          //getHomeById()
+          getMetrics()
         }
     }
   }
@@ -57,7 +61,7 @@ class alpha {
   def Login():Login ={
     println("Calling Login()")
     val urlExtension= "/api/Account/Login"
-    val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension,username,password)
+    val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension,new LoginDetails(username,password))
     val result: Login = jsonMapper.readValue(reply, classOf[Login])
 
     result.data match {
@@ -68,20 +72,28 @@ class alpha {
   }
 
   def refreshToken(): token = {
-    println("Calling refreshToken()")
-    val urlExtension= "Account/RefreshToken"
-    val reply = restCaller.get(eplBaseHost+urlExtension, readToken)
-    val result = jsonMapper.readValue(reply, classOf[token])
-    writeToken(Some(result))
-    result
+   // println("Calling refreshToken()")
+   // val urlExtension= "Api/Account/Login"
+   // val reply = restCaller.get(eplBaseHost+urlExtension, readToken)
+   // val result = jsonMapper.readValue(reply, classOf[token])
+   // writeToken(Some(result))
+  //  result
+    token.empty()
   }
 
-  def getHomeById() = {
-    println("Calling getHomeById ")
-    //val urlExtension= "Home/GetHomeById"
-    //val token = readToken
-    //val reply = restCaller.get(eplBaseHost+urlExtension, token, Map("homeId"->token.currentHomeId.toString))
-    //reporter.write(jsonMapper.readValue(reply, classOf[getHomeById]))
+  def getMetrics() = {
+    println("Calling getMetrics ")
+    val urlExtension= "/api/ESS/GetSecondDataBySn?sys_sn="+sys_sn+"&noLoading=true"
+    val token = readToken
+    val postParameters = new util.ArrayList[NameValuePair](2);
+    postParameters.add(new BasicNameValuePair("sys_sn", sys_sn));
+    postParameters.add(new BasicNameValuePair("noLoading", "true"));
+    val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
+      withToken = true,
+      token = token.AccessToken,
+      withParameters = true,
+      parameters = postParameters)
+    reporter.write(jsonMapper.readValue(reply, classOf[getHomeById]))
   }
 
 

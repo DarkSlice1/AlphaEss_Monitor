@@ -39,10 +39,16 @@ object objectMapper {
                     TokenCreateTime: Date,
                     RefreshTokenKey: String)
 
+  class RestBody()
   case class LoginDetails(
                          username: String,
                          password: String
-                         )
+                         ) extends RestBody
+
+  case class SystemDetails(
+                            sys_sn: String,
+                            noLoading:String
+                          ) extends RestBody
 
   case class getHomeById(
                           data: data,
@@ -346,6 +352,11 @@ object objectMapper {
   object token {
     def empty(): token = {
       new token("",0, Date.from(Instant.now()),"")
+    }
+  }
+  object RestBody {
+    def empty(): RestBody = {
+      new RestBody()
     }
   }
 }
