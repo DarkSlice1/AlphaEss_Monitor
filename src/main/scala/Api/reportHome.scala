@@ -40,5 +40,7 @@ class reportHome {
     reporterKamon.poc_meter_l1.record((metrics.poc_meter_l1 * 10).toLong, Map("sn_sys" -> metrics.sn))
     reporterKamon.poc_meter_l2.record((metrics.poc_meter_l2 * 10).toLong, Map("sn_sys" -> metrics.sn))
     reporterKamon.poc_meter_l3.record((metrics.poc_meter_l3 * 10).toLong, Map("sn_sys" -> metrics.sn))
+
+    println("Metrics Pushed")
   }
 }

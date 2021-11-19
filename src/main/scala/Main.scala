@@ -1,24 +1,38 @@
 import com.typesafe.config.{Config, ConfigFactory}
-import Api.{alpha}
+import Api.alpha
 import kamon.Kamon
 import kamon.system.SystemMetrics
+
+import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
 import scala.util.{Failure, Success, Try}
 
 
 object Main extends App {
 
-  startKamon(ConfigFactory.load("application.conf"))
+  val conf1 = ConfigFactory.defaultApplication()
+  val conf2 = ConfigFactory.load()
 
-  new alpha(){
-    //run in a 10 second loop
-    try {
-      run()
-      Thread.sleep(10000)
-    }
-    catch {
-      case ex : Exception => println("ERROR Running - cleaning token, Exception : " + ex.toString);
+  startKamon(conf1.withFallback(conf2).resolve())
+
+  val task = new Runnable {
+  val app = new alpha()
+
+    override def run(): Unit = {
+      //run in a 10 second loop
+      try {
+        app.run()
+        //Thread.sleep(10000)
+      }
+      catch {
+        case ex: Exception => println("ERROR Running - cleaning token, Exception : " + ex.toString);
+      }
     }
   }
+
+  val ex = new ScheduledThreadPoolExecutor(1)
+  val f = ex.scheduleAtFixedRate(task, 1, 10, TimeUnit.SECONDS)
+  //f.cancel(false)
+
 
   private def startKamon(config: Config) = {
     val system = config.getBoolean("kamon.system-metrics.jvm.enabled")
