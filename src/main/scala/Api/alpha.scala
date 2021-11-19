@@ -48,7 +48,7 @@ class alpha {
           //token expired - lets refresh
           println("Token is Expired")
           //refreshToken()
-         //TODO figure out fresh toke command
+         //TODO figure out fresh token command
           Login();
           run()
         }
@@ -58,11 +58,11 @@ class alpha {
     }
   }
 
-  def Login():Login ={
+  def Login():LoginReply ={
     println("Calling Login()")
     val urlExtension= "/api/Account/Login"
     val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension,new LoginDetails(username,password))
-    val result: Login = jsonMapper.readValue(reply, classOf[Login])
+    val result: LoginReply = jsonMapper.readValue(reply, classOf[LoginReply])
 
     result.data match {
       case null => println("ERROR : " + result.toString)
@@ -93,7 +93,7 @@ class alpha {
       token = token.AccessToken,
       withParameters = true,
       parameters = postParameters)
-    reporter.write(jsonMapper.readValue(reply, classOf[getHomeById]))
+    reporter.write((jsonMapper.readValue(reply, classOf[SystemDetailsReply]).data))
   }
 
 

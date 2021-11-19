@@ -1,13 +1,7 @@
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.typesafe.config.{Config, ConfigFactory}
-import Api.objectMapper.{getHomeById, token}
-import Api.{alpha, reportHome}
-import com.fasterxml.jackson.annotation.JsonFormat
+import Api.{alpha}
 import kamon.Kamon
 import kamon.system.SystemMetrics
-
-import java.io.File
-import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 
@@ -25,8 +19,6 @@ object Main extends App {
       case ex : Exception => println("ERROR Running - cleaning token, Exception : " + ex.toString);
     }
   }
-
-
 
   private def startKamon(config: Config) = {
     val system = config.getBoolean("kamon.system-metrics.jvm.enabled")
