@@ -18,7 +18,7 @@ import scala.util.Try
 
 
 class alpha {
-  val reporter = new reportHome()
+  var reporter: Option[reportHome] = None
   val jsonMapper = new ObjectMapper()
   val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   df.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -93,7 +93,8 @@ class alpha {
       token = token.AccessToken,
       withParameters = true,
       parameters = postParameters)
-    reporter.write((jsonMapper.readValue(reply, classOf[SystemDetailsReply]).data))
+    val metrics = (jsonMapper.readValue(reply, classOf[SystemDetailsReply]).data)
+    reporter.getOrElse(new reportHome(metrics.sn)).write(metrics)
   }
 
 
