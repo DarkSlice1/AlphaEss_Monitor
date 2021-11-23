@@ -11,7 +11,7 @@ import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.util.EntityUtils
-
+import collection.JavaConversions._
 import java.util.Base64
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.{KeyFactory, MessageDigest}
@@ -23,7 +23,6 @@ class Tapo {
   val config: Config = ConfigFactory.load()
   var username = config.getString("tapo.username")
   var password = config.getString("tapo.password")
-  import collection.JavaConversions._
   var addresses = config.getStringList("tapo.addresses").toList(0) //TODO for now just one IP address
 
   val jsonMapper = new ObjectMapper()
