@@ -3,6 +3,8 @@ package metrics
 import kamon.Kamon
 import kamon.datadog.DatadogAgentReporter
 import kamon.metric.MeasurementUnit
+import kamon.tag.TagSet
+import kamon.util.UnifiedMap
 
 class KamonMetrics {
 
@@ -12,65 +14,65 @@ class KamonMetrics {
     val name: String
 
     def increment() = {
-      Kamon.counter(name).increment()
+      Kamon.counter(name).withoutTags().increment()
     }
 
-    def increment(tags: Option[Map[String, String]]) = {
-      if (tags.isDefined)
-        Kamon.counter(name).refine(tags.get).increment()
+    def increment(TagName:String, TagValue:String) = {
+      if (TagName.nonEmpty)
+        Kamon.counter(name).withTag(TagName,TagValue).increment()
       else
-        Kamon.counter(name).increment()
+        Kamon.counter(name).withoutTags().increment()
     }
 
-    def increment(amount: Long, tags: Option[Map[String, String]] = None) = {
-      if (tags.isDefined)
-        Kamon.counter(name).refine(tags.get).increment(amount)
+    def increment(amount: Long, TagName:String, TagValue:String) = {
+      if (TagName.nonEmpty)
+        Kamon.counter(name).withTag(TagName,TagValue).increment(amount)
       else
-        Kamon.counter(name).increment(amount)
+        Kamon.counter(name).withoutTags.increment(amount)
     }
 
     def remove() = {
-      Kamon.counter(name).remove()
+      Kamon.counter(name).withoutTags.remove()
     }
 
-    def remove(tags: Map[String, String]) = {
-      Kamon.counter(name).remove(tags)
+    def remove(TagName:String, TagValue:String) = {
+      Kamon.counter(name).withTag(TagName,TagValue).remove()
     }
   }
 
   trait Histogram {
     val name: String
 
-    def record(value: Long) = Kamon.histogram(name).record(value)
+    def record(value: Long) = Kamon.histogram(name).withoutTags().record(value)
 
-    def record(value: Long, tags: Map[String, String]) = Kamon.histogram(name).refine(tags).record(value)
+    def record(value: Long, TagName:String, TagValue:String) = Kamon.histogram(name).withTag(TagName,TagValue).record(value)
 
     def remove() = {
-      Kamon.histogram(name).remove()
+      Kamon.histogram(name).withoutTags().remove()
     }
 
-    def remove(tags: Map[String, String]) = {
-      Kamon.histogram(name).remove(tags)
+    def remove(TagName:String, TagValue:String) = {
+      Kamon.histogram(name).withTag(TagName,TagValue).remove()
     }
   }
 
   trait RangeSampler {
     val name: String
 
-    def increment() = Kamon.rangeSampler(name).increment()
+    def increment() = Kamon.rangeSampler(name).withoutTags().increment()
 
-    def increment(tags: Map[String, String]) = Kamon.rangeSampler(name).refine(tags).increment()
+    def increment(TagName:String, TagValue:String) = Kamon.rangeSampler(name).withTag(TagName,TagValue).increment()
 
-    def decrement() = Kamon.rangeSampler(name).decrement()
+    def decrement() = Kamon.rangeSampler(name).withoutTags().decrement()
 
-    def decrement(tags: Map[String, String]) = Kamon.rangeSampler(name).refine(tags).decrement()
+    def decrement(TagName:String, TagValue:String) = Kamon.rangeSampler(name).withTag(TagName,TagValue).decrement()
 
     def remove() = {
       Kamon.rangeSampler(name)
     }
 
-    def remove(tags: Map[String, String]) = {
-      Kamon.rangeSampler(name).remove(tags)
+    def remove(TagName:String, TagValue:String) = {
+      Kamon.rangeSampler(name).withTag(TagName,TagValue).remove
     }
   }
 
@@ -79,23 +81,23 @@ class KamonMetrics {
 
     def add() = Kamon.gauge(name)
 
-    def add(tags: Map[String, String]) = Kamon.gauge(name).refine(tags)
+    def add(TagName:String, TagValue:String) = Kamon.gauge(name).withTag(TagName,TagValue).update(0)
 
-    def add(value: MeasurementUnit, tags: Map[String, String]) = Kamon.gauge(name, value).refine(tags)
+    def add(value: Double, TagName:String, TagValue:String) = Kamon.gauge(name).withTag(TagName,TagValue).update(value)
 
-    def set(value: Long) = Kamon.gauge(name).set(value)
+    def set(value: Long) = Kamon.gauge(name).withoutTags().update(value)
 
-    def increment() = Kamon.gauge(name).increment()
+    def increment() = Kamon.gauge(name).withoutTags().increment()
 
-    def increment(value: Long) = Kamon.gauge(name).increment(value)
+    def increment(value: Long) = Kamon.gauge(name).withoutTags().increment(value)
 
-    def decrement() = Kamon.gauge(name).decrement()
+    def decrement() = Kamon.gauge(name).withoutTags().decrement()
 
-    def decrement(value: Long) = Kamon.gauge(name).decrement(value)
+    def decrement(value: Long) = Kamon.gauge(name).withoutTags().decrement(value)
 
-    def remove() = Kamon.gauge(name).remove()
+    def remove() = Kamon.gauge(name).withoutTags().remove()
 
-    def remove(tags: Map[String, String]) = Kamon.gauge(name).remove(tags)
+    def remove(TagName:String, TagValue:String) = Kamon.gauge(name).withTag(TagName,TagValue).remove()
 
   }
 
@@ -155,6 +157,19 @@ class KamonMetrics {
   object pbat extends Gauge {
     val name = "alpha.ess.pbat"
   }
+
+  object pbatCharge extends Counter {
+    val name = "alpha.ess.pbatCharge"
+  }
+
+  object pbatDischarge extends Counter {
+    val name = "alpha.ess.pbatDischarge"
+  }
+
+  object invertorPower extends Counter {
+    val name = "alpha.ess.invertorPower"
+  }
+
 
   object sva extends Gauge {
     val name = "alpha.ess.sva"

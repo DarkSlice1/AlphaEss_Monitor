@@ -3,7 +3,7 @@ package Api
 import java.time.Instant
 import java.util.Date
 
-object objectMapper {
+object AlphaObjectMapper {
 
   //{"code":200,"info":"Success","data":{"_id":"61954899033b4c578ca1cb89","createtime":"2021-11-17 18:23:21","uploadtime":"2021-11-17 18:22:42","sn":"AL2002321060150","ppv1":0.0,"ppv2":0.0,"ppv3":0.0,"ppv4":0.0,"preal_l1":0.0,"preal_l2":0.0,"preal_l3":0.0,"pmeter_l1":858.0,"pmeter_l2":0.0,"pmeter_l3":0.0,"pmeter_dc":0.0,"soc":11.6,"factory_flag":0,"pbat":0.0000,"sva":0.0,"varac":61.0,"vardc":0.0,"ev1_power":0,"ev1_chgenergy_real":0.0,"ev1_mode":0,"ev2_power":0,"ev2_chgenergy_real":0.0,"ev2_mode":0,"ev3_power":0,"ev3_chgenergy_real":0.0,"ev3_mode":0,"ev4_power":0,"ev4_chgenergy_real":0.0,"ev4_mode":0,"poc_meter_l1":0.0,"poc_meter_l2":0.0,"poc_meter_l3":0.0}}
 

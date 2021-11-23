@@ -1,13 +1,11 @@
 package Api
-
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.typesafe.config.{Config, ConfigFactory}
-import objectMapper._
+import AlphaObjectMapper._
 import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 import org.apache.http.NameValuePair
 import org.apache.http.message.BasicNameValuePair
-
 import java.io.{BufferedWriter, File, FileWriter}
 import java.text.SimpleDateFormat
 import java.time.{Instant, LocalDateTime, ZoneId}
@@ -33,7 +31,7 @@ class alpha {
   var sys_sn = config.getString("alphaess.system_sn")
 
   val eplBaseHost = "https://www.alphaess.com"
-  val tokenFile = new File(getClass.getResource("/lastToken.txt").getFile())
+  val tokenFile = new File(getClass.getResource("/AlphaLastToken.txt").getFile())
 
   def run(): Unit = {
     //Do we have an access token
@@ -97,13 +95,12 @@ class alpha {
     reporter.getOrElse(new reportHome(metrics.sn)).write(metrics)
   }
 
-
   def readToken() :token = {
     val bufferedSource = Source.fromFile(tokenFile)
     val token = Try (jsonMapper.readValue(bufferedSource.mkString, classOf[token]))
     bufferedSource.close
     //return token or an empty expired token
-    token.getOrElse(objectMapper.token.empty())
+    token.getOrElse(AlphaObjectMapper.token.empty())
   }
 
   def writeToken(token : Option[token])= {

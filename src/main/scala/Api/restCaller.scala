@@ -1,6 +1,6 @@
 package Api
 
-import Api.objectMapper.{LoginDetails, RestBody, token}
+import Api.AlphaObjectMapper.{LoginDetails, RestBody, token}
 import com.google.gson.Gson
 import org.apache.http.NameValuePair
 import org.apache.http.client.entity.UrlEncodedFormEntity
