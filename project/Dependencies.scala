@@ -22,13 +22,15 @@ object Dependencies {
 
   private val gson                  = "com.google.code.gson"            % "gson"                    % "2.8.9"
   private val apache_http           = "org.apache.httpcomponents"       % "httpclient"              % "4.5.13"
-private val cipher = "me.chanjar" % "weixin-java-cp" % "1.3.3"
+  private val squareup              = "com.squareup.okhttp"             % "okhttp"                  % "2.7.5"
+  private val bouncycastle          = "org.bouncycastle"                % "bcprov-ext-jdk16"        % "1.46"
+
 
   private val kamonDeps = Seq(kamon_core, kamon_akka, kamon_akka_remote, kamon_scala, kamon_datadog, kamon_system_metrics, aspectj_weaver)
   private val JSONDeps = Seq(jackson_core, jackson_databind, jackson_module, jackson_datatype_jdk8, json4s_base, json4s_jackson)
 
 
-  val coreDependencies =  kamonDeps ++ JSONDeps  ++ Seq(gson,apache_http,cipher)//++ Seq()
+  val coreDependencies =  kamonDeps ++ JSONDeps  ++ Seq(gson,apache_http,squareup,bouncycastle)//++ Seq()
 
   lazy val resolverSettings = Seq()
 }

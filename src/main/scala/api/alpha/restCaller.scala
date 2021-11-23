@@ -1,19 +1,18 @@
-package Api
+package api.alpha
 
-import Api.AlphaObjectMapper.{LoginDetails, RestBody, token}
+import api.alpha.AlphaObjectMapper.{RestBody, token}
 import com.google.gson.Gson
 import org.apache.http.NameValuePair
-import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.{HttpGet, HttpPost}
+import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.util.EntityUtils
-import org.apache.http.client.utils._
-import java.util.ArrayList
+
 import java.io.DataOutputStream
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util
+import java.util.ArrayList
 
 object restCaller {
 
@@ -46,7 +45,7 @@ object restCaller {
                  requestMethod: String = "POST",
                  connectTimeout: Int = timeout,
                  readTimeout: Int = timeout,
-                 parameters: String = "") : String = {
+                 parameters: String = ""): String = {
     import java.net.{HttpURLConnection, URL}
     val postData = parameters.getBytes(StandardCharsets.UTF_8)
     val postDataLength = postData.length;
@@ -85,8 +84,8 @@ object restCaller {
   }
 
 
-  def simpleRestPostCall(url: String, data:RestBody,
-                         token:String = "") :String = {
+  def simpleRestPostCall(url: String, data: RestBody,
+                         token: String = ""): String = {
     // convert it to a JSON string
     val json = new Gson().toJson(data)
     // create an HttpPost object
@@ -104,23 +103,23 @@ object restCaller {
   }
 
   def simpleRestGetCall(url: String,
-                         withParameters:Boolean = false,
-                         parameters:ArrayList[NameValuePair] = new ArrayList(),
-                         withToken:Boolean = false,
-                         token:String = "") :String = {
+                        withParameters: Boolean = false,
+                        parameters: ArrayList[NameValuePair] = new ArrayList(),
+                        withToken: Boolean = false,
+                        token: String = ""): String = {
 
     // create an HttpGet object
     val uri = url
     val get = new HttpGet(uri)
-    if(withParameters) {
+    if (withParameters) {
       new URIBuilder(get.getURI()).addParameters(parameters).build()
     }
 
     // set the Content-type
     get.setHeader("Content-type", "application/json")
     get.setHeader("Host", "www.alphaess.com")
-    if(withToken) {
-      get.setHeader("Authorization", "Bearer "+token)
+    if (withToken) {
+      get.setHeader("Authorization", "Bearer " + token)
     }
     //post.setEntity(new StringEntity(json))
     // send the get request
@@ -129,4 +128,3 @@ object restCaller {
     EntityUtils.toString(response.getEntity, "UTF-8")
   }
 }
-

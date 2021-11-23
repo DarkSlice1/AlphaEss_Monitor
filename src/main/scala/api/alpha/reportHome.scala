@@ -1,6 +1,6 @@
-package Api
+package api.alpha
 
-import Api.AlphaObjectMapper.AlphaMetrics
+import api.alpha.AlphaObjectMapper.AlphaMetrics
 import metrics.KamonMetrics
 
 class reportHome(syn_name: String) {

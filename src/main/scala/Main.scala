@@ -1,5 +1,7 @@
+import api.alpha.alpha
+import api.tapo.Tapo
 import com.typesafe.config.{Config, ConfigFactory}
-import Api.{Tapo, alpha}
+import api.tapo
 import com.google.gson.internal.bind.DefaultDateTypeAdapter.DateType
 import kamon.Kamon
 import kamon.system.SystemMetrics
@@ -20,12 +22,23 @@ object Main extends App {
   val alpha = new alpha()
   val tapo = new Tapo()
 
+    val config: Config = ConfigFactory.load()
+    var username = config.getString("tapo.username")
+    var password = config.getString("tapo.password")
+    import collection.JavaConversions._
+    var addresses = config.getString("tapo.addresses") //TODO for now just one IP address
+
+
     override def run(): Unit = {
       //run in a 10 second loop
       try {
         //alpha.run()
-        tapo.run()
-        println(Instant.now())
+
+        if(tapo.token.isEmpty) {
+          tapo.Setup()
+        }
+
+        tapo.Run()
       }
       catch {
         case ex: Exception => println("ERROR Running - cleaning token, Exception : " + ex.toString);

@@ -1,11 +1,13 @@
-package Api
+package api.alpha
+
+import api.alpha.AlphaObjectMapper._
+import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.typesafe.config.{Config, ConfigFactory}
-import AlphaObjectMapper._
-import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 import org.apache.http.NameValuePair
 import org.apache.http.message.BasicNameValuePair
+
 import java.io.{BufferedWriter, File, FileWriter}
 import java.text.SimpleDateFormat
 import java.time.{Instant, LocalDateTime, ZoneId}
