@@ -1,10 +1,5 @@
 package Api
 
-import com.google.gson.Gson
-import me.chanjar.weixin.common.util.crypto.PKCS7Encoder
-
-import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
-import java.security.{KeyPairGenerator, SecureRandom}
 import java.util.Base64
 import javax.crypto.{Cipher, SecretKey}
 import javax.crypto.spec.IvParameterSpec
@@ -36,45 +31,15 @@ object TapoObjectMapper {
                          )
 
   case class LoginPayloadParams(
-                                 username:String,
-                                 password:String
+                                 username: String,
+                                 password: String
                                )
 
   case class SecurePassthroughPayload(
-                                       method:String,
-                                       params :SecurePassthroughPayloadParams
+                                       method: String,
+                                       params: SecurePassthroughPayloadParams
                                      )
-  case class SecurePassthroughPayloadParams(request:String)
 
-  class C658a @throws[Exception]
-  (val bArr: Array[Byte], val bArr2: Array[Byte])
-  {
-    val key = new SecretKeySpec(bArr, "AES")
-    val iv = new IvParameterSpec(bArr2)
+  case class SecurePassthroughPayloadParams(request: String)
 
-    val f21776a_enc = Cipher.getInstance("AES/CBC/PKCS5Padding")
-    f21776a_enc.init(Cipher.ENCRYPT_MODE, key, iv)
-    val f21777b_dec = Cipher.getInstance("AES/CBC/PKCS5Padding")
-    f21777b_dec.init(Cipher.DECRYPT_MODE, key, iv)
-
-    def decrypt(cipherText: String): String = {
-      val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-      cipher.init(Cipher.DECRYPT_MODE, key, iv)
-      val plainText = cipher.doFinal(Base64.getDecoder.decode(cipherText))
-      new String(plainText)
-    }
-
-    def encrypt( input: String): String = {
-      val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-      cipher.init(Cipher.ENCRYPT_MODE, key, iv)
-      val cipherText = cipher.doFinal(input.getBytes)
-      Base64.getEncoder.encodeToString(cipherText)
-    }
-  }
-  class KspB64 {
-    def decode (bytes : Array[Byte] ): Array[Byte] =
-      {
-       Base64.getMimeDecoder().decode(bytes)
-      }
-  }
 }
