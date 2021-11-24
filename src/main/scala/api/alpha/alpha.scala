@@ -82,7 +82,7 @@ class alpha {
   }
 
   def getMetrics() = {
-    println("Calling getMetrics ")
+    //println("Calling getMetrics ")
     val urlExtension= "/api/ESS/GetSecondDataBySn?sys_sn="+sys_sn+"&noLoading=true"
     val token = readToken
     val postParameters = new util.ArrayList[NameValuePair](2);
@@ -94,6 +94,7 @@ class alpha {
       withParameters = true,
       parameters = postParameters)
     val metrics = (jsonMapper.readValue(reply, classOf[SystemDetailsReply]).data)
+    println("AlphaEss Metrics Received")
     reporter.getOrElse(new reportHome(metrics.sn)).write(metrics)
   }
 

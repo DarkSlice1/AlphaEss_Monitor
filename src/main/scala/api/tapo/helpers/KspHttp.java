@@ -24,14 +24,14 @@ public class KspHttp {
                 .build();
         boolean executed = false;
         Response response = null;
-        while (!executed) {
+        //while (!executed) {
             try {
                 response = okHttpClient.newCall(request).execute();
-                executed = true;
+           //     executed = true;
             } catch (IOException ex) {
-                KspDebug.out("Request failed, retry...");
+                KspDebug.out("Request failed, retry..."+ex.getMessage());
             }
-        }
+        //}
         return response;
 
     }

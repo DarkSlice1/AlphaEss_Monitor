@@ -1,14 +1,9 @@
 package metrics
 
 import kamon.Kamon
-import kamon.datadog.DatadogAgentReporter
-import kamon.metric.MeasurementUnit
-import kamon.tag.TagSet
-import kamon.util.UnifiedMap
 
-class KamonMetrics {
 
-//Kamon.addReporter(new DatadogAgentReporter)
+final class KamonMetrics() {
 
   trait Counter {
     val name: String
@@ -87,9 +82,13 @@ class KamonMetrics {
 
     def set(value: Long) = Kamon.gauge(name).withoutTags().update(value)
 
+    def set(value: Long, TagName:String, TagValue:String) = Kamon.gauge(name).withTag(TagName,TagValue).update(value)
+
     def increment() = Kamon.gauge(name).withoutTags().increment()
 
     def increment(value: Long) = Kamon.gauge(name).withoutTags().increment(value)
+
+    def increment(value: Long, TagName:String, TagValue:String) = Kamon.gauge(name).withTag(TagName,TagValue).increment(value)
 
     def decrement() = Kamon.gauge(name).withoutTags().decrement()
 
@@ -154,23 +153,22 @@ class KamonMetrics {
     val name = "alpha.ess.factory_flag"
   }
 
-  object pbat extends Gauge {
-    val name = "alpha.ess.pbat"
+  object pbatDischargeGauge extends Gauge {
+    val name = "alpha.ess.pbatDischargeGauge"
   }
-
-  object pbatCharge extends Counter {
-    val name = "alpha.ess.pbatCharge"
+  object pbatChargeGauge extends Gauge {
+    val name = "alpha.ess.pbatChargeGauge"
   }
-
-  object pbatDischarge extends Counter {
-    val name = "alpha.ess.pbatDischarge"
+  object pbatChargeCounter extends Counter {
+    val name = "alpha.ess.pbatChargeCounter"
+  }
+  object pbatDischargeCounter extends Counter {
+    val name = "alpha.ess.pbatDischargeCounter"
   }
 
   object invertorPower extends Counter {
     val name = "alpha.ess.invertorPower"
   }
-
-
   object sva extends Gauge {
     val name = "alpha.ess.sva"
   }
@@ -243,5 +241,11 @@ class KamonMetrics {
     val name = "alpha.ess.poc_meter_l3"
   }
 
+  object tapoEnergyUsageCounter extends Counter {
+    val name = "tapo.EnergyUsageCounter"
+  }
 
+  object tapoEnergyUsageGauge extends Gauge {
+    val name = "tapo.tapoEnergyUsageGauge"
+  }
 }

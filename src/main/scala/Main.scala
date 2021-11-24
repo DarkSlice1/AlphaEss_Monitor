@@ -1,5 +1,5 @@
 import api.alpha.alpha
-import api.tapo.Tapo
+import api.tapo.{Tapo, tapoMiddleMan}
 import com.typesafe.config.{Config, ConfigFactory}
 import api.tapo
 import com.google.gson.internal.bind.DefaultDateTypeAdapter.DateType
@@ -20,24 +20,12 @@ object Main extends App {
 
   val task = new Runnable {
   val alpha = new alpha()
-  val tapo = new Tapo()
-
-    val config: Config = ConfigFactory.load()
-    var username = config.getString("tapo.username")
-    var password = config.getString("tapo.password")
-    import collection.JavaConversions._
-    var addresses = config.getString("tapo.addresses") //TODO for now just one IP address
-
+  val tapo = new tapoMiddleMan(new Tapo())
 
     override def run(): Unit = {
       //run in a 10 second loop
       try {
-        //alpha.run()
-
-        if(tapo.token.isEmpty) {
-          tapo.Setup()
-        }
-
+        alpha.run()
         tapo.Run()
       }
       catch {

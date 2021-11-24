@@ -19,7 +19,8 @@ class reportHome(syn_name: String) {
   private val pmeter_dc = reporterKamon.pmeter_dc.add().withTag("sys_name",syn_name)
   private val soc = reporterKamon.soc.add().withTag("sys_name",syn_name)
   private val factory_flag = reporterKamon.factory_flag.add().withTag("sys_name",syn_name)
-  private val pbat = reporterKamon.pbat.add().withTag("sys_name",syn_name)
+  private val pbatChargeGauge = reporterKamon.pbatChargeGauge.add().withTag("sys_name",syn_name)
+  private val pbatDischargeGauge = reporterKamon.pbatDischargeGauge.add().withTag("sys_name",syn_name)
   private val sva = reporterKamon.sva.add().withTag("sys_name",syn_name)
   private val varac = reporterKamon.varac.add().withTag("sys_name",syn_name)
   private val vardc = reporterKamon.vardc.add().withTag("sys_name",syn_name)
@@ -54,7 +55,6 @@ class reportHome(syn_name: String) {
     pmeter_dc.update((metrics.pmeter_dc * 10).toLong)
     soc.update((metrics.soc * 10).toLong)
     factory_flag.update(metrics.factory_flag)
-    pbat.update((metrics.pbat * 10).toLong)
     sva.update((metrics.sva * 10).toLong)
     varac.update((metrics.varac * 10).toLong)
     vardc.update((metrics.vardc * 10).toLong)
@@ -75,15 +75,28 @@ class reportHome(syn_name: String) {
     poc_meter_l3.update((metrics.poc_meter_l3 * 10).toLong)
 
     if(metrics.pbat>0) {
-      reporterKamon.pbatDischarge.increment((metrics.pbat * 10).toLong,"sys_name", syn_name)
+      reporterKamon.pbatDischargeCounter.increment((metrics.pbat * 10).toLong,"sys_name", syn_name)
+      pbatDischargeGauge.update((metrics.pbat * 10).toLong)
     }
     else {
-      if(metrics.soc != 100)// dont increment if battery is full
-        reporterKamon.pbatCharge.increment(Math.abs((metrics.pbat * 10).toLong), "sys_name", syn_name)
+      // don't increment if battery charge as part of SOC if battery is full
+      if(metrics.soc != 100) {
+        reporterKamon.pbatChargeCounter.increment(Math.abs((metrics.pbat * 10).toLong), "sys_name", syn_name)
+      }
+      //battery still get charged when full (apparently)
+      pbatChargeGauge.update(Math.abs((metrics.pbat * 10).toLong))
     }
+
+    //zero metrics for charging / discharging if not active
+    if(metrics.pbat == 0)
+      {
+        pbatDischargeGauge.update(0)
+        pbatChargeGauge.update(0)
+      }
+
 
     reporterKamon.invertorPower.increment((metrics.varac * 10).toLong, "sys_name", syn_name)
 
-    println("Metrics Pushed")
+    //println("Metrics Pushed")
   }
 }

@@ -20,6 +20,7 @@ public class Tapo {
     public Map<String, String> token = new HashMap<>();
     public Map<String, HandshakeResponse> handshakeResponse = new HashMap<>();
 
+
     Config config = ConfigFactory.load();
     String email = config.getString("tapo.username");
     String password = config.getString("tapo.password");
@@ -78,11 +79,15 @@ public class Tapo {
         }
     }
 
-    public void Run() {
+    public Map<String, Integer> Run() {
+        Map<String, Integer> reply = new HashMap<>();
         for (Integer i = 0; i < addresses.size(); i++) {
             TapoFlow tapoFlow = new TapoFlow(addresses.get(i));
             KspDebug.out("Will try to Get Energy Info!");
-            KspDebug.out(addresses.get(i)+" = "+tapoFlow.getPlugEnergyUsage(c658a.get(addresses.get(i)), token.get(addresses.get(i)), handshakeResponse.get(addresses.get(i)).getCookie()));
-        }
+            Integer value = tapoFlow.getPlugEnergyUsage(c658a.get(addresses.get(i)), token.get(addresses.get(i)), handshakeResponse.get(addresses.get(i)).getCookie());
+            System.out.println("Tapo Energy: "+addresses.get(i)+" = "+value);
+            reply.put(addresses.get(i),value);
+       }
+        return reply;
     }
 }
