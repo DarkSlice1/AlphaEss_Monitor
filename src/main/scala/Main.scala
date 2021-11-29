@@ -27,6 +27,7 @@ object Main extends App {
       try {
         alpha.run()
         tapo.Run()
+        println(Instant.now())
       }
       catch {
         case ex: Exception => println("ERROR Running - cleaning token, Exception : " + ex.toString);

@@ -41,7 +41,7 @@ public class TapoFlow {
                     KspJson.convertToObj(responseBody)
             );
         } catch (IOException ex) {
-            KspDebug.out("Something went wrong: " + ex.getMessage());
+            System.out.println("Something went wrong: " + ex.getMessage());
             return null;
         }
     }
@@ -76,7 +76,7 @@ public class TapoFlow {
         }
         catch (Exception ex)
         {
-            KspDebug.out("Something went wrong! " + ex.getMessage());
+            System.out.println("Something went wrong! " + ex.getMessage());
         }
     }
 
@@ -113,7 +113,7 @@ public class TapoFlow {
         }
         catch (Exception ex)
         {
-            KspDebug.out("Something went wrong! " + ex.getMessage());
+            System.out.println("Something went wrong! " + ex.getMessage());
             return null;
         }
     }
@@ -147,7 +147,7 @@ public class TapoFlow {
         }
         catch (Exception ex)
         {
-            KspDebug.out("Something went wrong! " + ex.getMessage());
+            System.out.println("Something went wrong! " + ex.getMessage());
 
         }
     }
