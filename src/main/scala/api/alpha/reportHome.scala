@@ -42,37 +42,37 @@ class reportHome(syn_name: String) {
 
 
   def write(metrics : AlphaMetrics): Unit = {
-    ppv1.update((metrics.ppv1 * 10).toLong)
-    ppv2.update((metrics.ppv2 * 10).toLong)
-    ppv3.update((metrics.ppv3 * 10).toLong)
-    ppv4.update((metrics.ppv4 * 10).toLong)
-    preal_l1.update((metrics.preal_l1 * 10).toLong)
-    preal_l2.update((metrics.preal_l2 * 10).toLong)
-    preal_l3.update((metrics.preal_l3 * 10).toLong)
-    pmeter_l1.update((metrics.pmeter_l1 * 10).toLong)
-    pmeter_l2.update((metrics.pmeter_l2 * 10).toLong)
-    pmeter_l3.update((metrics.pmeter_l3 * 10).toLong)
-    pmeter_dc.update((metrics.pmeter_dc * 10).toLong)
-    soc.update((metrics.soc * 10).toLong)
+    ppv1.update(CheckForZero(metrics.ppv1))
+    ppv2.update(CheckForZero(metrics.ppv2))
+    ppv3.update(CheckForZero(metrics.ppv3))
+    ppv4.update(CheckForZero(metrics.ppv4))
+    preal_l1.update(CheckForZero(metrics.preal_l1))
+    preal_l2.update(CheckForZero(metrics.preal_l2))
+    preal_l3.update(CheckForZero(metrics.preal_l3))
+    pmeter_l1.update(CheckForZero(metrics.pmeter_l1))
+    pmeter_l2.update(CheckForZero(metrics.pmeter_l2))
+    pmeter_l3.update(CheckForZero(metrics.pmeter_l3))
+    pmeter_dc.update(CheckForZero(metrics.pmeter_dc))
+    soc.update(CheckForZero(metrics.soc))
     factory_flag.update(metrics.factory_flag)
-    sva.update((metrics.sva * 10).toLong)
-    varac.update((metrics.varac * 10).toLong)
-    vardc.update((metrics.vardc * 10).toLong)
+    sva.update(CheckForZero(metrics.sva))
+    varac.update(CheckForZero(metrics.varac))
+    vardc.update(CheckForZero(metrics.vardc))
     ev1_power.update(metrics.ev1_power)
-    ev1_chgenergy_real.update((metrics.ev1_chgenergy_real * 10).toLong)
+    ev1_chgenergy_real.update(CheckForZero(metrics.ev1_chgenergy_real))
     ev1_mode.update(metrics.ev1_mode)
     ev2_power.update(metrics.ev2_power)
-    ev2_chgenergy_real.update((metrics.ev2_chgenergy_real * 10).toLong)
+    ev2_chgenergy_real.update(CheckForZero(metrics.ev2_chgenergy_real))
     ev2_mode.update(metrics.ev2_mode)
     ev3_power.update(metrics.ev3_power)
-    ev3_chgenergy_real.update((metrics.ev3_chgenergy_real * 10).toLong)
+    ev3_chgenergy_real.update(CheckForZero(metrics.ev3_chgenergy_real))
     ev3_mode.update(metrics.ev3_mode)
     ev4_power.update(metrics.ev4_power)
-    ev4_chgenergy_real.update((metrics.ev4_chgenergy_real * 10).toLong)
+    ev4_chgenergy_real.update((metrics.ev4_chgenergy_real))
     ev4_mode.update(metrics.ev4_mode)
-    poc_meter_l1.update((metrics.poc_meter_l1 * 10).toLong)
-    poc_meter_l2.update((metrics.poc_meter_l2 * 10).toLong)
-    poc_meter_l3.update((metrics.poc_meter_l3 * 10).toLong)
+    poc_meter_l1.update(CheckForZero(metrics.poc_meter_l1))
+    poc_meter_l2.update(CheckForZero(metrics.poc_meter_l2))
+    poc_meter_l3.update(CheckForZero(metrics.poc_meter_l3))
 
     if(metrics.pbat>0) {
       reporterKamon.pbatDischargeCounter.increment((metrics.pbat * 10).toLong,"sys_name", syn_name)
@@ -93,10 +93,15 @@ class reportHome(syn_name: String) {
         pbatDischargeGauge.update(0)
         pbatChargeGauge.update(0)
       }
-
-
     reporterKamon.invertorPower.increment((metrics.varac * 10).toLong, "sys_name", syn_name)
 
     //println("Metrics Pushed")
+  }
+
+  def CheckForZero(value:Double):Long = {
+    if (value == 0)
+      0
+    else
+      (value * 10).toLong
   }
 }

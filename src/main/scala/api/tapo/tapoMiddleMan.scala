@@ -24,7 +24,13 @@ class tapoMiddleMan(tapoParamenter: Tapo) {
       val metrics: util.Map[String, Integer] = tapo.Run()
       metrics foreach { case (key, value) => {
         reporterKamon.tapoEnergyUsageCounter.increment((value / 100).toLong, "ipAddress", key)
-        reporterKamon.tapoEnergyUsageGauge.set((value / 100).toLong, "ipAddress", key)
+        if(value == 0)
+        {
+          reporterKamon.tapoEnergyUsageGauge.set(0, "ipAddress", key)
+        }
+        else {
+          reporterKamon.tapoEnergyUsageGauge.set((value / 100).toLong, "ipAddress", key)
+        }
       }
       }
     }
