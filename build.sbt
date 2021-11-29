@@ -3,6 +3,7 @@ import Dependencies._
 
 fork in (Test, run) := true
 
+
 lazy val root = Project("alphaess_monitor", file("."))
   .enablePlugins(JavaAppPackaging, UniversalPlugin)
   .settings(basicSettings: _*)

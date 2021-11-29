@@ -12,3 +12,5 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % sbtNativePackagerVersi
 addSbtPlugin("io.kamon" % "sbt-aspectj-runner" % sbtAspectJRunVersion)
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-aspectj" % "0.10.6")
+
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.15.0")

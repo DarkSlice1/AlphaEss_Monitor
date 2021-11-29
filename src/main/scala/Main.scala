@@ -1,10 +1,8 @@
 import api.alpha.alpha
 import api.tapo.{Tapo, tapoMiddleMan}
 import com.typesafe.config.{Config, ConfigFactory}
-import api.tapo
-import com.google.gson.internal.bind.DefaultDateTypeAdapter.DateType
 import kamon.Kamon
-import kamon.system.SystemMetrics
+
 
 import java.time.Instant
 import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
@@ -41,8 +39,8 @@ object Main extends App {
 
 
   private def startKamon(config: Config) = {
-    val system = config.getBoolean("kamon.system-metrics.jvm.enabled")
-    val host = config.getBoolean("kamon.system-metrics.host.enabled")
+   // val system = config.getBoolean("kamon.system-metrics.jvm.enabled")
+   // val host = config.getBoolean("kamon.system-metrics.host.enabled")
     println("Starting Kamon reporters...." + config.getStringList("kamon.reporters").toString)
     Kamon.init(config)
     Try(Kamon.reconfigure(config)) match {
