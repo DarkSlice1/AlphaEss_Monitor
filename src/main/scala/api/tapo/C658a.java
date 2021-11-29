@@ -1,6 +1,7 @@
 package api.tapo;
 
 import api.tapo.helpers.KspB64;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -13,9 +14,9 @@ public class C658a {
     public C658a(byte[] bArr, byte[] bArr2) throws Exception {
         SecretKeySpec secretKeySpec = new SecretKeySpec(bArr, "AES");
         IvParameterSpec ivParameterSpec = new IvParameterSpec(bArr2);
-        f21776a_enc = Cipher.getInstance("AES/CBC/PKCS7Padding");
+        f21776a_enc = Cipher.getInstance("AES/CBC/PKCS5Padding");
         f21776a_enc.init(1, secretKeySpec, ivParameterSpec);
-        f21777b_dec = Cipher.getInstance("AES/CBC/PKCS7Padding");
+        f21777b_dec = Cipher.getInstance("AES/CBC/PKCS5Padding");
         f21777b_dec.init(2, secretKeySpec, ivParameterSpec);
 
 

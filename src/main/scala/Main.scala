@@ -14,6 +14,16 @@ object Main extends App {
   val conf1 = ConfigFactory.defaultApplication()
   val conf2 = ConfigFactory.load()
 
+  println("Varaibles")
+  println("ALPHA_USERNAME = "+conf2.getString("alphaess.username"))
+  println("ALPHA_PASSWORD = "+conf2.getString("alphaess.password"))
+  println("ALPHA_SYS_SN = "+conf2.getString("alphaess.system_sn"))
+  println("TAPO_USERNAME = "+conf2.getString("tapo.username"))
+  println("TAPO_PASSWORD = "+conf2.getString("tapo.password"))
+  println("TAPO_ADDRESSES = "+conf2.getString("tapo.addresses"))
+  println("KAMON_DATADOG_API_KEY = "+conf2.getString("kamon.datadog.api.api-key"))
+
+
   startKamon(conf1.withFallback(conf2).resolve())
 
   val task = new Runnable {

@@ -41,10 +41,12 @@ public class Tapo {
             if(handshakeResponse.containsKey(addresses.get(i)))
             {
                 handshakeResponse.computeIfPresent(addresses.get(i), (k, v) -> tapoFlow.makeHandshake(kspKeyPair));
+                KspDebug.out("Updated handshake");
             }
             else
             {
                 handshakeResponse.put(addresses.get(i),tapoFlow.makeHandshake(kspKeyPair));
+                KspDebug.out("Created handshake");
             }
 
             String keyFromTapo = handshakeResponse.get(addresses.get(i)).getResponse().getAsJsonObject("result").get("key").getAsString();
@@ -55,10 +57,12 @@ public class Tapo {
             if(c658a.containsKey(addresses.get(i)))
             {
                 c658a.computeIfPresent(addresses.get(i), (k, v) -> KspEncryption.decodeTapoKey(keyFromTapo, kspKeyPair));
+                KspDebug.out("Updated c658a");
             }
             else
             {
                 c658a.put(addresses.get(i),KspEncryption.decodeTapoKey(keyFromTapo, kspKeyPair));
+                KspDebug.out("Created c658a");
             }
 
             KspDebug.out("Decoded!");
@@ -69,10 +73,12 @@ public class Tapo {
             if(token.containsKey(addresses.get(i)))
             {
                 token.computeIfPresent(addresses.get(i), (k, v) -> resp.getAsJsonObject("result").get("token").getAsString());
+                KspDebug.out("Updated token");
             }
             else
             {
                 token.put(addresses.get(i),resp.getAsJsonObject("result").get("token").getAsString());
+                KspDebug.out("Created token");
             }
             KspDebug.out("Got token: " + token.get(addresses.get(i)));
             tapoFlow.getPlugEnergyUsage(c658a.get(addresses.get(i)), token.get(addresses.get(i)), handshakeResponse.get(addresses.get(i)).getCookie());
