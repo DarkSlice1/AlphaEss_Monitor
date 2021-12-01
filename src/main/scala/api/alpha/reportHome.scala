@@ -13,7 +13,8 @@ class reportHome(syn_name: String) {
   private val preal_l1 = reporterKamon.preal_l1.add().withTag("sys_name",syn_name)
   private val preal_l2 = reporterKamon.preal_l2.add().withTag("sys_name",syn_name)
   private val preal_l3 = reporterKamon.preal_l3.add().withTag("sys_name",syn_name)
-  private val pmeter_l1 = reporterKamon.pmeter_l1.add().withTag("sys_name",syn_name)
+  private val gridPull_l1 = reporterKamon.gridPull_l1.add().withTag("sys_name",syn_name)
+  private val gridPush_l1 = reporterKamon.gridPush_l1.add().withTag("sys_name",syn_name)
   private val pmeter_l2 = reporterKamon.pmeter_l2.add().withTag("sys_name",syn_name)
   private val pmeter_l3 = reporterKamon.pmeter_l3.add().withTag("sys_name",syn_name)
   private val pmeter_dc = reporterKamon.pmeter_dc.add().withTag("sys_name",syn_name)
@@ -49,7 +50,6 @@ class reportHome(syn_name: String) {
     preal_l1.update(CheckForZero(metrics.preal_l1))
     preal_l2.update(CheckForZero(metrics.preal_l2))
     preal_l3.update(CheckForZero(metrics.preal_l3))
-    pmeter_l1.update(CheckForZero(metrics.pmeter_l1))
     pmeter_l2.update(CheckForZero(metrics.pmeter_l2))
     pmeter_l3.update(CheckForZero(metrics.pmeter_l3))
     pmeter_dc.update(CheckForZero(metrics.pmeter_dc))
@@ -73,6 +73,16 @@ class reportHome(syn_name: String) {
     poc_meter_l1.update(CheckForZero(metrics.poc_meter_l1))
     poc_meter_l2.update(CheckForZero(metrics.poc_meter_l2))
     poc_meter_l3.update(CheckForZero(metrics.poc_meter_l3))
+
+    if(metrics.pmeter_l1 >0)
+      {
+        gridPull_l1.update(CheckForZero(metrics.pmeter_l1))
+        gridPush_l1.update(0)
+      }
+      else {
+      gridPush_l1.update(CheckForZero(metrics.pmeter_l1))
+      gridPull_l1.update(0)
+    }
 
     if(metrics.pbat>0) {
       reporterKamon.pbatDischargeCounter.increment((metrics.pbat * 10).toLong,"sys_name", syn_name)
