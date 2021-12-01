@@ -56,6 +56,9 @@ class reportHome(syn_name: String) {
     ppv2.update(CheckForZero(metrics.ppv2))
     ppv3.update(CheckForZero(metrics.ppv3))
     ppv4.update(CheckForZero(metrics.ppv4))
+
+    //preal_l1 is the output of the inverter "Inverter L1 real-time output power, this parameter has positive and negative"
+    //should be equal to the PPV's minus the discharge of the battery
     preal_l1.update(CheckForZero(metrics.preal_l1))
     preal_l2.update(CheckForZero(metrics.preal_l2))
     preal_l3.update(CheckForZero(metrics.preal_l3))
@@ -65,6 +68,9 @@ class reportHome(syn_name: String) {
     soc.update(CheckForZero(metrics.soc))
     factory_flag.update(metrics.factory_flag)
     sva.update(CheckForZero(metrics.sva))
+
+    //guessing this is the total Wattage the inverter is pulling to do its job ???
+    //need to confirm - not sure how - CT-Clamp???
     varac.update(CheckForZero(metrics.varac))
     vardc.update(CheckForZero(metrics.vardc))
     ev1_power.update(metrics.ev1_power)
