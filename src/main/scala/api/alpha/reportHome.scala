@@ -42,7 +42,7 @@ class reportHome(syn_name: String) {
   private val poc_meter_l3 = reporterKamon.poc_meter_l3.add().withTag("sys_name",syn_name)
   private val houseLoad = reporterKamon.houseLoad.add().withTag("sys_name",syn_name)
 
-
+//https://github.com/liqun2013/alphaess-webapi/blob/93539b332f2be17240f7359be2f0c51deda06d6c/AlphaEssWeb.Api_V2.Model/Dtos/PowerDataDto.cs
   def write(metrics : AlphaMetrics): Unit = {
 
     //House load calc
