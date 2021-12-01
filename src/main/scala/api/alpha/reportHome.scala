@@ -40,9 +40,18 @@ class reportHome(syn_name: String) {
   private val poc_meter_l1 = reporterKamon.poc_meter_l1.add().withTag("sys_name",syn_name)
   private val poc_meter_l2 = reporterKamon.poc_meter_l2.add().withTag("sys_name",syn_name)
   private val poc_meter_l3 = reporterKamon.poc_meter_l3.add().withTag("sys_name",syn_name)
+  private val houseLoad = reporterKamon.houseLoad.add().withTag("sys_name",syn_name)
 
 
   def write(metrics : AlphaMetrics): Unit = {
+
+    //House load calc
+    val solarGeneration = (metrics.ppv1+metrics.ppv2+metrics.ppv3+metrics.ppv4)
+    val gridConsumption = (metrics.pmeter_l1+metrics.pmeter_l2+metrics.pmeter_l3)
+    val batteryConsumption = metrics.pbat
+
+    houseLoad.update(CheckForZero(solarGeneration + gridConsumption + batteryConsumption))
+
     ppv1.update(CheckForZero(metrics.ppv1))
     ppv2.update(CheckForZero(metrics.ppv2))
     ppv3.update(CheckForZero(metrics.ppv3))

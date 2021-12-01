@@ -245,6 +245,10 @@ final class KamonMetrics() {
     val name = "alpha.ess.poc_meter_l3"
   }
 
+  object houseLoad extends Gauge {
+    val name = "alpha.ess.houseLoad"
+  }
+
   object tapoEnergyUsageCounter extends Counter {
     val name = "tapo.EnergyUsageCounter"
   }
@@ -252,4 +256,5 @@ final class KamonMetrics() {
   object tapoEnergyUsageGauge extends Gauge {
     val name = "tapo.tapoEnergyUsageGauge"
   }
+
 }
