@@ -16,8 +16,8 @@ public class KspHttp {
 
         this.okHttpClient = new OkHttpClient();
         //force a fail fast here - its all local network calls.
-        this.okHttpClient.setConnectTimeout(500, TimeUnit.MILLISECONDS);
-        this.okHttpClient.setReadTimeout(500, TimeUnit.MILLISECONDS);
+        this.okHttpClient.setConnectTimeout(1000, TimeUnit.MILLISECONDS);
+        this.okHttpClient.setReadTimeout(1000, TimeUnit.MILLISECONDS);
     }
 
     public Response makePost(String url, String json, String cookie) throws IOException {
