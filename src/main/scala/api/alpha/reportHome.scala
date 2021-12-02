@@ -99,28 +99,28 @@ class reportHome(syn_name: String) {
       gridPull_l1.update(0)
     }
 
+    //discharging battery
     if(metrics.pbat>0) {
       reporterKamon.pbatDischargeCounter.increment((metrics.pbat * 10).toLong,"sys_name", syn_name)
       pbatDischargeGauge.update((metrics.pbat * 10).toLong)
+      pbatChargeGauge.update(0)
     }
-    else {
+    //charging battery
+    else if(metrics.pbat<0) {
       // don't increment if battery charge as part of SOC if battery is full
       if(metrics.soc != 100) {
         reporterKamon.pbatChargeCounter.increment(Math.abs((metrics.pbat * 10).toLong), "sys_name", syn_name)
       }
       //battery still get charged when full (apparently)
       pbatChargeGauge.update(Math.abs((metrics.pbat * 10).toLong))
+      pbatDischargeGauge.update(0)
     }
-
     //zero metrics for charging / discharging if not active
-    if(metrics.pbat == 0)
-      {
-        pbatDischargeGauge.update(0)
-        pbatChargeGauge.update(0)
-      }
+    else {
+      pbatDischargeGauge.update(0)
+      pbatChargeGauge.update(0)
+    }
     reporterKamon.invertorPower.increment((metrics.varac * 10).toLong, "sys_name", syn_name)
-
-    //println("Metrics Pushed")
   }
 
   def CheckForZero(value:Double):Long = {

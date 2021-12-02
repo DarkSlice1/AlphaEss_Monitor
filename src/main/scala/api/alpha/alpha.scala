@@ -59,7 +59,6 @@ class alpha {
   }
 
   def Login():LoginReply ={
-    println("Calling Login()")
     val urlExtension= "/api/Account/Login"
     val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension,new LoginDetails(username,password))
     val result: LoginReply = jsonMapper.readValue(reply, classOf[LoginReply])
