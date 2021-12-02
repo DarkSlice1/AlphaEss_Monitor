@@ -31,7 +31,7 @@ class tapoMiddleMan(tapoParamenter: Tapo) {
       }
       catch {
         case ex: Exception =>
-          println("ERROR Tapo  : " + address + " - could not get token: " + ex.toString)
+          println("Tapo Energy: " + address + " = " + ex.getMessage)
           tapo.token.put(address, "")
       }
     }
@@ -42,18 +42,20 @@ class tapoMiddleMan(tapoParamenter: Tapo) {
 
     addresses foreach { case (address) => {
       try {
-        val energyUsage = tapo.Run(address)
-        reporterKamon.tapoEnergyUsageCounter.increment((energyUsage / 100).toLong, "ipAddress", address)
-        if (energyUsage == 0) {
-          reporterKamon.tapoEnergyUsageGauge.set(0, "ipAddress", address)
-        }
-        else {
-          reporterKamon.tapoEnergyUsageGauge.set((energyUsage / 100).toLong, "ipAddress", address)
+        if (tapo.token.getOrElse(address, "") != "") {
+          val energyUsage = tapo.Run(address)
+          reporterKamon.tapoEnergyUsageCounter.increment((energyUsage / 100).toLong, "ipAddress", address)
+          if (energyUsage == 0) {
+            reporterKamon.tapoEnergyUsageGauge.set(0, "ipAddress", address)
+          }
+          else {
+            reporterKamon.tapoEnergyUsageGauge.set((energyUsage / 100).toLong, "ipAddress", address)
+          }
         }
       }
       catch {
         case ex: Exception =>
-          println("ERROR Tapo : "+address+" - could not get Energy Reading : " + ex.toString)
+          println("Tapo Energy: "+address+" = " + ex.getMessage)
           tapo.token.put(address,"")
       }
     }

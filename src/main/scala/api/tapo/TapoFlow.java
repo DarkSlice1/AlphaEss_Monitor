@@ -80,7 +80,7 @@ public class TapoFlow {
         }
     }
 
-    public Integer getPlugEnergyUsage(C658a c658a, String token, String cookie){
+    public Integer getPlugEnergyUsage(C658a c658a, String token, String cookie) throws Exception {
         try{
             DeviceInfoParams deviceInfoParams = new DeviceInfoParams();
             TPIoTRequest<DeviceInfoParams> tpIoTRequest = new TPIoTRequest<>();
@@ -113,8 +113,7 @@ public class TapoFlow {
         }
         catch (Exception ex)
         {
-            System.out.println("Something went wrong! " + ex.getMessage());
-            return null;
+            throw new Exception("Could not Get Energy reading : "+ ex.getMessage());
         }
     }
 
