@@ -25,9 +25,15 @@ class tapoMiddleMan(tapoParamenter: Tapo) {
 
     var token = new util.HashMap[String, String]
     addresses foreach { case (address) =>
-
-      if (tapo.token.getOrElse(address, "") == "") {
-        tapo.Setup(username, password, address)
+      try {
+        if (tapo.token.getOrElse(address, "") == "") {
+          tapo.Setup(username, password, address)
+        }
+      }
+      catch {
+        case ex: Exception =>
+          println("ERROR Tapo  : " + address + " - could not get token: " + ex.toString)
+          tapo.token.put(address, "")
       }
     }
 
