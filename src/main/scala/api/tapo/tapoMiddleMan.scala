@@ -53,7 +53,7 @@ class tapoMiddleMan(tapoParamenter: Tapo) {
       }
       catch {
         case ex: Exception =>
-          println("ERROR Tapo : "+address+" - clearing its token : " + ex.toString)
+          println("ERROR Tapo : "+address+" - could not get Energy Reading : " + ex.toString)
           tapo.token.put(address,"")
       }
     }
