@@ -23,7 +23,6 @@ class tapoMiddleMan(tapoParamenter: Tapo) {
     val password = config.getString("tapo.password")
     val addresses: Array[String] = config.getString("tapo.addresses").split(",")
 
-    var token = new util.HashMap[String, String]
     addresses foreach { case (address) =>
       try {
         if (tapo.token.getOrElse(address, "") == "") {
