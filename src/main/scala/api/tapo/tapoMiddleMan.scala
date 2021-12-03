@@ -32,7 +32,10 @@ class tapoMiddleMan(tapoParamenter: Tapo) {
       catch {
         case ex: Exception =>
           println("Tapo Energy: " + address + " = " + ex.getMessage)
-          tapo.token.put(address, "")
+          //reset the device to start over
+          tapo.token.remove(address)
+          tapo.c658a.remove(address)
+          tapo.handshakeResponse.remove(address)
       }
     }
 
