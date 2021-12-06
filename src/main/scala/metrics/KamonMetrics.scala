@@ -101,7 +101,7 @@ final class KamonMetrics() {
   }
 
   //Forecasting Solar Generation
-  object forecasting_todaysGeneration extends Counter {
+  object forecasting_todaysGeneration extends Gauge {
     val name = "forecasting.todaysGeneration"
   }
 
