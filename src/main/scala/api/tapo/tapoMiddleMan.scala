@@ -1,24 +1,18 @@
 package api.tapo
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
 import metrics.KamonMetrics
 
-import java.util
-import java.util.{Arrays, HashMap, List, Map}
 import scala.collection.JavaConversions.mapAsScalaMap
-import scala.reflect.internal.util.Statistics.canEnable.||
 
 
-class tapoMiddleMan(tapoParamenter: Tapo) {
+
+class tapoMiddleMan(tapoParamenter: Tapo, config :Config) {
 
   val reporterKamon = new KamonMetrics()
   val tapo = tapoParamenter
 
-  val aquarium_tapoEnergyUsage = reporterKamon.tapoEnergyUsageGauge.add().withTag("sys_name","")
-
   def Run(): Unit = {
-
-    val config = ConfigFactory.load
     val username = config.getString("tapo.username")
     val password = config.getString("tapo.password")
     val addresses: Array[String] = config.getString("tapo.addresses").split(",")
@@ -39,10 +33,6 @@ class tapoMiddleMan(tapoParamenter: Tapo) {
       }
     }
 
-
-
-    //TODO Error handling
-
     addresses foreach { case (address) => {
       try {
         if (tapo.token.getOrElse(address, "") != "") {
@@ -59,7 +49,9 @@ class tapoMiddleMan(tapoParamenter: Tapo) {
       catch {
         case ex: Exception =>
           println("Tapo Energy: "+address+" = " + ex.getMessage)
-          tapo.token.put(address,"")
+          tapo.token.remove(address)
+          tapo.c658a.remove(address)
+          tapo.handshakeResponse.remove(address)
       }
     }
     }

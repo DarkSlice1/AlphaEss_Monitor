@@ -50,12 +50,17 @@ class reportHome(syn_name: String) {
     val gridConsumption = (metrics.pmeter_l1+metrics.pmeter_l2+metrics.pmeter_l3)
     val batteryConsumption = metrics.pbat
 
-    houseLoad.update(CheckForZero(solarGeneration + gridConsumption + batteryConsumption))
+    //Handle Grid flow Metrics
+    GridFlowMetrics(metrics, gridConsumption)
+    //Handle Battery flow Metrics
+    BatteryFlowMetrics(metrics)
+    //handle Solar Generator
+    SolarFlowMetrics(metrics,solarGeneration)
 
-    ppv1.update(CheckForZero(metrics.ppv1))
-    ppv2.update(CheckForZero(metrics.ppv2))
-    ppv3.update(CheckForZero(metrics.ppv3))
-    ppv4.update(CheckForZero(metrics.ppv4))
+    houseLoad.update(CheckForZero(solarGeneration + gridConsumption + batteryConsumption))
+    reporterKamon.invertorPower.increment((metrics.varac * 10).toLong, "sys_name", syn_name)
+
+    //Misc Metrics Below
 
     //preal_l1 is the output of the inverter "Inverter L1 real-time output power, this parameter has positive and negative"
     //should be equal to the PPV's minus the discharge of the battery
@@ -88,39 +93,6 @@ class reportHome(syn_name: String) {
     poc_meter_l1.update(CheckForZero(metrics.poc_meter_l1))
     poc_meter_l2.update(CheckForZero(metrics.poc_meter_l2))
     poc_meter_l3.update(CheckForZero(metrics.poc_meter_l3))
-
-    if(metrics.pmeter_l1 >0)
-      {
-        gridPull_l1.update(CheckForZero(metrics.pmeter_l1))
-        gridPush_l1.update(0)
-      }
-      else {
-      gridPush_l1.update(CheckForZero(metrics.pmeter_l1))
-      gridPull_l1.update(0)
-    }
-
-    //discharging battery
-    if(metrics.pbat>0) {
-      reporterKamon.pbatDischargeCounter.increment((metrics.pbat * 10).toLong,"sys_name", syn_name)
-      pbatDischargeGauge.update((metrics.pbat * 10).toLong)
-      pbatChargeGauge.update(0)
-    }
-    //charging battery
-    else if(metrics.pbat<0) {
-      // don't increment if battery charge as part of SOC if battery is full
-      if(metrics.soc != 100) {
-        reporterKamon.pbatChargeCounter.increment(Math.abs((metrics.pbat * 10).toLong), "sys_name", syn_name)
-      }
-      //battery still get charged when full (apparently)
-      pbatChargeGauge.update(Math.abs((metrics.pbat * 10).toLong))
-      pbatDischargeGauge.update(0)
-    }
-    //zero metrics for charging / discharging if not active
-    else {
-      pbatDischargeGauge.update(0)
-      pbatChargeGauge.update(0)
-    }
-    reporterKamon.invertorPower.increment((metrics.varac * 10).toLong, "sys_name", syn_name)
   }
 
   def CheckForZero(value:Double):Long = {
@@ -128,5 +100,61 @@ class reportHome(syn_name: String) {
       0
     else
       (value * 10).toLong
+  }
+
+  def GridFlowMetrics(metrics: AlphaMetrics, gridConsumption: Double): Unit = {
+    //Grid Push or Pull ?
+    if (metrics.pmeter_l1 > 0) {
+      //update our counter for tracking grid pull
+      reporterKamon.totalGridConsumption.increment(CheckForZero(gridConsumption * 10), "sys_name", syn_name)
+      //updage our gauge for tracking grid pull
+      gridPull_l1.update(CheckForZero(metrics.pmeter_l1))
+      // set our grid push to 0
+      gridPush_l1.update(0)
+    } else {
+      //update our counter for tracking grid pull
+      reporterKamon.totalGridPush.increment(CheckForZero(gridConsumption * 10), "sys_name", syn_name)
+      //update our counter for tracking grid push
+      gridPush_l1.update(CheckForZero(metrics.pmeter_l1))
+      // set our grid pull to 0
+      gridPull_l1.update(0)
+    }
+  }
+
+  def BatteryFlowMetrics(metrics: AlphaMetrics): Unit = {
+    //discharging battery
+    if (metrics.pbat > 0) {
+      reporterKamon.pbatDischargeCounter.increment((metrics.pbat * 10).toLong, "sys_name", syn_name)
+      pbatDischargeGauge.update((metrics.pbat * 10).toLong)
+      pbatChargeGauge.update(0)
+    }
+
+    //charging battery
+    else if (metrics.pbat < 0) {
+      // don't increment if battery charge as part of SOC if battery is full
+      if (metrics.soc != 100) {
+        reporterKamon.pbatChargeCounter.increment(Math.abs((metrics.pbat * 10).toLong), "sys_name", syn_name)
+      }
+      //battery still get charged when full (apparently)
+      pbatChargeGauge.update(Math.abs((metrics.pbat * 10).toLong))
+      pbatDischargeGauge.update(0)
+    }
+
+    //zero metrics for charging / discharging if not active
+    else {
+      pbatDischargeGauge.update(0)
+      pbatChargeGauge.update(0)
+    }
+  }
+
+  def SolarFlowMetrics(metrics: AlphaMetrics, solarGeneration : Double): Unit =
+  {
+    ppv1.update(CheckForZero(metrics.ppv1))
+    ppv2.update(CheckForZero(metrics.ppv2))
+    ppv3.update(CheckForZero(metrics.ppv3))
+    ppv4.update(CheckForZero(metrics.ppv4))
+
+    reporterKamon.totalSolarGeneration.increment(CheckForZero(solarGeneration * 10),"sys_name", syn_name)
+
   }
 }

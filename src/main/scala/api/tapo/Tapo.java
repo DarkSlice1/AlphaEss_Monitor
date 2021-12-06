@@ -4,15 +4,9 @@ import com.google.gson.JsonObject;
 import api.tapo.domain.HandshakeResponse;
 import api.tapo.domain.KspKeyPair;
 import api.tapo.helpers.KspDebug;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import java.io.IOException;
 import java.security.*;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 

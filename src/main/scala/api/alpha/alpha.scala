@@ -17,7 +17,7 @@ import scala.io.Source
 import scala.util.Try
 
 
-class alpha {
+class alpha(config: Config) {
   var reporter: Option[reportHome] = None
   val jsonMapper = new ObjectMapper()
   val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -27,7 +27,7 @@ class alpha {
   jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
   jsonMapper.setDateFormat(df);
 
-  val config: Config = ConfigFactory.load()
+
   var username = config.getString("alphaess.username")
   var password = config.getString("alphaess.password")
   var sys_sn = config.getString("alphaess.system_sn")

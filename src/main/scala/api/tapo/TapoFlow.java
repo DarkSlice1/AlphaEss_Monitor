@@ -22,7 +22,6 @@ public class TapoFlow {
 
     }
 
-
     public HandshakeResponse makeHandshake(KspKeyPair kspKeyPair) {
         HandshakeParams handshakeParams = new HandshakeParams();
         handshakeParams.setKey(kspKeyPair.getPublicKey());
