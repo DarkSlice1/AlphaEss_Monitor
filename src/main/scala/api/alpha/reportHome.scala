@@ -95,6 +95,7 @@ class reportHome(syn_name: String) {
     poc_meter_l3.update(CheckForZero(metrics.poc_meter_l3))
   }
 
+  //seems metrics are given in double we * 10 here and divide by 10 on DD
   def CheckForZero(value:Double):Long = {
     if (value == 0)
       0
