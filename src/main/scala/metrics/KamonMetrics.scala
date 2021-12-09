@@ -179,6 +179,9 @@ final class KamonMetrics() {
   object preal_l3 extends Gauge {
     val name = "alpha.ess.preal_l3"
   }
+  object pmeter_l1 extends Gauge {
+    val name = "alpha.ess.pmeter_l1"
+  }
   object pmeter_l2 extends Gauge {
     val name = "alpha.ess.pmeter_l2"
   }
