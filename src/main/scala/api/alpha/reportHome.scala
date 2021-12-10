@@ -3,9 +3,8 @@ package api.alpha
 import api.alpha.AlphaObjectMapper.AlphaMetrics
 import metrics.KamonMetrics
 
-class reportHome(syn_name: String) {
-
-  val reporterKamon = new KamonMetrics()
+class reportHome(syn_name: String, reporterKamon : KamonMetrics) {
+  var DailySolarGeneration : Long = 0
   private val ppv1 = reporterKamon.ppv1.add().withTag("sys_name",syn_name)
   private val ppv2 = reporterKamon.ppv2.add().withTag("sys_name",syn_name)
   private val ppv3 = reporterKamon.ppv3.add().withTag("sys_name",syn_name)
@@ -43,7 +42,7 @@ class reportHome(syn_name: String) {
   private val poc_meter_l3 = reporterKamon.poc_meter_l3.add().withTag("sys_name",syn_name)
   private val houseLoad = reporterKamon.houseLoad.add().withTag("sys_name",syn_name)
 
-//https://github.com/liqun2013/alphaess-webapi/blob/93539b332f2be17240f7359be2f0c51deda06d6c/AlphaEssWeb.Api_V2.Model/Dtos/PowerDataDto.cs
+  //https://github.com/liqun2013/alphaess-webapi/blob/93539b332f2be17240f7359be2f0c51deda06d6c/AlphaEssWeb.Api_V2.Model/Dtos/PowerDataDto.cs
   def write(metrics : AlphaMetrics): Unit = {
 
     //House load calc
@@ -157,7 +156,7 @@ class reportHome(syn_name: String) {
     ppv3.update(CheckForZero(metrics.ppv3))
     ppv4.update(CheckForZero(metrics.ppv4))
 
+    DailySolarGeneration += CheckForZero(solarGeneration)
     reporterKamon.totalSolarGeneration.increment(CheckForZero(solarGeneration),"sys_name", syn_name)
-
   }
 }

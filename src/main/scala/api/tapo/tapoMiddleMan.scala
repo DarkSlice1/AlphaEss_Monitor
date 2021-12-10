@@ -7,9 +7,8 @@ import scala.collection.JavaConversions.mapAsScalaMap
 
 
 
-class tapoMiddleMan(tapoParamenter: Tapo, config :Config) {
+class tapoMiddleMan(tapoParamenter: Tapo, config :Config, reporterKamon : KamonMetrics) {
 
-  val reporterKamon = new KamonMetrics()
   val tapo = tapoParamenter
 
   def Run(): Unit = {

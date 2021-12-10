@@ -11,9 +11,7 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.util.EntityUtils
 
-class SolarForecast(config : Config) {
-
-  val reporterKamon = new KamonMetrics()
+class SolarForecast(config : Config, reporterKamon : KamonMetrics) {
 
   val lat = config.getString("forcasting.lat")
   val lon = config.getString("forcasting.lon")
@@ -26,9 +24,9 @@ class SolarForecast(config : Config) {
   jsonMapper.registerModule(new JavaTimeModule())
   jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
+  private var todaysForecast = 0
 
   def getTodaysForcast():Integer ={
-
       // create an HttpGet object
       val uri = "https://api.forecast.solar/estimate/watthours/day/"+lat+"/"+lon+"/"+dec+"/"+az+"/"+kwh
       val get = new HttpGet(uri)
@@ -42,13 +40,22 @@ class SolarForecast(config : Config) {
       val reply = EntityUtils.toString(response.getEntity, "UTF-8")
 
       //due to the bad json format received from the service (dynamic name values), mapping to too much work for now
-      val todaysForcast = jsonMapper.readTree(reply).get("result").elements().next().asInt()
-      println("Forecaster Generation for today is :"+todaysForcast+" watts")
-      todaysForcast
+      todaysForecast = jsonMapper.readTree(reply).get("result").elements().next().asInt()
+      println("Forecaster Generation for today is :"+todaysForecast+" watts")
+    todaysForecast
     }
 
   def publishTodaysForcast(value: Integer) = {
     reporterKamon.forecasting_todaysGeneration.set(value.longValue())
+  }
+
+  def RunNightlySummaryMetrics(totalSolarGeneration: Long): Unit =
+  {
+    val  accuracy = (todaysForecast/totalSolarGeneration)*100
+    reporterKamon.forecasting_todaysAccuracy.set(accuracy)
+
+    //reset the value
+    todaysForecast = 0
   }
 
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.typesafe.config.{Config, ConfigFactory}
+import metrics.KamonMetrics
 import org.apache.http.NameValuePair
 import org.apache.http.message.BasicNameValuePair
 
@@ -17,8 +18,8 @@ import scala.io.Source
 import scala.util.Try
 
 
-class alpha(config: Config) {
-  var reporter: Option[reportHome] = None
+class alpha(config: Config, reporterKamon : KamonMetrics) {
+
   val jsonMapper = new ObjectMapper()
   val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   df.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -31,6 +32,8 @@ class alpha(config: Config) {
   var username = config.getString("alphaess.username")
   var password = config.getString("alphaess.password")
   var sys_sn = config.getString("alphaess.system_sn")
+
+  var reporter = new reportHome(sys_sn,reporterKamon)
 
   val eplBaseHost = "https://www.alphaess.com"
   val tokenFile = new File(getClass.getResource("/AlphaLastToken.txt").getFile())
@@ -94,7 +97,7 @@ class alpha(config: Config) {
       parameters = postParameters)
     val metrics = (jsonMapper.readValue(reply, classOf[SystemDetailsReply]).data)
     println("AlphaEss Metrics Received")
-    reporter.getOrElse(new reportHome(metrics.sn)).write(metrics)
+    reporter.write(metrics)
   }
 
   def readToken() :token = {
@@ -116,4 +119,8 @@ class alpha(config: Config) {
     bw.close()
   }
 
+  def resetDailyCounter(): Unit =
+  {
+    reporter.DailySolarGeneration = 0
+  }
 }
