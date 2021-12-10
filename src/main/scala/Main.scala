@@ -6,7 +6,7 @@ import kamon.Kamon
 import metrics.KamonMetrics
 
 import java.time.temporal.ChronoUnit
-import java.time.{Duration, Instant, LocalDateTime, OffsetDateTime, ZoneOffset}
+import java.time.{Duration, Instant, LocalDateTime, OffsetDateTime, ZoneOffset, temporal}
 import java.util.{Date, concurrent}
 import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
 import scala.util.{Failure, Success, Try}
@@ -54,7 +54,7 @@ object Main extends App {
     }
   }
 
-  //runs at 1 am each day
+  //runs at 1 am each day - get forecast
   val GatherSolarForecastMetrics = new Runnable {
     override def run(): Unit = {
 
@@ -69,12 +69,13 @@ object Main extends App {
     }
   }
 
-  //run at 11pm every day
+  //run at 11pm every day - publish forecast accuracy
   val PublishSolarForecastNightlySummaryMetrics = new Runnable {
     override def run(): Unit = {
       try {
         //make sure we have a full days set of data first
-        if(applicationStartTime.plus(1, ChronoUnit.DAYS).isAfter(Instant.now())) {
+
+        if(applicationStartTime.until(Instant.now(),ChronoUnit.HOURS) > 24) {
           //what was today's solar generation as a percentage of forecasted
           forecast.RunNightlySummaryMetrics(alpha.reporter.DailySolarGeneration)
           println("Publish Daily forecasting Metrics")
