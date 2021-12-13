@@ -27,7 +27,7 @@ object Dependencies {
   private val bouncycastle          = "org.bouncycastle"                % "bcprov-ext-jdk16"        % "1.46"
 
 
-  private val kamonDeps = Seq(kamon_core, kamon_datadog, aspectj_weaver,kamon_system_metrics,kamon_bundle)
+  private val kamonDeps = Seq(kamon_core, kamon_datadog, aspectj_weaver,kamon_system_metrics)//,kamon_bundle) // breaks running on windows???
   private val JSONDeps = Seq(jackson_core, jackson_databind, jackson_module, jackson_datatype_jdk8, json4s_base, json4s_jackson)
 
 
