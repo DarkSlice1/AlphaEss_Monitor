@@ -46,6 +46,7 @@ object Main extends App {
       try {
         alpha.run()
         tapo.Run()
+
         println(Instant.now())
       }
       catch {
