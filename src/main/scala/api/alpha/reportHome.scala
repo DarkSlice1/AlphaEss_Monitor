@@ -4,7 +4,7 @@ import api.alpha.AlphaObjectMapper.AlphaMetrics
 import metrics.KamonMetrics
 
 class reportHome(syn_name: String, reporterKamon : KamonMetrics) {
-  var DailySolarGeneration : Long = 0
+  var DailySolarGeneration : Double = 0
   private val ppv1 = reporterKamon.ppv1.add().withTag("sys_name",syn_name)
   private val ppv2 = reporterKamon.ppv2.add().withTag("sys_name",syn_name)
   private val ppv3 = reporterKamon.ppv3.add().withTag("sys_name",syn_name)
@@ -156,7 +156,7 @@ class reportHome(syn_name: String, reporterKamon : KamonMetrics) {
     ppv3.update(CheckForZero(metrics.ppv3))
     ppv4.update(CheckForZero(metrics.ppv4))
 
-    DailySolarGeneration += CheckForZero(solarGeneration)
+    DailySolarGeneration += solarGeneration
     reporterKamon.totalSolarGeneration.increment(CheckForZero(solarGeneration),"sys_name", syn_name)
   }
 }
