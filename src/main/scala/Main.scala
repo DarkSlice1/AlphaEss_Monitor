@@ -1,4 +1,5 @@
 import api.alpha.alpha
+import api.ember.ember
 import api.forecast.solar.SolarForecast
 import api.tapo.{Tapo, tapoMiddleMan}
 import com.typesafe.config.{Config, ConfigFactory}
@@ -21,6 +22,8 @@ object Main extends App {
   println("ALPHA_USERNAME = " + conf2.getString("alphaess.username"))
   println("ALPHA_PASSWORD = " + conf2.getString("alphaess.password"))
   println("ALPHA_SYS_SN = " + conf2.getString("alphaess.system_sn"))
+  println("EMBER_USERNAME = " + conf2.getString("ember.username"))
+  println("EMBER_PASSWORD = " + conf2.getString("ember.password"))
   println("TAPO_USERNAME = " + conf2.getString("tapo.username"))
   println("TAPO_PASSWORD = " + conf2.getString("tapo.password"))
   println("TAPO_ADDRESSES = " + conf2.getString("tapo.addresses"))
@@ -37,6 +40,7 @@ object Main extends App {
   val reporterKamon = new KamonMetrics()
 
   val alpha = new alpha(conf2,reporterKamon)
+  val ember = new ember(conf2,reporterKamon)
   val tapo = new tapoMiddleMan(new Tapo(), conf2,reporterKamon)
   val forecast = new SolarForecast(conf2,reporterKamon)
 
@@ -46,7 +50,7 @@ object Main extends App {
       try {
         alpha.run()
         tapo.Run()
-
+        //ember.Run()
         println(Instant.now())
       }
       catch {

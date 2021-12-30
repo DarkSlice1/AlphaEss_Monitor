@@ -1,32 +1,18 @@
 package api.alpha
 
 import api.alpha.AlphaObjectMapper._
-import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.typesafe.config.{Config, ConfigFactory}
+import api.common.FileIO._
+import api.common.Token
+import com.typesafe.config.Config
 import metrics.KamonMetrics
 import org.apache.http.NameValuePair
 import org.apache.http.message.BasicNameValuePair
 
-import java.io.{BufferedWriter, File, FileWriter}
-import java.text.SimpleDateFormat
+import java.io.File
 import java.time.{Instant, LocalDateTime, ZoneId}
 import java.util
-import java.util.TimeZone
-import scala.io.Source
-import scala.util.Try
-
 
 class alpha(config: Config, reporterKamon : KamonMetrics) {
-
-  val jsonMapper = new ObjectMapper()
-  val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-  df.setTimeZone(TimeZone.getTimeZone("UTC"));
-  jsonMapper.registerModule(DefaultScalaModule)
-  jsonMapper.registerModule(new JavaTimeModule())
-  jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-  jsonMapper.setDateFormat(df);
 
 
   var username = config.getString("alphaess.username")
@@ -40,7 +26,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
 
   def run(): Unit = {
     //Do we have an access token
-    readToken() match {
+    readToken(tokenFile) match {
       // No - empty token object returned
       case token if (token.AccessToken == "") => Login(); run;
       // Yes
@@ -49,7 +35,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
         val today = LocalDateTime.ofInstant(Instant.now(),ZoneId.of("UTC"))
         if(today.isAfter(expiry)){
           //token expired - lets refresh
-          println("Token is Expired")
+          println("Alpha Token is Expired")
           //refreshToken()
          //TODO figure out fresh token command
           Login();
@@ -68,25 +54,25 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
 
     result.data match {
       case null => println("ERROR : " + result.toString)
-      case value : Any =>  writeToken(Some(value))
+      case value : Any =>  writeToken(tokenFile,Some(value))
     }
     result
   }
 
-  def refreshToken(): token = {
+  def refreshToken(): Token = {
    // println("Calling refreshToken()")
    // val urlExtension= "Api/Account/Login"
    // val reply = restCaller.get(eplBaseHost+urlExtension, readToken)
    // val result = jsonMapper.readValue(reply, classOf[token])
    // writeToken(Some(result))
   //  result
-    token.empty()
+    Token.empty()
   }
 
   def getMetrics() = {
     //println("Calling getMetrics ")
     val urlExtension= "/api/ESS/GetSecondDataBySn?sys_sn="+sys_sn+"&noLoading=true"
-    val token = readToken
+    val token = readToken(tokenFile)
     val postParameters = new util.ArrayList[NameValuePair](2);
     postParameters.add(new BasicNameValuePair("sys_sn", sys_sn));
     postParameters.add(new BasicNameValuePair("noLoading", "true"));
@@ -100,24 +86,6 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
     reporter.write(metrics)
   }
 
-  def readToken() :token = {
-    val bufferedSource = Source.fromFile(tokenFile)
-    val token = Try (jsonMapper.readValue(bufferedSource.mkString, classOf[token]))
-    bufferedSource.close
-    //return token or an empty expired token
-    token.getOrElse(AlphaObjectMapper.token.empty())
-  }
-
-  def writeToken(token : Option[token])= {
-    val bw = new BufferedWriter(new FileWriter(tokenFile))
-    token match{
-      case Some(value) => println("Access Token received : " + value.AccessToken + ", expires on "+value.ExpiresIn+" minutes, created at "+value.TokenCreateTime)
-                  bw.write(jsonMapper.writeValueAsString(value))
-      //clean the file
-      case None =>  bw.write("")
-    }
-    bw.close()
-  }
 
   def resetDailyCounter(): Unit =
   {

@@ -51,6 +51,9 @@ class SolarForecast(config : Config, reporterKamon : KamonMetrics) {
 
   def RunNightlySummaryMetrics(totalSolarGeneration: Double): Unit =
   {
+    println("Forecasting data : Today's Forecast ="+todaysForecast.toDouble)
+    println("Forecasting data : Total Solar Generation ="+totalSolarGeneration)
+
     val  accuracy = (todaysForecast.toDouble/totalSolarGeneration)*100
     reporterKamon.forecasting_todaysAccuracy.set(accuracy.toLong)
 

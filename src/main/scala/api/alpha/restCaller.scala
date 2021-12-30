@@ -1,6 +1,7 @@
 package api.alpha
 
-import api.alpha.AlphaObjectMapper.{RestBody, token}
+
+import api.common.{RestBody, Token}
 import com.google.gson.Gson
 import org.apache.http.NameValuePair
 import org.apache.http.client.methods.{HttpGet, HttpPost}
@@ -19,7 +20,7 @@ object restCaller {
   val timeout = 1000
 
   def get(url: String,
-          tokenObj: token,
+          tokenObj: Token,
           parameters: Map[String, String] = Map.empty,
           requestMethod: String = "GET",
           connectTimeout: Int = timeout,
