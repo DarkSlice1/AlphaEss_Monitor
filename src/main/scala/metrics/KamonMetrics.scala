@@ -117,6 +117,17 @@ final class KamonMetrics() {
     val name = "tapo.tapoEnergyUsageGauge"
   }
 
+  //Ember heating
+  object emberBoostCounter extends Counter {
+    val name = "ember.boostCounter"
+  }
+  object emberBoostGauge extends Gauge {
+    val name = "ember.boosted"
+  }
+  object emberTemperature extends Gauge {
+    val name = "ember.Temperature"
+  }
+
 
   //SOLAR Metrics
   object ppv1 extends Gauge {

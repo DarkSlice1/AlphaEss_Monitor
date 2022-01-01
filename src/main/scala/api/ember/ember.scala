@@ -19,6 +19,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
   val eplBaseHost = "https://eu-https.topband-cloud.com/ember-back/"
   val tokenFile = new File(getClass.getResource("/EmberLastToken.txt").getFile())
 
+
   var gatewayId = ""
 
   def Run(): Unit = {
@@ -135,6 +136,20 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
     }
     //we now have the zone name and the Temperature
     println(parsedResult)
+
+    parsedResult foreach (zone =>{
+      reporterKamon.emberTemperature.set(zone._2._1, "zone", zone._1)
+      if(zone._2._2 == true){
+        //boost active
+        reporterKamon.emberBoostCounter.increment(1,"zone", zone._1)
+        reporterKamon.emberBoostGauge.set(1, "zone", zone._1)
+      }
+      else{
+        reporterKamon.emberBoostGauge.set(0, "zone", zone._1)
+      }
+
+    })
+
 
   }
 

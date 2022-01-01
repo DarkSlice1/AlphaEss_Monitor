@@ -50,7 +50,7 @@ object Main extends App {
       try {
         alpha.run()
         tapo.Run()
-        //ember.Run()
+        ember.Run()
         println(Instant.now())
       }
       catch {
