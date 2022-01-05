@@ -3,12 +3,16 @@ package api.ember
 import api.common.FileIO._
 import api.common.Token
 import api.ember.EmberObjectMapper._
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.TagName
 import com.typesafe.config.Config
 import metrics.KamonMetrics
 
 import java.io.File
 import java.time.{Instant, LocalDateTime, ZoneId}
+import java.util
+import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 
 class ember(config: Config, reporterKamon : KamonMetrics) {
@@ -17,14 +21,13 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
   val username = config.getString("ember.username")
   val password = config.getString("ember.password")
   val eplBaseHost = "https://eu-https.topband-cloud.com/ember-back/"
-  val tokenFile = new File(getClass.getResource("/EmberLastToken.txt").getFile())
-
+  var token = Token.empty()
 
   var gatewayId = ""
 
   def Run(): Unit = {
 
-    readToken(tokenFile) match {
+    token match {
       // No - empty token object returned
       case token if (token.AccessToken == "") => Login(); Run;
       // Yes
@@ -56,14 +59,13 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
 
     result.data match {
       case null => println("ERROR : " + result.toString)
-      case value: Any => writeToken(tokenFile, Some(new Token(AccessToken = value.token, RefreshTokenKey = value.refresh_token)))
+      case value: Any => token =  new Token(AccessToken = value.token, RefreshTokenKey = value.refresh_token)
     }
     result
   }
 
   def GetGatewayId() = {
     val urlExtension = "homes/list"
-    val token = readToken(tokenFile)
     val reply = restCaller.simpleRestGetCall(eplBaseHost + urlExtension,
       withToken = true,
       token = token.AccessToken,
@@ -73,9 +75,19 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
     println("Ember Gateway Received")
   }
 
+  def GetValueAtIndex(elements: HomeMetricsData, position: Int) : String = {
+
+    ("" /: elements.pointDataList) { (RunningData, thisData) => {
+      RunningData + thisData.pointIndex match {
+        case x if x == ""+position => return thisData.value + ""
+        case _ => ""
+      }
+    }
+    }
+  }
+
   def getMetrics(): Unit = {
     val urlExtension = "homesVT/zoneProgram"
-    val token = readToken(tokenFile)
     val reply = restCaller.simpleRestPostCall(eplBaseHost + urlExtension,
       GatewayID(gatewayId),
       withToken = true,
@@ -85,71 +97,57 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
     val mapper = (jsonMapper.readValue(reply, classOf[HomeMetrics]))
 
     val parsedResult = {
-      (mutable.Map[String, (Int, Boolean)]() /: mapper.data) { (sum, element) => {
-        val zoneName = element.name //Name of Zone
-        //now get temperature of Zone
-
-        var currentTemp = 0
-        var isBoostOn = false
-        val tempAndBoost = (mutable.Map[Int, Boolean]() /: element.pointDataList) { (pointSum, pointElement) => {
-
-          pointElement.pointIndex match {
-
-            //index 5 is the temp reading
-            case 5 => {
-                try {
-                  currentTemp = Integer.parseInt(pointElement.value)
-                }
-                catch {
-                  case ex: Exception => println("ERROR Running - Reading Temperature: " + ex.toString)
-                }
-            }
-
-            //is Boost on?
-            case 8 => {
-              if(pointElement.value == "1")
-                isBoostOn = true
-            }
-
-            case _ => //do nothing
-          }
-          pointSum += currentTemp -> isBoostOn
-        }
-        }
-
-        //flatten the tempAndBoost to a tuple
-
-
-        sum += zoneName -> (if(tempAndBoost.size == 2)
-          {
-            Tuple2(
-              tempAndBoost.find(_._1 != 0).getOrElse(0, false)._1,
-              tempAndBoost.find(_._2 == true).getOrElse(
-                tempAndBoost.find(_._1 != 0).getOrElse(0, false)._1, false)._2)
-          }
-            else
-            {
-              Tuple2(tempAndBoost.head._1, tempAndBoost.head._2)
-          })
+      (ListBuffer[HomeMetricsKeyData]() /: mapper.data) { (sum, element) => {
+        val currentTemp = Integer.parseInt(GetValueAtIndex(element, 5))
+        val isBoosting = if (GetValueAtIndex(element, 8) == "1") true else false
+        val isBurning0il = if (GetValueAtIndex(element, 10) == "2") true else false
+        sum += new HomeMetricsKeyData(element.name, currentTemp, isBoosting, isBurning0il)
       }
       }
+
+      //flatten the tempAndBoost to a tuple
+
+
+      //        sum += zoneName -> (if(tempAndBoost.size == 2)
+      //          {
+      //            Tuple2(
+      //              tempAndBoost.find(_._1 != 0).getOrElse(0, false)._1,
+      //              tempAndBoost.find(_._2 == true).getOrElse(
+      //                tempAndBoost.find(_._1 != 0).getOrElse(0, false)._1, false)._2)
+      //          }
+      //            else
+      //            {
+      //              Tuple2(tempAndBoost.head._1, tempAndBoost.head._2)
+      //          })
     }
+      //}
+    //}
     //we now have the zone name and the Temperature
     println(parsedResult)
 
-    parsedResult foreach (zone =>{
-      reporterKamon.emberTemperature.set(zone._2._1, "zone", zone._1)
-      if(zone._2._2 == true){
-        //boost active
-        reporterKamon.emberBoostCounter.increment(1,"zone", zone._1)
-        reporterKamon.emberBoostGauge.set(1, "zone", zone._1)
+    var isBurningOil = false
+    parsedResult foreach (zone => {
+      reporterKamon.emberTemperature.set(zone.CurrentTemp, "zone", zone.Zone)
+      if(zone.IsBoost == true){
+        reporterKamon.emberBoostCounter.increment(1,"zone", zone.Zone)
+        reporterKamon.emberBoostGauge.set(1, "zone", zone.Zone)
       }
       else{
-        reporterKamon.emberBoostGauge.set(0, "zone", zone._1)
+        reporterKamon.emberBoostGauge.set(0, "zone", zone.Zone)
       }
-
+      if(zone.IsBurning == true) {
+        //if boiler is on, it could be heating many zone - so lets not link to a zone
+        isBurningOil = true
+      }
     })
 
+    if(isBurningOil){
+      reporterKamon.emberBurnCounter.increment(1, "","")
+      reporterKamon.emberBurnGauge.set(1)
+    }
+    else{
+      reporterKamon.emberBurnGauge.set(0)
+    }
 
   }
 

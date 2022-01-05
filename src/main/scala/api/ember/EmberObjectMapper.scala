@@ -84,5 +84,15 @@ object EmberObjectMapper {
                                   pointIndex: Int,
                                   value: String)
 
-
+  object HomeMetricsKeyData {
+    def empty() :HomeMetricsKeyData = {
+      new HomeMetricsKeyData("",0,false,false)
+    }
+  }
+  case class HomeMetricsKeyData(
+                               Zone:String,
+                               CurrentTemp : Int,
+                               IsBoost : Boolean,
+                               IsBurning : Boolean
+                               )
 }

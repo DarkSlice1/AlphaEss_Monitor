@@ -124,6 +124,12 @@ final class KamonMetrics() {
   object emberBoostGauge extends Gauge {
     val name = "ember.boosted"
   }
+  object emberBurnCounter extends Counter {
+    val name = "ember.burningOilCounter"
+  }
+  object emberBurnGauge extends Gauge {
+    val name = "ember.BurningOil"
+  }
   object emberTemperature extends Gauge {
     val name = "ember.Temperature"
   }

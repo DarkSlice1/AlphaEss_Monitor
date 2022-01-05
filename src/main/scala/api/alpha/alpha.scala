@@ -22,11 +22,11 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
   var reporter = new reportHome(sys_sn,reporterKamon)
 
   val eplBaseHost = "https://www.alphaess.com"
-  val tokenFile = new File(getClass.getResource("/AlphaLastToken.txt").getFile())
+  var token = Token.empty()
 
   def run(): Unit = {
     //Do we have an access token
-    readToken(tokenFile) match {
+    token match {
       // No - empty token object returned
       case token if (token.AccessToken == "") => Login(); run;
       // Yes
@@ -54,7 +54,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
 
     result.data match {
       case null => println("ERROR : " + result.toString)
-      case value : Any =>  writeToken(tokenFile,Some(value))
+      case value : Any =>  token = value
     }
     result
   }
@@ -72,7 +72,6 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
   def getMetrics() = {
     //println("Calling getMetrics ")
     val urlExtension= "/api/ESS/GetSecondDataBySn?sys_sn="+sys_sn+"&noLoading=true"
-    val token = readToken(tokenFile)
     val postParameters = new util.ArrayList[NameValuePair](2);
     postParameters.add(new BasicNameValuePair("sys_sn", sys_sn));
     postParameters.add(new BasicNameValuePair("noLoading", "true"));
