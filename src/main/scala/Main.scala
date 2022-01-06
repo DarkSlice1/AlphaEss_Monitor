@@ -87,6 +87,8 @@ object Main extends App {
         }
         else
           println("Didn't publish metrics, not a full days worth")
+
+        alpha.resetDailyCounter()
       }
       catch {
         case ex: Exception => println("ERROR: " + ex.toString);
