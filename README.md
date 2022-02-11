@@ -62,7 +62,7 @@ To get the total solar Generated you can you this metric
 alpha.ess.totalSolarGeneration
 ```
 Below is anexample of how DataDog could display these values
-[![SolarExample](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/SolarExample.png)]
+![SolarExample](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/SolarExample.png)
 
 ### _Battery Metrics_
 Currently Alpha has a warranty on the SOH (State of Health) of the battery. This warranty states that the battery should hold greater than 80% charge after 10 years. Unfortunatly Alpha has no way of tracking this information. (i asked)
