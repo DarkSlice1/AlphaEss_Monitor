@@ -13,10 +13,10 @@ All metrics are then published to DataDog to mapping and data collecting.
 I have this running on a Rasberry Pi 2W without issue
 
 ## _Getting Setup_
-Setup an account on [DataDog](https://www.datadoghq.com/)
--> Create a new dashboard
--> Pull down the Repo and run via SBT (simple Build tool)
--> Set the below enviromental varaibles
+Setup an account on [DataDog](https://www.datadoghq.com/)   
+-> Create a new dashboard   
+-> Pull down the Repo and run via SBT (simple Build tool)   
+-> Set the below enviromental varaibles   
    
 - ALPHA_USERNAME= The Registered Usename on your Alpha Ess System     
 - ALPHA_PASSWORD= The Registered password on your Alpha Ess System      
@@ -61,7 +61,8 @@ To get the total solar Generated you can you this metric
 ```sh
 alpha.ess.totalSolarGeneration
 ```
-Below is anexample of how DataDog could display these values
+
+Below is an example of how DataDog could display these values
 ![SolarExample](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/SolarExample.png)
 
 ### _Battery Metrics_
