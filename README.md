@@ -75,7 +75,7 @@ alpha.ess.pbatDischargeCounter (how much total watts have we taken from the batt
 alpha.ess.pbatChargeGauge (how much watts are charging the battery with now)
 alpha.ess.pbatDischargeGauge (how much watts are taking fron the battery with now)
 ```
-[![BatteryExample](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/BatteryExample.png)]
+![BatteryExample](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/BatteryExample.png)
 
    
 KNOWN ISSUES     
