@@ -59,4 +59,4 @@ Usages
 -> The option to remotly turns a device in the house on instead of selling energy back the grid     
 
 
-[![SolarExample](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/SolarExample.png)]
+
