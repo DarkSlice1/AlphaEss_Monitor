@@ -78,6 +78,46 @@ alpha.ess.pbatDischargeGauge (how much watts are taking fron the battery with no
 ```
 ![BatteryExample](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/BatteryExample.png)
 
+
+
+for checking the SOH of the battery we need to first fully charge the battery.
+We can then check the 90% of SOC added. (not a good idea to completly drain the battery)
+So lets assume we start at 10% and charge up to 100%. We can use the _alpha.ess.pbatChargeCounter_ to check hw much charge we've placed into the battery and compary with the company state battery capactiy. oddly enough my system is 3 x 5.7 kw and should have a usable capacity of 5.1kw x 3 = 15.3. However i am getting 10% more 16.8kw.
+The Datadog JSON Monitor is written like this 
+```sh
+{
+    "viz": "query_value",
+    "requests": [
+        {
+            "formulas": [
+                {
+                    "formula": "((((query1 / 10) / 60 / 6) / (15300 * 0.9)) * 100) - ((((query2 / 10) / 60 / 6) / (15300 * 0.9)) * 100)"
+                }
+            ],
+            "response_format": "scalar",
+            "queries": [
+                {
+                    "query": "sum:alpha.ess.pbatChargeCounter{$Alpha_SystemID}.as_count()",
+                    "data_source": "metrics",
+                    "name": "query1",
+                    "aggregator": "sum"
+                },
+                {
+                    "query": "sum:alpha.ess.pbatDischargeCounter{$Alpha_SystemID}.as_count()",
+                    "data_source": "metrics",
+                    "name": "query2",
+                    "aggregator": "sum"
+                }
+            ]
+        }
+    ],
+    "autoscale": true,
+    "custom_unit": "%",
+    "precision": 2
+}
+```
+and will yeild this result
+![BatterySOHExample](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/BatterySOHExample.png)]
    
 KNOWN ISSUES     
 Alpha published all watage usage in a Double, DataDog can only accept a Long - All metrics for Alpha are * by 10     
