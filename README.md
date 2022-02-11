@@ -80,10 +80,13 @@ alpha.ess.pbatDischargeGauge (how much watts are taking fron the battery with no
 
 
 
-for checking the SOH of the battery we need to first fully charge the battery.
-We can then check the 90% of SOC added. (not a good idea to completly drain the battery)
-So lets assume we start at 10% and charge up to 100%. We can use the _alpha.ess.pbatChargeCounter_ to check hw much charge we've placed into the battery and compary with the company state battery capactiy. oddly enough my system is 3 x 5.7 kw and should have a usable capacity of 5.1kw x 3 = 15.3. However i am getting 10% more 16.8kw.
-The Datadog JSON Monitor is written like this 
+for checking the SOH of the battery we need to first fully charge the battery.   
+We can then check that 90% of charge was added. (not a good idea to completly drain the battery)   
+So lets assume we start at 10% and charge up to 100%. We can use the _alpha.ess.pbatChargeCounter_ to check how much charge we've placed into the battery and compare with the company stated battery capactiy.    
+Oddly enough my system is 3 x 5.7 kw and should have a usable capacity of 5.1kw x 3 = 15.3kw    
+However i am getting 10% more 16.8kw.
+
+The Datadog JSON Monitor on the DataDog dashboard is written like this - where .9 is assumed a 90% charge
 ```sh
 {
     "viz": "query_value",
