@@ -19,7 +19,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
   var password = config.getString("alphaess.password")
   var sys_sn = config.getString("alphaess.system_sn")
 
-  var reporter = new reportHome(sys_sn,reporterKamon)
+  var reporter = new reportHome(config,reporterKamon)
 
   val eplBaseHost = "https://www.alphaess.com"
   var token = Token.empty()
