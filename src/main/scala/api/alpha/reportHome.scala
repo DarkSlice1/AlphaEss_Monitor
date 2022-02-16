@@ -119,7 +119,7 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
       // set our grid push to 0
       gridPush_l1.update(0)
       //add cost metric
-      CostPerKwMetric(CheckForZero(metrics.pmeter_l1))
+      CostPerKwMetric(metrics.pmeter_l1)
     } else {
       //update our counter for tracking grid push
       reporterKamon.totalGridPush.increment(CheckForZero(gridConsumption), "sys_name", syn_name)
@@ -161,30 +161,30 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
 
     (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)).toString() match
     {
-      case "0" => reporterKamon.gridPull_CostHour_00_01.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.00_01")),"sys_name", syn_name)
-      case "1" => reporterKamon.gridPull_CostHour_01_02.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.01_02")),"sys_name", syn_name)
-      case "2" => reporterKamon.gridPull_CostHour_02_03.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.02_03")),"sys_name", syn_name)
-      case "3" => reporterKamon.gridPull_CostHour_03_04.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.03_04")),"sys_name", syn_name)
-      case "4" => reporterKamon.gridPull_CostHour_04_05.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.04_05")),"sys_name", syn_name)
-      case "5" => reporterKamon.gridPull_CostHour_05_06.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.05_06")),"sys_name", syn_name)
-      case "6" => reporterKamon.gridPull_CostHour_06_07.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.06_07")),"sys_name", syn_name)
-      case "7" => reporterKamon.gridPull_CostHour_07_08.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.07_08")),"sys_name", syn_name)
-      case "8" => reporterKamon.gridPull_CostHour_08_09.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.08_09")),"sys_name", syn_name)
-      case "9" => reporterKamon.gridPull_CostHour_09_10.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.09_10")),"sys_name", syn_name)
-      case "10" => reporterKamon.gridPull_CostHour_10_11.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.10_11")),"sys_name", syn_name)
-      case "11" => reporterKamon.gridPull_CostHour_11_12.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.11_12")),"sys_name", syn_name)
-      case "12" => reporterKamon.gridPull_CostHour_12_13.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.12_13")),"sys_name", syn_name)
-      case "13" => reporterKamon.gridPull_CostHour_13_14.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.13_14")),"sys_name", syn_name)
-      case "14" => reporterKamon.gridPull_CostHour_14_15.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.14_15")),"sys_name", syn_name)
-      case "15" => reporterKamon.gridPull_CostHour_15_16.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.15_16")),"sys_name", syn_name)
-      case "16" => reporterKamon.gridPull_CostHour_16_17.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.16_17")),"sys_name", syn_name)
-      case "17" => reporterKamon.gridPull_CostHour_17_18.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.17_18")),"sys_name", syn_name)
-      case "18" => reporterKamon.gridPull_CostHour_18_19.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.18_19")),"sys_name", syn_name)
-      case "19" => reporterKamon.gridPull_CostHour_19_20.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.19_20")),"sys_name", syn_name)
-      case "20" => reporterKamon.gridPull_CostHour_20_21.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.20_21")),"sys_name", syn_name)
-      case "21" => reporterKamon.gridPull_CostHour_21_22.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.21_22")),"sys_name", syn_name)
-      case "22" => reporterKamon.gridPull_CostHour_22_23.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.22_23")),"sys_name", syn_name)
-      case "23" => reporterKamon.gridPull_CostHour_23_00.increment(CheckForZero(gridConsumption * config.getDouble("cost_per_kw.23_00")),"sys_name", syn_name)
+      case "0" => reporterKamon.gridPull_CostHour_00_01.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "1" => reporterKamon.gridPull_CostHour_01_02.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "2" => reporterKamon.gridPull_CostHour_02_03.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "3" => reporterKamon.gridPull_CostHour_03_04.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "4" => reporterKamon.gridPull_CostHour_04_05.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "5" => reporterKamon.gridPull_CostHour_05_06.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "6" => reporterKamon.gridPull_CostHour_06_07.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "7" => reporterKamon.gridPull_CostHour_07_08.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "8" => reporterKamon.gridPull_CostHour_08_09.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "9" => reporterKamon.gridPull_CostHour_09_10.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "10" => reporterKamon.gridPull_CostHour_10_11.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "11" => reporterKamon.gridPull_CostHour_11_12.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "12" => reporterKamon.gridPull_CostHour_12_13.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "13" => reporterKamon.gridPull_CostHour_13_14.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "14" => reporterKamon.gridPull_CostHour_14_15.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "15" => reporterKamon.gridPull_CostHour_15_16.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "16" => reporterKamon.gridPull_CostHour_16_17.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "17" => reporterKamon.gridPull_CostHour_17_18.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "18" => reporterKamon.gridPull_CostHour_18_19.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "19" => reporterKamon.gridPull_CostHour_19_20.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "20" => reporterKamon.gridPull_CostHour_20_21.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "21" => reporterKamon.gridPull_CostHour_21_22.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "22" => reporterKamon.gridPull_CostHour_22_23.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
+      case "23" => reporterKamon.gridPull_CostHour_23_00.increment(CheckForZero(gridConsumption),"sys_name", syn_name)
     }
   }
 
