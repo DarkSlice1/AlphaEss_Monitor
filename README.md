@@ -170,8 +170,8 @@ alpha.ess.gridPull_CostHour_21_22
 alpha.ess.gridPull_CostHour_22_23
 alpha.ess.gridPull_CostHour_23_00
 ```
-So what does this data look like?
-![GridPullAndCosting](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/GridPullAndCosting.png)]
+So what does this data look like?   
+![GridPullAndCosting](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/GridPullAndCosting.png)
 
 
 
