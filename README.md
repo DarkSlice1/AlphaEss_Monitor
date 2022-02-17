@@ -33,12 +33,28 @@ Setup an account on [DataDog](https://www.datadoghq.com/)
 - FORCAST_KWH= See http://doc.forecast.solar/doku.php?id=api:estimate.   
 - KAMON_DATADOG_API_KEY= The API key for your DataDog account upon which to pushlish all metrics to 
 
-Then run via
+pull down the assembly jar file form the releases   
+example (linux) script could be
 
 ```sh
-sbt run
-```
+export ALPHA_USERNAME=username
+export ALPHA_PASSWORD=passowrd
+export ALPHA_SYS_SN=serial_number
+export EMBER_USERNAME=username
+export EMBER_PASSWORD=password
+export TAPO_USERNAME=username
+export TAPO_PASSWORD=password
+export TAPO_ADDRESSES=192.168.1.2,192.168.1.3
+export KAMON_DATADOG_API_KEY=key
+export FORCAST_LAT=0
+export FORCAST_LON=-0
+export FORCAST_DEC=0
+export FORCAST_AZ=0
+export FORCAST_KWH=0
 
+java -jar alphaess_monitor-assembly-1.0.jar 
+
+```
 
 
 ## _Generated Alpha ESS Mestrics_
@@ -78,6 +94,49 @@ alpha.ess.pbatDischargeGauge (how much watts are taking fron the battery with no
 ```
 ![BatteryExample](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/BatteryExample.png)
 
+
+
+for checking the SOH of the battery we need to first fully charge the battery.   
+We can then check that 90% of charge was added. (not a good idea to completly drain the battery)   
+So lets assume we start at 10% and charge up to 100%. We can use the _alpha.ess.pbatChargeCounter_ to check how much charge we've placed into the battery and compare with the company stated battery capactiy.    
+Oddly enough my system is 3 x 5.7 kw and should have a usable capacity of 5.1kw x 3 = 15.3kw    
+However i am getting 10% more 16.8kw.
+
+The Datadog JSON Monitor on the DataDog dashboard is written like this - where .9 is assumed a 90% charge
+```sh
+{
+    "viz": "query_value",
+    "requests": [
+        {
+            "formulas": [
+                {
+                    "formula": "((((query1 / 10) / 60 / 6) / (15300 * 0.9)) * 100) - ((((query2 / 10) / 60 / 6) / (15300 * 0.9)) * 100)"
+                }
+            ],
+            "response_format": "scalar",
+            "queries": [
+                {
+                    "query": "sum:alpha.ess.pbatChargeCounter{$Alpha_SystemID}.as_count()",
+                    "data_source": "metrics",
+                    "name": "query1",
+                    "aggregator": "sum"
+                },
+                {
+                    "query": "sum:alpha.ess.pbatDischargeCounter{$Alpha_SystemID}.as_count()",
+                    "data_source": "metrics",
+                    "name": "query2",
+                    "aggregator": "sum"
+                }
+            ]
+        }
+    ],
+    "autoscale": true,
+    "custom_unit": "%",
+    "precision": 2
+}
+```
+and will yeild this result
+![BatterySOHExample](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/BatterySOHExample.png)]
    
 KNOWN ISSUES     
 Alpha published all watage usage in a Double, DataDog can only accept a Long - All metrics for Alpha are * by 10     
