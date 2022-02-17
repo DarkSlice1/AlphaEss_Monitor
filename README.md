@@ -13,10 +13,10 @@ All metrics are then published to DataDog to mapping and data collecting.
 I have this running on a Rasberry Pi 2W without issue
 
 ## _Getting Setup_
-Setup an account on [DataDog](https://www.datadoghq.com/)
--> Create a new dashboard
--> Pull down the Repo and run via SBT (simple Build tool)
--> Set the below enviromental varaibles
+Setup an account on [DataDog](https://www.datadoghq.com/)   
+-> Create a new dashboard   
+-> (Optional)Pull down the Repo and run via SBT (simple Build tool)   
+-> Set the below enviromental varaibles   
    
 - ALPHA_USERNAME= The Registered Usename on your Alpha Ess System     
 - ALPHA_PASSWORD= The Registered password on your Alpha Ess System      
