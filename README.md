@@ -136,7 +136,7 @@ and will yeild this result
 
 
 
-### _Energy Cost Tracking (AlphaESS) and Pull Location(Tapo)_
+### _Energy Cost Tracking (AlphaESS)_
 These metrics take advantage of the reverse engineering of the Tapo P110 smart socket the Alpha ESS 
 The following metrics are available to you
 
@@ -171,7 +171,7 @@ alpha.ess.gridPull_CostHour_22_23
 alpha.ess.gridPull_CostHour_23_00
 ```
 So what does this data look like?
-![GridPullAndCosting](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/BatterySOHExample.png)]
+![GridPullAndCosting](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/GridPullAndCosting.png)]
 
 
 
