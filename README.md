@@ -33,7 +33,7 @@ Setup an account on [DataDog](https://www.datadoghq.com/)
 - FORCAST_KWH= See http://doc.forecast.solar/doku.php?id=api:estimate.   
 - KAMON_DATADOG_API_KEY= The API key for your DataDog account upon which to pushlish all metrics to 
 
-pull down the assembly jar file form the releases
+pull down the assembly jar file form the releases   
 example (linux) script could be
 
 ```sh
