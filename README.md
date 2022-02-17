@@ -137,8 +137,7 @@ and will yeild this result
 
 
 ### _Energy Cost Tracking (AlphaESS)_
-These metrics take advantage of the reverse engineering of the Tapo P110 smart socket the Alpha ESS 
-The following metrics are available to you
+The following metrics are available to you for tracking house hold energy from the grid and pushing to the grid
 
 ```sh
 alpha.ess.gridPull_l1               (Gauge : real time watts pulled from the Grid)
