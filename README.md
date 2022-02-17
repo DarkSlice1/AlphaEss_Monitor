@@ -33,12 +33,28 @@ Setup an account on [DataDog](https://www.datadoghq.com/)
 - FORCAST_KWH= See http://doc.forecast.solar/doku.php?id=api:estimate.   
 - KAMON_DATADOG_API_KEY= The API key for your DataDog account upon which to pushlish all metrics to 
 
-Then run via
+pull down the assembly jar file form the releases
+example (linux) script could be
 
 ```sh
-sbt run
-```
+export ALPHA_USERNAME=username
+export ALPHA_PASSWORD=passowrd
+export ALPHA_SYS_SN=serial_number
+export EMBER_USERNAME=username
+export EMBER_PASSWORD=password
+export TAPO_USERNAME=username
+export TAPO_PASSWORD=password
+export TAPO_ADDRESSES=192.168.1.2,192.168.1.3
+export KAMON_DATADOG_API_KEY=key
+export FORCAST_LAT=0
+export FORCAST_LON=-0
+export FORCAST_DEC=0
+export FORCAST_AZ=0
+export FORCAST_KWH=0
 
+java -jar alphaess_monitor-assembly-1.0.jar 
+
+```
 
 
 ## _Generated Alpha ESS Mestrics_
