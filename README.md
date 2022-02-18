@@ -7,7 +7,8 @@ Currently Re-doing the Readme
   - [Solar Metrics](#solar-metrics)   
   - [Battery Metrics](#battery-metrics)   
   - [Energy Cost Tracking](#energy-cost-tracking)   
-
+- [Tapo 110 Energy Tracking](#tapo-110-energy-tracking)
+- [Ember Heating](#ember-heating)
 
 # Overview
    
@@ -83,15 +84,15 @@ Alpha's API will seperate each array of solar panels into Solar Strings. These 4
 if you have 2 Solar Stirngs, Each holding an array of panels of different wattage, you could check the health of the string by compare the % output of one Solar String against another
 (this metrics is multiplied by 10, to avoid issues with decimal points, please divide by 10 on DataDog) 
 ```sh
-alpha.ess.ppv1
-alpha.ess.ppv2
-alpha.ess.ppv3
-alpha.ess.ppv4
+alpha.ess.ppv1                  (Gauge : How much is generated for String 1 right now)
+alpha.ess.ppv2                  (Gauge : How much is generated for String 2 right now)
+alpha.ess.ppv3                  (Gauge : How much is generated for String 3 right now)
+alpha.ess.ppv4                  (Gauge : How much is generated for String 4 right now)
 ```
 
 To get the total solar Generated you can you this metric
 ```sh
-alpha.ess.totalSolarGeneration
+alpha.ess.totalSolarGeneration  (Counter : Total Solar generator over all Solar Strings)
 ```
 Below is anexample of how DataDog could display these values
 [![SolarExample](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/SolarExample.png)]
@@ -158,6 +159,7 @@ alpha.ess.gridPull_l1               (Gauge : real time watts pulled from the Gri
 alpha.ess.gridPush_l1               (Gauge : real time watts pushed to the Grid)
 alpha.ess.totalGridConsumption      (Counter : Total watts pull from the Grid)
 alpha.ess.totalGridPush             (Counter : Total watts pushed to the Grid)
+alpha.ess.houseLoad                 (Gauge : Real time watts load on the house)
 ```
 
 if you wanted to work out how much your energy companany should be charging you, you have the grid pull counter metrics in 1 hour slot
@@ -188,8 +190,23 @@ So what does this data look like?
 
 
 
+ # _Tapo 110 Energy Tracking_
+ The idea here to tracking large consumers of energy that are plugged into a wall socket. We cant track house hold items that are wired directly to the fuse box (Celiing lights, Ovens, Hot Water Tanks etc)   
+    
+The application will generate the following metrics, once you add a comma delimited list of local ip address ( I highly recommend that you give a static IP to these devices via your routers Static DHCP mapping) The application will go though the list every 10 seconds and grab the current wattage draw
  
-   
+ ```sh
+ tapo.EnergyUsageCounter    (Counter: The total wattage over a period of time)
+ tapo.tapoEnergyUsageGauge  (Gauge : The Watage right now)
+ ```
  
+ So what can yo do with this data? you can map what is being drawn from your house at any time, overlapping with the Alpha Ess House load metric you can see what applicance is drawing what wattage and see as a percentage of the total house draw.   
+You can also see what applicance is cost your largest cost in your energy bill
+
+![TapoEnergyPerDevice](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/TapoEnergyPerDevice.png)
+![TapoHouseLoad](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/TapoHouseLoad.png)
+![TapoPercentageUsage](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/TapoPercentageUsage.png)
 
 
+ # _Ember Heating_
+ todo
