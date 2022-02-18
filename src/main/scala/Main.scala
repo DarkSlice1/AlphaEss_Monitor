@@ -1,6 +1,7 @@
 import api.alpha.alpha
 import api.ember.ember
 import api.forecast.solar.SolarForecast
+import api.myenergi.myenergi_zappie
 import api.tapo.{Tapo, tapoMiddleMan}
 import com.typesafe.config.{Config, ConfigFactory}
 import kamon.Kamon
@@ -43,6 +44,7 @@ object Main extends App {
   val ember = new ember(conf2,reporterKamon)
   val tapo = new tapoMiddleMan(new Tapo(), conf2,reporterKamon)
   val forecast = new SolarForecast(conf2,reporterKamon)
+  val myenergi = new myenergi_zappie(conf2,reporterKamon)
 
   val GatherRealTimeMetrics = new Runnable {
     override def run(): Unit = {
@@ -51,6 +53,7 @@ object Main extends App {
         alpha.run()
         tapo.Run()
         ember.Run()
+        myenergi.Run()
         println(Instant.now())
       }
       catch {

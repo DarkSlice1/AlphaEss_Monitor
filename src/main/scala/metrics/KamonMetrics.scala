@@ -100,6 +100,14 @@ final class KamonMetrics() {
 
   }
 
+  //MyEnergi
+  object zappiEnergyUsageCounter extends Counter {
+    val name = "myenergy.zapiEnergyUsageCounter"
+  }
+  object zappiEnergyUsageGauge extends Gauge {
+    val name = "myenergy.zapiEnergyUsageGauge"
+  }
+
   //Forecasting Solar Generation
   object forecasting_todaysGeneration extends Gauge {
     val name = "forecasting.todaysGeneration"

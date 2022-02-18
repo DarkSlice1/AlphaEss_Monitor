@@ -3,15 +3,9 @@ package api.ember
 import api.common.FileIO._
 import api.common.Token
 import api.ember.EmberObjectMapper._
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.TagName
 import com.typesafe.config.Config
 import metrics.KamonMetrics
-
-import java.io.File
 import java.time.{Instant, LocalDateTime, ZoneId}
-import java.util
-import scala.collection.JavaConverters._
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 
