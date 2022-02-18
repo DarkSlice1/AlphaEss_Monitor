@@ -11,14 +11,16 @@ Currently Re-doing the Readme
 
 # Overview
    
-Application for home monitoring of Energer usage / Generation and Heating Use.   
+Application for home monitoring of Energy usage / Generation and Heating Use.   
 Energy generation is tracked via the AlphaESS API (Solor Panels / Inverter / Battery).   
 Engergy usage is tracked via TAPO P110 smart sockets - the API's have been reverse Engineered to get this data.   
 Heating is tacked via the Ember Smart Heating system - tracks Temperature / Boost times / how long its been bruning oil      
-EV Car Changing is tracked via the MYenergi API
+EV Car Changing is tracked via the MyEnergi API
    
 All metrics are then published to DataDog to mapping and data collecting.  
 I have this running on a Rasberry Pi 2W without issue
+
+
 
 ## _Getting Setup_
 Setup an account on [DataDog](https://www.datadoghq.com/)   
@@ -68,7 +70,8 @@ java -jar alphaess_monitor-assembly-1.0.jar
 
 
 ## _Generated Alpha ESS Mestrics_
-All there metrics are gathered by pinging the Alpha API every 10 seconds, the totals metrics are counter values and are only as accurate the data received. 
+All there metrics are gathered by pinging the Alpha API every 10 seconds, the totals metrics are counter values and are only as accurate the data received.   
+*Please note All metic's are miltiplied by 10 as the kamon library can't push doubles to DataDog, so please divide by 10 on te DataDog side*
 
 ### _Solar Metrics_
 
