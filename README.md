@@ -1,5 +1,13 @@
 Currently Re-doing the Readme
 
+##### Table of Contents  
+- [Overview](#overview)   
+- [Getting Setup](#getting-setup)   
+- [Generated Alpha ESS Mestrics](#generated-alpha-ess-mestrics)   
+  - [Solar Metrics](#solar-metrics)   
+  - [Battery Metrics](#battery-metrics)   
+  - [Energy Cost Tracking](#energy-cost-tracking)   
+
 
 # Overview
    
@@ -13,10 +21,10 @@ All metrics are then published to DataDog to mapping and data collecting.
 I have this running on a Rasberry Pi 2W without issue
 
 ## _Getting Setup_
-Setup an account on [DataDog](https://www.datadoghq.com/)
--> Create a new dashboard
--> Pull down the Repo and run via SBT (simple Build tool)
--> Set the below enviromental varaibles
+Setup an account on [DataDog](https://www.datadoghq.com/)   
+-> Create a new dashboard   
+-> (Optional)Pull down the Repo and run via SBT (simple Build tool)   
+-> Set the below enviromental varaibles   
    
 - ALPHA_USERNAME= The Registered Usename on your Alpha Ess System     
 - ALPHA_PASSWORD= The Registered password on your Alpha Ess System      
@@ -33,7 +41,7 @@ Setup an account on [DataDog](https://www.datadoghq.com/)
 - FORCAST_KWH= See http://doc.forecast.solar/doku.php?id=api:estimate.   
 - KAMON_DATADOG_API_KEY= The API key for your DataDog account upon which to pushlish all metrics to 
 
-pull down the assembly jar file form the releases   
+pull down the assembly jar file form the releases or compile via SBT   
 example (linux) script could be
 
 ```sh
@@ -136,7 +144,7 @@ and will yeild this result
 
 
 
-### _Energy Cost Tracking (AlphaESS)_
+### _Energy Cost Tracking_
 The following metrics are available to you for tracking house hold energy from the grid and pushing to the grid
 
 ```sh
