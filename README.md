@@ -2,7 +2,7 @@ Currently Re-doing the Readme
 
 ##### Table of Contents  
 [Overview](#overview)   
-[Getting Setup](##-getting-setup)   
+[Getting Setup](##-getting-setup-)   
 [Generated Alpha ESS Mestrics](## _Generated Alpha ESS Mestrics_)   
 [Solar Metrics](### _Solar Metrics_)   
 [Battery Metrics](### _Battery Metrics_)   
