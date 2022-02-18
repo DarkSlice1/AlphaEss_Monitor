@@ -50,9 +50,9 @@ object Main extends App {
     override def run(): Unit = {
       //run in a 10 second loop
       try {
-        //alpha.run()
-        //tapo.Run()
-        //ember.Run()
+        alpha.run()
+        tapo.Run()
+        ember.Run()
         myenergi.Run()
         println(Instant.now())
       }

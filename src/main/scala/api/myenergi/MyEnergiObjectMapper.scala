@@ -19,6 +19,8 @@ object MyEnergiObjectMapper {
                           sno: Int,
                           dat: String,
                           tim: String,
+                          ectp1: Int,
+                          ectp2: Int,
                           ectp3: Int,
                           ectt1: String,
                           ectt2: String,

@@ -54,8 +54,20 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) {
       host = asn_url,
       digestUri = urlExtension
     )
-   jsonMapper.readValue(reply, classOf[jstatusZReply])
+   val conversion = jsonMapper.readValue(reply, classOf[jstatusZReply])
+     //multiplying by 10 to align with other metrics
+    try{
+      reporterKamon.zappiEnergyUsageCounter.increment((conversion.zappi.head.ectp1*10).toLong, "hub", username)
+      if (conversion.zappi.head.div == 0) {
+        reporterKamon.zappiEnergyUsageGauge.set(0, "hub", username)
+      }
+      else {
+        reporterKamon.zappiEnergyUsageGauge.set((conversion.zappi.head.ectp1*10).toLong, "hub", username)
+      }
+    }
 
-    //TODO MAP metrics
+
+
+
   }
 }
