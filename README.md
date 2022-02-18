@@ -3,7 +3,7 @@ Currently Re-doing the Readme
 ##### Table of Contents  
 - [Overview](#overview)   
 - [Getting Setup](#getting-setup)   
-- [Generated Alpha ESS Mestrics](#generated-alpha-ess-mestrics)   
+- [Generated Alpha ESS Mestrics](#generated-alpha-ess-metrics)   
   - [Solar Metrics](#solar-metrics)   
   - [Battery Metrics](#battery-metrics)   
   - [Energy Cost Tracking](#energy-cost-tracking)   
@@ -70,13 +70,13 @@ java -jar alphaess_monitor-assembly-1.0.jar
 
 
 
-## _Generated Alpha ESS Mestrics_
-All there metrics are gathered by pinging the Alpha API every 10 seconds, the totals metrics are counter values and are only as accurate the data received.   
+## _Generated Alpha ESS Metrics_  
 ```diff
 - Please note All metric's are miltiplied by 10 as the kamon library can't push doubles to DataDog, 
 - Please divide by 10 on the DataDog side.   
 - Example : A grid pull of 5000 watts is actaully 500.0 watts
 ```
+All there metrics are gathered by pinging the Alpha API every 10 seconds, the totals metrics are counter values and are only as accurate the data received. 
 
 
 ### _Solar Metrics_
@@ -191,7 +191,12 @@ So what does this data look like?
 
 
  # _Tapo 110 Energy Tracking_
- The idea here to tracking large consumers of energy that are plugged into a wall socket. We cant track house hold items that are wired directly to the fuse box (Celiing lights, Ovens, Hot Water Tanks etc)   
+```diff
+- Please note All metric's are miltiplied by 10 as the kamon library can't push doubles to DataDog, 
+- Please divide by 10 on the DataDog side.   
+- Example : A grid pull of 5000 watts is actaully 500.0 watts
+``` 
+The idea here to tracking large consumers of energy that are plugged into a wall socket. We cant track house hold items that are wired directly to the fuse box (Celiing lights, Ovens, Hot Water Tanks etc)   
     
 The application will generate the following metrics, once you add a comma delimited list of local ip address ( I highly recommend that you give a static IP to these devices via your routers Static DHCP mapping) The application will go though the list every 10 seconds and grab the current wattage draw
  
