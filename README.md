@@ -1,7 +1,7 @@
 Currently Re-doing the Readme
 
 ##### Table of Contents  
-[Overview](#overview)   
+- [Overview](#overview)   
 - [Getting Setup](#getting-setup)   
 - [Generated Alpha ESS Mestrics](#generated-alpha-ess-mestrics)   
   - [Solar Metrics](#solar-metrics)   
