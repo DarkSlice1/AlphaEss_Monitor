@@ -2,11 +2,11 @@ Currently Re-doing the Readme
 
 ##### Table of Contents  
 [Overview](#overview)   
-[Getting Setup](#getting-setup)   
-[Generated Alpha ESS Mestrics](#generated-alpha-ess-mestrics)   
-[Solar Metrics](#solar-metrics)   
-[Battery Metrics](#battery-metrics)   
-[Energy Cost Tracking](#energy-cost-tracking)   
+- [Getting Setup](#getting-setup)   
+- [Generated Alpha ESS Mestrics](#generated-alpha-ess-mestrics)   
+  - [Solar Metrics](#solar-metrics)   
+  - [Battery Metrics](#battery-metrics)   
+  - [Energy Cost Tracking](#energy-cost-tracking)   
 
 
 # Overview
