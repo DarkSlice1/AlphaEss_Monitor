@@ -1,5 +1,9 @@
 Currently Re-doing the Readme
 
+```diff
+- test
+```
+
 ##### Table of Contents  
 - [Overview](#overview)   
 - [Getting Setup](#getting-setup)   
@@ -74,9 +78,8 @@ All there metrics are gathered by pinging the Alpha API every 10 seconds, the to
 <span style="color:red">**Please note All metric's are miltiplied by 10 as the kamon library can't push doubles to DataDog, so please divide by 10 on the DataDog side.   
 So a grid pull of 5000 watts is actaully 500.0 watts**some *blue* text</span>
 
+
 ### _Solar Metrics_
-
-
 Alpha's API will seperate each array of solar panels into Solar Strings. These 4 Gauge Metrics will show the generated Solar energy in watts.
 if you have 2 Solar Stirngs, Each holding an array of panels of different wattage, you could check the health of the string by compare the % output of one Solar String against another
 (this metrics is multiplied by 10, to avoid issues with decimal points, please divide by 10 on DataDog) 
