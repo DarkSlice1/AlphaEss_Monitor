@@ -190,13 +190,6 @@ So what does this data look like?
 
  
    
-   
-   
-Usages       
--> Can be used to calculate State of Health in the Solar inverter Battery    
--> To see how wattage the invertor is using - how much actaul wattage are you getting from solar    
--> The breakdown of hosehold usage by what device     
--> The option to remotly turns a device in the house on instead of selling energy back the grid     
-
+ 
 
 
