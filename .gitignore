@@ -26,3 +26,6 @@ project/boot/
 .ensime_cache/
 .ensime
 /src/main/g8/project/target/
+
+#My Specific
+push2pie.sh

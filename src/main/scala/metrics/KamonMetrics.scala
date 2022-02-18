@@ -166,6 +166,81 @@ final class KamonMetrics() {
     val name = "alpha.ess.totalGridPush"
   }
 
+
+  //Grid Cost Metrics
+  object gridPull_CostHour_00_01 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_00_01"
+  }
+  object gridPull_CostHour_01_02 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_01_02"
+  }
+  object gridPull_CostHour_02_03 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_02_03"
+  }
+  object gridPull_CostHour_03_04 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_03_04"
+  }
+  object gridPull_CostHour_04_05 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_04_05"
+  }
+  object gridPull_CostHour_05_06 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_05_06"
+  }
+  object gridPull_CostHour_06_07 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_06_07"
+  }
+  object gridPull_CostHour_07_08 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_07_08"
+  }
+  object gridPull_CostHour_08_09 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_08_09"
+  }
+  object gridPull_CostHour_09_10 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_09_10"
+  }
+  object gridPull_CostHour_10_11 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_10_11"
+  }
+  object gridPull_CostHour_11_12 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_11_12"
+  }
+  object gridPull_CostHour_12_13 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_12_13"
+  }
+  object gridPull_CostHour_13_14 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_13_14"
+  }
+  object gridPull_CostHour_14_15 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_14_15"
+  }
+  object gridPull_CostHour_15_16 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_15_16"
+  }
+  object gridPull_CostHour_16_17 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_16_17"
+  }
+  object gridPull_CostHour_17_18 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_17_18"
+  }
+  object gridPull_CostHour_18_19 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_18_19"
+  }
+  object gridPull_CostHour_19_20 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_19_20"
+  }
+  object gridPull_CostHour_20_21 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_20_21"
+  }
+  object gridPull_CostHour_21_22 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_21_22"
+  }
+  object gridPull_CostHour_22_23 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_22_23"
+  }
+  object gridPull_CostHour_23_00 extends Counter {
+    val name = "alpha.ess.gridPull_CostHour_23_00"
+  }
+
   //Battery Metrics
   object soc extends Gauge {
     val name = "alpha.ess.soc"
