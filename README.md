@@ -1,5 +1,13 @@
 Currently Re-doing the Readme
 
+# Table of Contents
+1. [Overview](# Overview)
+2. [Getting Setup](## _Getting Setup_)
+3. [Generated Alpha ESS Mestrics](## _Generated Alpha ESS Mestrics_)
+4. [Solar Metrics](### _Solar Metrics_)
+5. [Battery Metrics](### _Battery Metrics_)
+6. [Energy Cost Tracking](### _Energy Cost Tracking_)
+
 
 # Overview
    
@@ -136,7 +144,7 @@ and will yeild this result
 
 
 
-### _Energy Cost Tracking (AlphaESS)_
+### _Energy Cost Tracking_
 The following metrics are available to you for tracking house hold energy from the grid and pushing to the grid
 
 ```sh
