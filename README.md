@@ -164,6 +164,7 @@ alpha.ess.houseLoad                 (Gauge : Real time watts load on the house)
 ```
 
 if you wanted to work out how much your energy companany should be charging you, you have the grid pull counter metrics in 1 hour slot
+Very usefull if you want to compare energy providers to see what energy you use when during the day and compare provider plans
 
 ```sh
 alpha.ess.gridPull_CostHour_00_01
