@@ -1,4 +1,4 @@
-Currently Re-doing the Readme
+
 
 ##### Table of Contents  
 - [Overview](#overview)   
@@ -8,7 +8,8 @@ Currently Re-doing the Readme
   - [Battery Metrics](#battery-metrics)   
   - [Energy Cost Tracking](#energy-cost-tracking)   
 - [Tapo 110 Energy Tracking](#tapo-110-energy-tracking)
-- [Ember Heating](#ember-heating)
+- [Ember Heat Tracking](#ember-heat-tracking)
+- [Zappi Tracking](#zappi-tracking)
 
 # Overview
    
@@ -213,5 +214,8 @@ You can also see what applicance is cost your largest cost in your energy bill
 ![TapoPercentageUsage](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/TapoPercentageUsage.png)
 
 
- # _Ember Heating_
+# _Ember Heat Tracking_
+ todo
+ 
+# _Zappi Tracking_
  todo
