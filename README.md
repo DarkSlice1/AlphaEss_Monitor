@@ -72,8 +72,9 @@ java -jar alphaess_monitor-assembly-1.0.jar
 ## _Generated Alpha ESS Mestrics_
 All there metrics are gathered by pinging the Alpha API every 10 seconds, the totals metrics are counter values and are only as accurate the data received.   
 ```diff
-- Please note All metric's are miltiplied by 10 as the kamon library can't push doubles to DataDog, so please divide by 10 on the DataDog side.   
-So a grid pull of 5000 watts is actaully 500.0 watts
+- Please note All metric's are miltiplied by 10 as the kamon library can't push doubles to DataDog, 
+- Please divide by 10 on the DataDog side.   
+- Example : A grid pull of 5000 watts is actaully 500.0 watts
 ```
 
 
