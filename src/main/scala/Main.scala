@@ -34,6 +34,8 @@ object Main extends App {
   println("FORCAST_DEC = " + conf2.getString("forcasting.dec"))
   println("FORCAST_AZ = " + conf2.getString("forcasting.az"))
   println("FORCAST_KWH = " + conf2.getString("forcasting.kwh"))
+  println("MYENGERI_USERNAME = " + conf2.getString("myenergi.username"))
+  println("MYENGERI_PASSWORD = " + conf2.getString("myenergi.password"))
 
   var applicationStartTime : Instant = Instant.now()
 
