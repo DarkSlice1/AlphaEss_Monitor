@@ -98,26 +98,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
         sum += new HomeMetricsKeyData(element.name, currentTemp, isBoosting, isBurning0il)
       }
       }
-
-      //flatten the tempAndBoost to a tuple
-
-
-      //        sum += zoneName -> (if(tempAndBoost.size == 2)
-      //          {
-      //            Tuple2(
-      //              tempAndBoost.find(_._1 != 0).getOrElse(0, false)._1,
-      //              tempAndBoost.find(_._2 == true).getOrElse(
-      //                tempAndBoost.find(_._1 != 0).getOrElse(0, false)._1, false)._2)
-      //          }
-      //            else
-      //            {
-      //              Tuple2(tempAndBoost.head._1, tempAndBoost.head._2)
-      //          })
     }
-      //}
-    //}
-    //we now have the zone name and the Temperature
-    println(parsedResult)
 
     var isBurningOil = false
     parsedResult foreach (zone => {
@@ -143,6 +124,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
       reporterKamon.emberBurnGauge.set(0)
     }
 
+    println("Ember Metrics Completed")
   }
 
 

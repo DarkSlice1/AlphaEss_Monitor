@@ -20,22 +20,41 @@ object Main extends App {
   val conf2 = ConfigFactory.load()
 
   println("Variable's")
-  println("ALPHA_USERNAME = " + conf2.getString("alphaess.username"))
-  println("ALPHA_PASSWORD = " + conf2.getString("alphaess.password"))
-  println("ALPHA_SYS_SN = " + conf2.getString("alphaess.system_sn"))
-  println("EMBER_USERNAME = " + conf2.getString("ember.username"))
-  println("EMBER_PASSWORD = " + conf2.getString("ember.password"))
-  println("TAPO_USERNAME = " + conf2.getString("tapo.username"))
-  println("TAPO_PASSWORD = " + conf2.getString("tapo.password"))
-  println("TAPO_ADDRESSES = " + conf2.getString("tapo.addresses"))
+  val alphaEnabled =  conf2.getBoolean("alphaess.enabled")
+  val emberEnabled = conf2.getBoolean("ember.enabled")
+  val tapoEnabled = conf2.getBoolean("tapo.enabled")
+  val myEnergiEnabled = conf2.getBoolean("myenergi.enabled")
+  val forecastEnabled = conf2.getBoolean("forecasting.enabled")
+
   println("KAMON_DATADOG_API_KEY = " + conf2.getString("kamon.datadog.api.api-key"))
-  println("FORCAST_LAT = " + conf2.getString("forcasting.lat"))
-  println("FORCAST_LON = " + conf2.getString("forcasting.lon"))
-  println("FORCAST_DEC = " + conf2.getString("forcasting.dec"))
-  println("FORCAST_AZ = " + conf2.getString("forcasting.az"))
-  println("FORCAST_KWH = " + conf2.getString("forcasting.kwh"))
-  println("MYENGERI_USERNAME = " + conf2.getString("myenergi.username"))
-  println("MYENGERI_PASSWORD = " + conf2.getString("myenergi.password"))
+
+  if(alphaEnabled) {
+    println("ALPHA_USERNAME = " + conf2.getString("alphaess.username"))
+    println("ALPHA_PASSWORD = " + conf2.getString("alphaess.password"))
+    println("ALPHA_SYS_SN = " + conf2.getString("alphaess.system_sn"))
+  }
+  if(emberEnabled) {
+    println("EMBER_USERNAME = " + conf2.getString("ember.username"))
+    println("EMBER_PASSWORD = " + conf2.getString("ember.password"))
+  }
+  if(tapoEnabled) {
+    println("TAPO_USERNAME = " + conf2.getString("tapo.username"))
+    println("TAPO_PASSWORD = " + conf2.getString("tapo.password"))
+    println("TAPO_ADDRESSES = " + conf2.getString("tapo.addresses"))
+  }
+  if(myEnergiEnabled) {
+    println("MYENGERI_USERNAME = " + conf2.getString("myenergi.username"))
+    println("MYENGERI_PASSWORD = " + conf2.getString("myenergi.password"))
+  }
+  if(forecastEnabled) {
+    println("FORECAST_LAT = " + conf2.getString("forecasting.lat"))
+    println("FORECAST_LON = " + conf2.getString("forecasting.lon"))
+    println("FORECAST_DEC = " + conf2.getString("forecasting.dec"))
+    println("FORECAST_AZ = " + conf2.getString("forecasting.az"))
+    println("FORECAST_KWH = " + conf2.getString("forecasting.kwh"))
+  }
+
+
 
   var applicationStartTime : Instant = Instant.now()
 
@@ -52,11 +71,11 @@ object Main extends App {
     override def run(): Unit = {
       //run in a 10 second loop
       try {
-        alpha.run()
-        tapo.Run()
-        ember.Run()
-        myenergi.Run()
-        println(Instant.now())
+        if(alphaEnabled){alpha.run()}
+        if(tapoEnabled){tapo.Run()}
+        if(emberEnabled){ember.Run()}
+        if(myEnergiEnabled){myenergi.Run()}
+        println("All Metrics Gathered : "+Instant.now())
       }
       catch {
         case ex: Exception => println("ERROR Running - cleaning token, Exception : " + ex.toString);
@@ -101,34 +120,37 @@ object Main extends App {
     }
   }
 
-  val now = OffsetDateTime.now( ZoneOffset.UTC )
 
-  val ex = new ScheduledThreadPoolExecutor(1)
-  ex.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
+    val now = OffsetDateTime.now(ZoneOffset.UTC)
 
-  //Run at 1am Each day
-  ex.scheduleAtFixedRate(GatherSolarForecastMetrics, Duration.between(
-    now,
-    now.toLocalDate()
-      .plusDays( 1 )
-      .atStartOfDay( ZoneOffset.UTC )
-      .plusHours(1)
-  ).toMillis,
-    TimeUnit.DAYS.toMillis( 1 ),
-    TimeUnit.MILLISECONDS
-  )
+    val ex = new ScheduledThreadPoolExecutor(1)
+    ex.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
 
-  //Run at 11pm Each day
-  ex.scheduleAtFixedRate(PublishSolarForecastNightlySummaryMetrics, Duration.between(
+  if(myEnergiEnabled) {
+    //Run at 1am Each day
+    ex.scheduleAtFixedRate(GatherSolarForecastMetrics, Duration.between(
       now,
       now.toLocalDate()
-        .plusDays( 1 )
-        .atStartOfDay( ZoneOffset.UTC )
+        .plusDays(1)
+        .atStartOfDay(ZoneOffset.UTC)
+        .plusHours(1)
+    ).toMillis,
+      TimeUnit.DAYS.toMillis(1),
+      TimeUnit.MILLISECONDS
+    )
+
+    //Run at 11pm Each day
+    ex.scheduleAtFixedRate(PublishSolarForecastNightlySummaryMetrics, Duration.between(
+      now,
+      now.toLocalDate()
+        .plusDays(1)
+        .atStartOfDay(ZoneOffset.UTC)
         .minusHours(1)
     ).toMillis,
-    TimeUnit.DAYS.toMillis( 1 ),
-    TimeUnit.MILLISECONDS
-  )
+      TimeUnit.DAYS.toMillis(1),
+      TimeUnit.MILLISECONDS
+    )
+  }
 
 
   private def startKamon(config: Config) = {

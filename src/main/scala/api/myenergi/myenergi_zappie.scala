@@ -5,7 +5,7 @@ import api.myenergi.MyEnergiObjectMapper._
 import com.typesafe.config.Config
 import metrics.KamonMetrics
 
-//availaible endpoints : https://github.com/claytonn73/myenergi_api/blob/62d6915784bde9aaaa6fbfe34cc0ec6eeb2eb060/myenergi/const.py#L9
+//available endpoints : https://github.com/claytonn73/myenergi_api/blob/62d6915784bde9aaaa6fbfe34cc0ec6eeb2eb060/myenergi/const.py#L9
 
 class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) {
 
@@ -66,8 +66,6 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) {
       }
     }
 
-
-
-
+    println("Zappi Metrics Completed")
   }
 }

@@ -1,7 +1,6 @@
 package api.forecast.solar
 
-import api.forecast.solar.ForcastingModel.SolarForcastingReply
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+
 import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
@@ -13,11 +12,11 @@ import org.apache.http.util.EntityUtils
 
 class SolarForecast(config : Config, reporterKamon : KamonMetrics) {
 
-  val lat = config.getString("forcasting.lat")
-  val lon = config.getString("forcasting.lon")
-  val dec = config.getString("forcasting.dec")
-  val az = config.getString("forcasting.az")
-  val kwh = config.getString("forcasting.kwh")
+  val lat = config.getString("forecasting.lat")
+  val lon = config.getString("forecasting.lon")
+  val dec = config.getString("forecasting.dec")
+  val az = config.getString("forecasting.az")
+  val kwh = config.getString("forecasting.kwh")
 
   val jsonMapper = new ObjectMapper()
   jsonMapper.registerModule(DefaultScalaModule)

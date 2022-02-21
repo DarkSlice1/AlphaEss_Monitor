@@ -81,7 +81,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
       withParameters = true,
       parameters = postParameters)
     val metrics = (jsonMapper.readValue(reply, classOf[SystemDetailsReply]).data)
-    println("AlphaEss Metrics Received")
+    println("AlphaEss Metrics Completed")
     reporter.write(metrics)
   }
 

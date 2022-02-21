@@ -2,10 +2,10 @@ package api.forecast.solar
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-object ForcastingModel {
+object ForecastingModel {
 
 
-  case class SolarForcastingReply(result : result, message :message)
+  case class SolarForecastingReply(result : result, message :message)
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   case class result(today:String, todayValue:Int,tomorrow:String, tomorrowValue:Int)
