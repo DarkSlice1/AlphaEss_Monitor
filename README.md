@@ -32,10 +32,6 @@ Setup an account on [DataDog](https://www.datadoghq.com/)
 
 
 - KAMON_DATADOG_API_KEY= The API key for your DataDog account upon which to pushlish all metrics to 
-- ALPHA_ENABLED= true / false value - do you want to gather alpha metrics
-- ALPHA_USERNAME= The Registered Usename on your Alpha Ess System     
-- ALPHA_PASSWORD= The Registered password on your Alpha Ess System      
-- ALPHA_SYS_SN= The Serial number of your Alpha Ess System ( can be seen on the top of the Alpha App)     
 - EMBER_ENABLED= true / false value - do you want to gather ember metrics
 - EMBER_USERNAME= The Registered Usename on your Ember Heating System.   
 - EMBER_PASSWORD= The Registered password on your Ember Heating System.   
@@ -56,10 +52,10 @@ pull down the assembly jar file form the releases or compile via SBT
 example (linux) script could be
 
 ```sh
-export ALPHA_ENABLE=true
-export ALPHA_USERNAME=username
-export ALPHA_PASSWORD=passowrd
-export ALPHA_SYS_SN=serial_number
+export ALPHA_ENABLE=true            # true / false value - do you want to gather alpha metrics
+export ALPHA_USERNAME=username      # The Registered Usename on your Alpha Ess System     
+export ALPHA_PASSWORD=passowrd      # The Registered password on your Alpha Ess System      
+export ALPHA_SYS_SN=serial_number   # The Serial number of your Alpha Ess System ( can be seen on the top of the Alpha App)     
 
 export KAMON_DATADOG_API_KEY=key
 
