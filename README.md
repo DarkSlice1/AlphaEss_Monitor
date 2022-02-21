@@ -32,22 +32,17 @@ Setup an account on [DataDog](https://www.datadoghq.com/)
 
 
 - KAMON_DATADOG_API_KEY= The API key for your DataDog account upon which to pushlish all metrics to 
-
-
 - ALPHA_ENABLED= true / false value - do you want to gather alpha metrics
 - ALPHA_USERNAME= The Registered Usename on your Alpha Ess System     
 - ALPHA_PASSWORD= The Registered password on your Alpha Ess System      
 - ALPHA_SYS_SN= The Serial number of your Alpha Ess System ( can be seen on the top of the Alpha App)     
-
 - EMBER_ENABLED= true / false value - do you want to gather ember metrics
 - EMBER_USERNAME= The Registered Usename on your Ember Heating System.   
 - EMBER_PASSWORD= The Registered password on your Ember Heating System.   
-
 - TAPO_ENABLED= true / false value - do you want to gather tapo metrics
 - TAPO_USERNAME= The Registered Usename/Email Address on your Tapo TP-Link Account
 - TAPO_PASSWORD= The Registered Password Address on your Tapo TP-Link Account     
 - TAPO_ADDRESSES= Common Delimied list of IP address of you Tapo devices EG. "192.168.1.10,192.168.1.11";      
-
 - FORECAST_ENABLED= true / false value - do you want to gather forecasting metrics
 - FORECAST_LAT= See http://doc.forecast.solar/doku.php?id=api:estimate.   
 - FORECAST_LON= See http://doc.forecast.solar/doku.php?id=api:estimate.    
