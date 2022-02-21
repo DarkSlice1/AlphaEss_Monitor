@@ -28,37 +28,19 @@ I have this running on a Rasberry Pi 2W without issue
 Setup an account on [DataDog](https://www.datadoghq.com/)   
 -> Create a new dashboard   
 -> (Optional)Pull down the Repo and run via SBT (simple Build tool)   
--> Set the below enviromental varaibles   
-
-
-- KAMON_DATADOG_API_KEY= The API key for your DataDog account upon which to pushlish all metrics to 
-- EMBER_ENABLED= true / false value - do you want to gather ember metrics
-- EMBER_USERNAME= The Registered Usename on your Ember Heating System.   
-- EMBER_PASSWORD= The Registered password on your Ember Heating System.   
-- TAPO_ENABLED= true / false value - do you want to gather tapo metrics
-- TAPO_USERNAME= The Registered Usename/Email Address on your Tapo TP-Link Account
-- TAPO_PASSWORD= The Registered Password Address on your Tapo TP-Link Account     
-- TAPO_ADDRESSES= Common Delimied list of IP address of you Tapo devices EG. "192.168.1.10,192.168.1.11";      
-- FORECAST_ENABLED= true / false value - do you want to gather forecasting metrics
-- FORECAST_LAT= See http://doc.forecast.solar/doku.php?id=api:estimate.   
-- FORECAST_LON= See http://doc.forecast.solar/doku.php?id=api:estimate.    
-- FORECAST_DEC= See http://doc.forecast.solar/doku.php?id=api:estimate.   
-- FORECAST_AZ= See http://doc.forecast.solar/doku.php?id=api:estimate.   
-- FORECAST_KWH= See http://doc.forecast.solar/doku.php?id=api:estimate.   
-
+-> Set the below enviromental varaibles based on what metrics you wish to gather (Each section has its own variables to select from)  
 
 
 pull down the assembly jar file form the releases or compile via SBT   
 example (linux) script could be
 
 ```sh
-export ALPHA_ENABLE=true            # true / false value - do you want to gather alpha metrics
-export ALPHA_USERNAME=username      # The Registered Usename on your Alpha Ess System     
-export ALPHA_PASSWORD=passowrd      # The Registered password on your Alpha Ess System      
-export ALPHA_SYS_SN=serial_number   # The Serial number of your Alpha Ess System ( can be seen on the top of the Alpha App)     
+export ALPHA_ENABLE=true          
+export ALPHA_USERNAME=username      
+export ALPHA_PASSWORD=passowrd    
+export ALPHA_SYS_SN=serial_number  
 
-export KAMON_DATADOG_API_KEY=key
-
+export KAMON_DATADOG_API_KEY=MyKey
 
 java -jar alphaess_monitor-assembly-1.0.jar 
 
@@ -76,10 +58,10 @@ java -jar alphaess_monitor-assembly-1.0.jar
 
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
-export ALPHA_ENABLED=true
-export ALPHA_USERNAME=username
-export ALPHA_PASSWORD=passowrd
-export ALPHA_SYS_SN=serial_number
+export ALPHA_ENABLE=true            # true / false value - do you want to gather alpha metrics
+export ALPHA_USERNAME=username      # The Registered Usename on your Alpha Ess System     
+export ALPHA_PASSWORD=passowrd      # The Registered password on your Alpha Ess System      
+export ALPHA_SYS_SN=serial_number   # The Serial number of your Alpha Ess System ( can be seen on the top of the Alpha App)    
 ```
 
 All there metrics are gathered by pinging the Alpha API every 10 seconds, the totals metrics are counter values and are only as accurate the data received. 
@@ -205,10 +187,12 @@ So what does this data look like?
 ``` 
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
-export TAPO_ENABLED=true
-export TAPO_USERNAME=username
-export TAPO_PASSWORD=password
+export TAPO_ENABLED=true                          # true / false value - do you want to gather alpha metrics
+export TAPO_USERNAME=username                     # The Registered Usename/Email Address on your Tapo TP-Link Account
+export TAPO_PASSWORD=password                     # The Registered Password Address on your Tapo TP-Link Account    
+export TAPO_ADDRESSES=192.168.1.10,192.168.1.11   # Common Delimied list of IP address of you Tapo devices EG. "";
 ```
+
 The idea here to tracking large consumers of energy that are plugged into a wall socket. We cant track house hold items that are wired directly to the fuse box (Celiing lights, Ovens, Hot Water Tanks etc)   
     
 The application will generate the following metrics, once you add a comma delimited list of local ip address ( I highly recommend that you give a static IP to these devices via your routers Static DHCP mapping) The application will go though the list every 10 seconds and grab the current wattage draw
@@ -231,20 +215,20 @@ You can also see what applicance is cost your largest cost in your energy bill
     
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
-export EMBER_ENABLED=true
-export EMBER_USERNAME=username
-export EMBER_PASSWORD=password
+export EMBER_ENABLED=true            # true / false value - do you want to gather alpha metrics
+export EMBER_USERNAME=username       # The Registered Usename on your Ember Heating System.  
+export EMBER_PASSWORD=password       # The Registered password on your Ember Heating System.
 ```
  
  
 # _Zappi Tracking_
  todo  
-    
+
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
-export MYENERGI_ENABLED=true
-export MYENERGI_USERNAME=username
-export MYENERGI_PASSWORD=password
+export MYENERGI_ENABLED=true            # true / false value - do you want to gather alpha metrics
+export MYENERGI_USERNAME=username       # The Hub ID on your MyEnergi System.   
+export MYENERGI_PASSWORD=password       # The Registered password on your MyEnergi System.   
 ```
 
 
@@ -253,11 +237,11 @@ export MYENERGI_PASSWORD=password
     
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
-export FORCAST_ENABLED=true
-export FORCAST_LAT=0
-export FORCAST_LON=-0
-export FORCAST_DEC=0
-export FORCAST_AZ=0
-export FORCAST_KWH=0
+export FORCAST_ENABLED=true           # true / false value - do you want to gather alpha metrics
+export FORCAST_LAT=0                  # See http://doc.forecast.solar/doku.php?id=api:estimate.  
+export FORCAST_LON=-0                 # See http://doc.forecast.solar/doku.php?id=api:estimate.  
+export FORCAST_DEC=0                  # See http://doc.forecast.solar/doku.php?id=api:estimate.  
+export FORCAST_AZ=0                   # See http://doc.forecast.solar/doku.php?id=api:estimate.  
+export FORCAST_KWH=0                  # See http://doc.forecast.solar/doku.php?id=api:estimate.  
 ```
  
