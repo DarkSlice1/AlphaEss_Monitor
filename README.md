@@ -10,6 +10,7 @@
 - [Tapo 110 Energy Tracking](#tapo-110-energy-tracking)
 - [Ember Heat Tracking](#ember-heat-tracking)
 - [Zappi Tracking](#zappi-tracking)
+- [Forecasting](#forecasting)
 
 # Overview
    
