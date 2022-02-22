@@ -1,4 +1,6 @@
+import api.alpha.AlphaObjectMapper.{AlphaESSSendSetting}
 import api.alpha.alpha
+import api.common.FileIO
 import api.ember.ember
 import api.forecast.solar.SolarForecast
 import api.myenergi.myenergi_zappie
@@ -6,12 +8,11 @@ import api.tapo.{Tapo, tapoMiddleMan}
 import com.typesafe.config.{Config, ConfigFactory}
 import kamon.Kamon
 import metrics.KamonMetrics
+import api.common.FileIO._
 
 import java.time.temporal.ChronoUnit
-import java.time.{Duration, Instant, LocalDateTime, OffsetDateTime, ZoneOffset, temporal}
-import java.util.{Date, concurrent}
+import java.time.{Duration, Instant, OffsetDateTime, ZoneOffset}
 import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
-import scala.util.{Failure, Success, Try}
 
 
 object Main extends App {
@@ -71,10 +72,11 @@ object Main extends App {
     override def run(): Unit = {
       //run in a 10 second loop
       try {
+
         if(alphaEnabled){alpha.run()}
-        if(tapoEnabled){tapo.Run()}
-        if(emberEnabled){ember.Run()}
-        if(myEnergiEnabled){myenergi.Run()}
+        //if(tapoEnabled){tapo.Run()}
+        //if(emberEnabled){ember.Run()}
+        //if(myEnergiEnabled){myenergi.Run()}
         println("All Metrics Gathered : "+Instant.now())
       }
       catch {
@@ -108,6 +110,9 @@ object Main extends App {
           //what was today's solar generation as a percentage of forecasted
           forecast.RunNightlySummaryMetrics(alpha.reporter.DailySolarGeneration)
           println("Publish Daily forecasting Metrics")
+
+          //TODO get the value to set the charge rate too based on forecasted solar generation
+          alpha.setSystemSettings(95, alpha.getSystemSettings())
         }
         else
           println("Didn't publish metrics, not a full days worth")

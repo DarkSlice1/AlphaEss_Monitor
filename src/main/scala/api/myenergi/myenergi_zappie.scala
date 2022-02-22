@@ -65,6 +65,9 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) {
         reporterKamon.zappiEnergyUsageGauge.set((conversion.zappi.head.ectp1*10).toLong, "hub", username)
       }
     }
+    catch {
+      case ex: Exception => println("ERROR: " + ex.toString);
+    }
 
     println("Zappi Metrics Completed")
   }
