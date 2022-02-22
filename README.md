@@ -7,7 +7,7 @@
   - [Solar Metrics](#solar-metrics)   
   - [Battery Metrics](#battery-metrics)   
   - [Energy Cost Tracking](#energy-cost-tracking)   
-- [Tapo 110 Energy Tracking](#tapo-110-energy-tracking)
+- [Tapo P110 Energy Tracking](#tapo-p110-energy-tracking)
 - [Ember Heat Tracking](#ember-heat-tracking)
 - [Zappi Tracking](#zappi-tracking)
 - [Forecasting](#forecasting)
@@ -51,6 +51,7 @@ java -jar alphaess_monitor-assembly-1.0.jar
 
 
 ## _Generated Alpha ESS Metrics_  
+[AlpahEss](https://alphaess.com/)
 ```diff
 - Please note All metric's are miltiplied by 10 as the kamon library can't push doubles to DataDog, 
 - Please divide by 10 on the DataDog side.   
@@ -180,7 +181,8 @@ So what does this data look like?
 
 
 
- # _Tapo 110 Energy Tracking_
+ # _Tapo P110 Energy Tracking_
+[Tapo P110 Smart Socket](https://www.tapo.com/uk/product/smart-plug/tapo-p110/)
 ```diff
 - Please note All metric's are miltiplied by 10 as the kamon library can't push doubles to DataDog, 
 - Please divide by 10 on the DataDog side.   
@@ -213,7 +215,8 @@ You can also see what applicance is cost your largest cost in your energy bill
 
 # _Ember Heat Tracking_
  todo   
-    
+[Ember Heating](https://emberapp.ephcontrols.com/)
+
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
 export EMBER_ENABLED=true            # true / false value - do you want to gather ember metrics
@@ -224,7 +227,7 @@ export EMBER_PASSWORD=password       # The Registered password on your Ember Hea
  
 # _Zappi Tracking_
  todo  
-
+[My Energi - Zappi](https://myenergi.com/product/zappi/)
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
 export MYENERGI_ENABLED=true            # true / false value - do you want to gather myenergi metrics
