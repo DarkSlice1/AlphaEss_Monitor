@@ -17,6 +17,7 @@ object restCaller {
   val timeout = 1000
 
   def simpleRestPostCall(url: String, data: RestBody,
+                         withToken: Boolean = false,
                          token: String = ""): String = {
     // convert it to a JSON string
     val json = new Gson().toJson(data)
@@ -25,7 +26,9 @@ object restCaller {
     // set the Content-type
     post.setHeader("Content-type", "application/json")
     post.setHeader("Host", "www.alphaess.com")
-
+    if (withToken) {
+      post.setHeader("Authorization", "Bearer " + token)
+    }
     // add the JSON as a StringEntity
     post.setEntity(new StringEntity(json))
     // send the post request

@@ -53,7 +53,7 @@ class SolarForecast(config : Config, reporterKamon : KamonMetrics) {
     println("Forecasting data : Today's Forecast ="+todaysForecast.toDouble)
     println("Forecasting data : Total Solar Generation ="+totalSolarGeneration)
 
-    val  accuracy = (todaysForecast.toDouble/(totalSolarGeneration/1000))*100
+    val  accuracy = (todaysForecast.toDouble/(totalSolarGeneration / 60 / 6))*100
     reporterKamon.forecasting_todaysAccuracy.set(accuracy.toLong)
 
     //reset the value

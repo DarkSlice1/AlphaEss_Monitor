@@ -86,8 +86,35 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
   }
 
 
-  def resetDailyCounter(): Unit =
+  def resetDailyCounter() =
   {
     reporter.DailySolarGeneration = 0
+  }
+
+  def getSystemSettings(): AlphaESSReceivedSettingData =
+  {
+    val urlExtension= "/api/Account/GetCustomUseESSSetting?sys_sn="+sys_sn
+    val getParameters = new util.ArrayList[NameValuePair](2)
+    getParameters.add(new BasicNameValuePair("sys_sn", sys_sn))
+    val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
+      withToken = true,
+      token = token.AccessToken,
+      withParameters = true,
+      parameters = getParameters)
+
+    jsonMapper.readValue(reply, classOf[AlphaESSReceivedSetting]).data
+
+  }
+
+  def setSystemSettings(BatteryLevel :Int, data: AlphaESSReceivedSettingData)
+  {
+    val urlExtension= "/api/Account/CustomUseESSSetting"
+    //convert to AlphaESSSendSetting - what they give and what they expect are not the same :(
+    val convertedPayload =  AlphaESSSendSetting.from(data).copy(bat_high_cap=""+BatteryLevel)
+    val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension,convertedPayload,true,token.AccessToken)
+    val result = jsonMapper.readValue(reply, classOf[LoginReply])
+
+    if(result.code == 200)
+      println("Updated Battery to a max charge of "+BatteryLevel)
   }
 }
