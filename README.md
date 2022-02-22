@@ -193,7 +193,7 @@ Be sure to set the enviromental variables if you wish to use these metrics
 export TAPO_ENABLED=true                          # true / false value - do you want to gather tapo metrics
 export TAPO_USERNAME=username                     # The Registered Usename/Email Address on your Tapo TP-Link Account
 export TAPO_PASSWORD=password                     # The Registered Password Address on your Tapo TP-Link Account    
-export TAPO_ADDRESSES=192.168.1.10,192.168.1.11   # Common Delimied list of IP address of you Tapo devices EG. "";
+export TAPO_ADDRESSES=192.168.1.10,192.168.1.11   # Common Delimied list of IP address of you Tapo devices
 ```
 
 The idea here to tracking large consumers of energy that are plugged into a wall socket. We cant track house hold items that are wired directly to the fuse box (Celiing lights, Ovens, Hot Water Tanks etc)   
@@ -227,7 +227,7 @@ export EMBER_PASSWORD=password       # The Registered password on your Ember Hea
  
 # _Zappi Tracking_
  todo  
-[My Energi - Zappi](https://myenergi.com/product/zappi/)
+[My Energi - Zappi](https://myenergi.com/product/zappi/)   
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
 export MYENERGI_ENABLED=true            # true / false value - do you want to gather myenergi metrics
