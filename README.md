@@ -216,7 +216,7 @@ You can also see what applicance is cost your largest cost in your energy bill
     
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
-export EMBER_ENABLED=true            # true / false value - do you want to gather alpha metrics
+export EMBER_ENABLED=true            # true / false value - do you want to gather ember metrics
 export EMBER_USERNAME=username       # The Registered Usename on your Ember Heating System.  
 export EMBER_PASSWORD=password       # The Registered password on your Ember Heating System.
 ```
@@ -227,7 +227,7 @@ export EMBER_PASSWORD=password       # The Registered password on your Ember Hea
 
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
-export MYENERGI_ENABLED=true            # true / false value - do you want to gather alpha metrics
+export MYENERGI_ENABLED=true            # true / false value - do you want to gather myenergi metrics
 export MYENERGI_USERNAME=username       # The Hub ID on your MyEnergi System.   
 export MYENERGI_PASSWORD=password       # The Registered password on your MyEnergi System.   
 ```
@@ -238,7 +238,7 @@ export MYENERGI_PASSWORD=password       # The Registered password on your MyEner
     
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
-export FORCAST_ENABLED=true           # true / false value - do you want to gather alpha metrics
+export FORCAST_ENABLED=true           # true / false value - do you want to gather forecasting metrics
 export FORCAST_LAT=0                  # See http://doc.forecast.solar/doku.php?id=api:estimate.  
 export FORCAST_LON=-0                 # See http://doc.forecast.solar/doku.php?id=api:estimate.  
 export FORCAST_DEC=0                  # See http://doc.forecast.solar/doku.php?id=api:estimate.  
