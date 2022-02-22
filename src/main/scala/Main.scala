@@ -112,7 +112,7 @@ object Main extends App {
           println("Publish Daily forecasting Metrics")
 
           //TODO get the value to set the charge rate too based on forecasted solar generation
-          alpha.setSystemSettings(95, alpha.getSystemSettings())
+         // alpha.setSystemSettings(95, alpha.getSystemSettings())
         }
         else
           println("Didn't publish metrics, not a full days worth")
