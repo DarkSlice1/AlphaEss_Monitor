@@ -188,7 +188,7 @@ So what does this data look like?
 ``` 
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
-export TAPO_ENABLED=true                          # true / false value - do you want to gather alpha metrics
+export TAPO_ENABLED=true                          # true / false value - do you want to gather tapo metrics
 export TAPO_USERNAME=username                     # The Registered Usename/Email Address on your Tapo TP-Link Account
 export TAPO_PASSWORD=password                     # The Registered Password Address on your Tapo TP-Link Account    
 export TAPO_ADDRESSES=192.168.1.10,192.168.1.11   # Common Delimied list of IP address of you Tapo devices EG. "";
