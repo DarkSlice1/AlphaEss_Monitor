@@ -74,9 +74,9 @@ object Main extends App {
       try {
 
         if(alphaEnabled){alpha.run()}
-        //if(tapoEnabled){tapo.Run()}
-        //if(emberEnabled){ember.Run()}
-        //if(myEnergiEnabled){myenergi.Run()}
+        if(tapoEnabled){tapo.Run()}
+        if(emberEnabled){ember.Run()}
+        if(myEnergiEnabled){myenergi.Run()}
         println("All Metrics Gathered : "+Instant.now())
       }
       catch {
