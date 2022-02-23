@@ -69,10 +69,10 @@ object Main extends App with LazyLogging {
     override def run(): Unit = {
       //run in a 10 second loop
       try {
-       // if (alphaEnabled) {alpha.run()}
-       // if (tapoEnabled) {tapo.Run()}
-       // if (emberEnabled) {ember.Run()}
-       // if (myEnergiEnabled) {myenergi.Run()}
+       if (alphaEnabled) {alpha.run()}
+       if (tapoEnabled) {tapo.Run()}
+       if (emberEnabled) {ember.Run()}
+       if (myEnergiEnabled) {myenergi.Run()}
         logger.info("All Metrics Gathered : " + Instant.now())
       }
       catch {
