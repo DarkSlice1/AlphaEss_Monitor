@@ -60,7 +60,7 @@ java -jar alphaess_monitor-assembly-1.0.jar
 
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
-export ALPHA_ENABLE=true            # true / false value - do you want to gather alpha metrics
+export ALPHA_ENABLED=true            # true / false value - do you want to gather alpha metrics
 export ALPHA_USERNAME=username      # The Registered Usename on your Alpha Ess System     
 export ALPHA_PASSWORD=passowrd      # The Registered password on your Alpha Ess System      
 export ALPHA_SYS_SN=serial_number   # The Serial number of your Alpha Ess System ( can be seen on the top of the Alpha App)    
