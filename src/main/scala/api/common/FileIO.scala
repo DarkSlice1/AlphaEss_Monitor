@@ -3,13 +3,14 @@ package api.common
 import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.typesafe.scalalogging.LazyLogging
 import java.io.{BufferedWriter, File, FileWriter}
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 import scala.io.Source
 import scala.util.Try
 
-object FileIO {
+object FileIO extends LazyLogging{
 
   val jsonMapper = new ObjectMapper()
   val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -30,7 +31,7 @@ object FileIO {
   def writeToken(tokenFile:File, token : Option[Token])= {
     val bw = new BufferedWriter(new FileWriter(tokenFile))
     token match{
-      case Some(value) => println("Access Token received : " + value.AccessToken + ", expires on "+value.ExpiresIn+" minutes, created at "+value.TokenCreateTime)
+      case Some(value) => logger.info("Access Token received : " + value.AccessToken + ", expires on "+value.ExpiresIn+" minutes, created at "+value.TokenCreateTime)
         bw.write(jsonMapper.writeValueAsString(value))
       //clean the file
       case None =>  bw.write("")

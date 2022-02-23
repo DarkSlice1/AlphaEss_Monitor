@@ -2,17 +2,13 @@ import sbt._
 
 object Dependencies {
 
-  private val kamon_core            = "io.kamon"      %% "kamon-core"               % "2.3.1"
-  private val kamon_bundle          = "io.kamon"      %% "kamon-bundle"             % "2.3.1"
-  private val kamon_scala           = "io.kamon"      %% "kamon-scala"              % "0.6.7"
-  //private val kamon_akka            = "io.kamon"      %% "kamon-akka"               % "2.3.1"
-  //private val kamon_akka_remote     = "io.kamon"      %% "kamon-akka-remote-2.4"    % "1.1.0"
-  private val kamon_datadog         = "io.kamon"      %% "kamon-datadog"            % "2.3.1"
-  private val kamon_system_metrics  = "io.kamon"      %% "kamon-system-metrics"     % "2.3.1"
-  private val aspectj_weaver        = "org.aspectj"   % "aspectjweaver"             % "1.8.9"
+  private val kamon_core            = "io.kamon"                        %% "kamon-core"             % "2.3.1"
+  private val kamon_scala           = "io.kamon"                        %% "kamon-scala"            % "0.6.7"
+  private val kamon_datadog         = "io.kamon"                        %% "kamon-datadog"          % "2.3.1"
+  private val aspectj_weaver        = "org.aspectj"                     % "aspectjweaver"           % "1.8.9"
 
-  //  private val kamon_core = "io.kamon" %% "kamon-bundle" % "2.0.1"
-//  private val kamon_reporter = "io.kamon" %% "kamon-apm-reporter" % "2.0.0"
+  private val scala_logger          = "com.typesafe.scala-logging"      %% "scala-logging"          % "3.1.0"
+  private val logback               = "ch.qos.logback"                  % "logback-classic"         % "1.1.2"
 
   private val jackson_core          = "com.fasterxml.jackson.core"      % "jackson-core"            % "2.6.7"
   private val jackson_databind      = "com.fasterxml.jackson.core"      % "jackson-databind"        % "2.6.7"
@@ -29,9 +25,9 @@ object Dependencies {
 
   private val kamonDeps = Seq(kamon_core, kamon_datadog, aspectj_weaver,kamon_scala)
   private val JSONDeps = Seq(jackson_core, jackson_databind, jackson_module, jackson_datatype_jdk8, json4s_base, json4s_jackson)
+  private val logger = Seq(scala_logger,logback)
 
-
-  val coreDependencies =  kamonDeps ++ JSONDeps  ++ Seq(gson,apache_http,squareup,bouncycastle)//++ Seq()
+  val coreDependencies =  logger ++ kamonDeps ++ JSONDeps  ++ Seq(gson,apache_http,squareup,bouncycastle)
 
   lazy val resolverSettings = Seq()
 }

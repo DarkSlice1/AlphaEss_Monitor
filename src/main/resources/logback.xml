@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds">
 
-
     <property name="PATTERN_CONSOLE" value="%d{yyyy-MM-dd HH:mm:ss.SSS,UTC} [%-5level] [%logger{0}] %message%n%xException{5}"/>
-
+    <appender name="MAIN_ROLLING_LOGS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${user.dir}/logs.log</file>
+        <!-- What quantity of logs do we keep? -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${user.dir}/logs-%i.log.gz</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+        <!-- When do we roll the log file? -->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>50MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>${PATTERN_CONSOLE}</pattern>
+        </encoder>
+        <prudent>false</prudent>
+    </appender>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>
@@ -16,6 +31,7 @@
 
     <root level="${LOG_LEVEL}">
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="MAIN_ROLLING_LOGS"/>
     </root>
 
 </configuration>

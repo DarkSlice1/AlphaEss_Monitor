@@ -4,12 +4,14 @@ import api.common.FileIO._
 import api.common.Token
 import api.ember.EmberObjectMapper._
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.LazyLogging
 import metrics.KamonMetrics
+
 import java.time.{Instant, LocalDateTime, ZoneId}
 import scala.collection.mutable.ListBuffer
 
 
-class ember(config: Config, reporterKamon : KamonMetrics) {
+class ember(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
 
   val username = config.getString("ember.username")
@@ -30,7 +32,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
         val today = LocalDateTime.ofInstant(Instant.now(), ZoneId.of("UTC"))
         if (today.isAfter(expiry)) {
           //token expired - lets refresh
-          println("Ember Token is Expired")
+          logger.info("Ember Token is Expired")
           //refreshToken()
           //TODO figure out fresh token command
           Login()
@@ -52,7 +54,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
     val result: LoginReply = jsonMapper.readValue(reply, classOf[LoginReply])
 
     result.data match {
-      case null => println("ERROR : " + result.toString)
+      case null => logger.info("ERROR : " + result.toString)
       case value: Any => token =  new Token(AccessToken = value.token, RefreshTokenKey = value.refresh_token)
     }
     result
@@ -66,7 +68,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
       hostname = "eu-https.topband-cloud.com")
 
     gatewayId = (jsonMapper.readValue(reply, classOf[GatewayReply]).data.head.gatewayid)
-    println("Ember Gateway Received")
+    logger.info("Ember Gateway Received")
   }
 
   def GetValueAtIndex(elements: HomeMetricsData, position: Int) : String = {
@@ -124,7 +126,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) {
       reporterKamon.emberBurnGauge.set(0)
     }
 
-    println("Ember Metrics Completed")
+    logger.info("Ember Metrics Completed")
   }
 
 

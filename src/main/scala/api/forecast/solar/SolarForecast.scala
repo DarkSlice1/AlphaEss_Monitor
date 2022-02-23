@@ -5,12 +5,13 @@ import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.LazyLogging
 import metrics.KamonMetrics
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.util.EntityUtils
 
-class SolarForecast(config : Config, reporterKamon : KamonMetrics) {
+class SolarForecast(config : Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
   val lat = config.getString("forecasting.lat")
   val lon = config.getString("forecasting.lon")
@@ -40,7 +41,7 @@ class SolarForecast(config : Config, reporterKamon : KamonMetrics) {
 
       //due to the bad json format received from the service (dynamic name values), mapping to too much work for now
       todaysForecast = jsonMapper.readTree(reply).get("result").elements().next().asInt()
-      println("Forecaster Generation for today is :"+todaysForecast+" watts")
+      logger.info("Forecaster Generation for today is :"+todaysForecast+" watts")
     todaysForecast
     }
 
@@ -50,8 +51,8 @@ class SolarForecast(config : Config, reporterKamon : KamonMetrics) {
 
   def RunNightlySummaryMetrics(totalSolarGeneration: Double): Unit =
   {
-    println("Forecasting data : Today's Forecast ="+todaysForecast.toDouble)
-    println("Forecasting data : Total Solar Generation ="+totalSolarGeneration)
+    logger.info("Forecasting data : Today's Forecast ="+todaysForecast.toDouble)
+    logger.info("Forecasting data : Total Solar Generation ="+totalSolarGeneration)
 
     val  accuracy = (todaysForecast.toDouble/(totalSolarGeneration / 60 / 6))*100
     reporterKamon.forecasting_todaysAccuracy.set(accuracy.toLong)

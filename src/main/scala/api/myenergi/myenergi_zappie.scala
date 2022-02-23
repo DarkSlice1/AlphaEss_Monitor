@@ -3,11 +3,12 @@ package api.myenergi
 import api.common.FileIO._
 import api.myenergi.MyEnergiObjectMapper._
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.LazyLogging
 import metrics.KamonMetrics
 
 //available endpoints : https://github.com/claytonn73/myenergi_api/blob/62d6915784bde9aaaa6fbfe34cc0ec6eeb2eb060/myenergi/const.py#L9
 
-class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) {
+class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
 
   val username = config.getString("myenergi.username")
@@ -26,7 +27,7 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) {
       }
     }
     catch {
-      case ex: Exception => println("Zappie ERROR: " + ex.toString + " Trying to login again");
+      case ex: Exception => logger.error("Zappie ERROR: " + ex.toString + " Trying to login again")
         //reset
         asn_url = ""
     }
@@ -66,9 +67,9 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) {
       }
     }
     catch {
-      case ex: Exception => println("ERROR: " + ex.toString);
+      case ex: Exception => logger.error("ERROR: " + ex.toString);
     }
 
-    println("Zappi Metrics Completed")
+    logger.info("Zappi Metrics Completed")
   }
 }

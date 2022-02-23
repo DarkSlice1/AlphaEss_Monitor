@@ -4,15 +4,14 @@ import api.alpha.AlphaObjectMapper._
 import api.common.FileIO._
 import api.common.Token
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.LazyLogging
 import metrics.KamonMetrics
 import org.apache.http.NameValuePair
 import org.apache.http.message.BasicNameValuePair
-
-import java.io.File
 import java.time.{Instant, LocalDateTime, ZoneId}
 import java.util
 
-class alpha(config: Config, reporterKamon : KamonMetrics) {
+class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
 
   var username = config.getString("alphaess.username")
@@ -35,7 +34,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
         val today = LocalDateTime.ofInstant(Instant.now(),ZoneId.of("UTC"))
         if(today.isAfter(expiry)){
           //token expired - lets refresh
-          println("Alpha Token is Expired")
+          logger.info("Alpha Token is Expired")
           //refreshToken()
          //TODO figure out fresh token command
           Login();
@@ -53,14 +52,14 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
     val result: LoginReply = jsonMapper.readValue(reply, classOf[LoginReply])
 
     result.data match {
-      case null => println("ERROR : " + result.toString)
+      case null => logger.error("ERROR : " + result.toString)
       case value : Any =>  token = value
     }
     result
   }
 
   def refreshToken(): Token = {
-   // println("Calling refreshToken()")
+   // logger.info("Calling refreshToken()")
    // val urlExtension= "Api/Account/Login"
    // val reply = restCaller.get(eplBaseHost+urlExtension, readToken)
    // val result = jsonMapper.readValue(reply, classOf[token])
@@ -70,7 +69,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
   }
 
   def getMetrics() = {
-    //println("Calling getMetrics ")
+    //logger.info("Calling getMetrics ")
     val urlExtension= "/api/ESS/GetSecondDataBySn?sys_sn="+sys_sn+"&noLoading=true"
     val postParameters = new util.ArrayList[NameValuePair](2);
     postParameters.add(new BasicNameValuePair("sys_sn", sys_sn));
@@ -81,7 +80,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
       withParameters = true,
       parameters = postParameters)
     val metrics = (jsonMapper.readValue(reply, classOf[SystemDetailsReply]).data)
-    println("AlphaEss Metrics Completed")
+    logger.info("AlphaEss Metrics Completed")
     reporter.write(metrics)
   }
 
@@ -115,6 +114,6 @@ class alpha(config: Config, reporterKamon : KamonMetrics) {
     val result = jsonMapper.readValue(reply, classOf[LoginReply])
 
     if(result.code == 200)
-      println("Updated Battery to a max charge of "+BatteryLevel)
+      logger.info("Updated Battery to a max charge of "+BatteryLevel)
   }
 }

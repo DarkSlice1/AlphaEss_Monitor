@@ -2,6 +2,7 @@ package api.myenergi
 
 import api.common.RestBody
 import com.google.gson.Gson
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.http.NameValuePair
 import org.apache.http.client.methods.{HttpGet, HttpPost}
 import org.apache.http.entity.StringEntity
@@ -16,7 +17,7 @@ import org.apache.http.impl.client.BasicResponseHandler
 
 import java.util.{ArrayList, Date, Random}
 
-object restCaller {
+object restCaller extends LazyLogging{
 
   val timeout = 1000
 
@@ -53,15 +54,15 @@ object restCaller {
     val httpclient = new DefaultHttpClient
     val httpclient2 = new DefaultHttpClient
     val httpget = new HttpGet(url)
-    //System.out.println("Requesting : " + httpget.getURI)
+    //System.out.logger.info("Requesting : " + httpget.getURI)
 
     httpget.addHeader("HOST", host)
     val response = httpclient.execute(httpget)
-    //System.out.println(response.getStatusLine)
+    //System.out.logger.info(response.getStatusLine)
     var reply = ""
     if (response.getStatusLine.getStatusCode == HttpStatus.SC_UNAUTHORIZED) { //Get current current "WWW-Authenticate" header from response
       val authHeader = response.getFirstHeader(AUTH.WWW_AUTH)
-      //System.out.println("authHeader = " + authHeader)
+      //System.out.logger.info("authHeader = " + authHeader)
       val digestScheme = new DigestScheme
       //Parse realm, nonce sent by server.
       digestScheme.processChallenge(authHeader)

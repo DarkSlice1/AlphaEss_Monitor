@@ -1,13 +1,14 @@
 package api.tapo
 
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.LazyLogging
 import metrics.KamonMetrics
 
 import scala.collection.JavaConversions.mapAsScalaMap
 
 
 
-class tapoMiddleMan(tapoParamenter: Tapo, config :Config, reporterKamon : KamonMetrics) {
+class tapoMiddleMan(tapoParamenter: Tapo, config :Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
   val tapo = tapoParamenter
 
@@ -24,7 +25,7 @@ class tapoMiddleMan(tapoParamenter: Tapo, config :Config, reporterKamon : KamonM
       }
       catch {
         case ex: Exception =>
-          println("Tapo Energy: " + address + " = " + ex.getMessage)
+          logger.info("Tapo Energy: " + address + " = " + ex.getMessage)
           //reset the device to start over
           tapo.token.remove(address)
           tapo.c658a.remove(address)
@@ -47,7 +48,7 @@ class tapoMiddleMan(tapoParamenter: Tapo, config :Config, reporterKamon : KamonM
       }
       catch {
         case ex: Exception =>
-          println("Tapo Energy: "+address+" = " + ex.getMessage)
+          logger.info("Tapo Energy: "+address+" = " + ex.getMessage)
           tapo.token.remove(address)
           tapo.c658a.remove(address)
           tapo.handshakeResponse.remove(address)

@@ -122,12 +122,11 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
       CostPerKwMetric(metrics.pmeter_l1)
     } else {
       //update our counter for tracking grid push
-      reporterKamon.totalGridPush.increment(CheckForZero(gridConsumption), "sys_name", syn_name)
+      reporterKamon.totalGridPush.increment(CheckForZero(Math.abs(gridConsumption)), "sys_name", syn_name)
       //update our counter for tracking grid push
       gridPush_l1.update(CheckForZero(Math.abs(metrics.pmeter_l1)))
       // set our grid pull to 0
       gridPull_l1.update(0)
-
     }
   }
 
