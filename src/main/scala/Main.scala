@@ -100,16 +100,16 @@ object Main extends App with LazyLogging {
           todaysForecast match
           {
             case x if x>15000 => {
-              alpha.setSystemSettings(20, alpha.getSystemSettings())
-              logger.info("Battery percent will be: 20%")
+              alpha.setSystemSettings(30, alpha.getSystemSettings())
+              logger.info("Battery percent will be: 30%")
             }
             case x if(x<15000 && x>10000) => {
-              alpha.setSystemSettings(30, alpha.getSystemSettings())
-              logger.info("Battery percent will be: 40%")
+              alpha.setSystemSettings(50, alpha.getSystemSettings())
+              logger.info("Battery percent will be: 50%")
             }
             case x if(x<10000 && x>6000) => {
-              alpha.setSystemSettings(60, alpha.getSystemSettings())
-              logger.info("Battery percent will be: 70%")
+              alpha.setSystemSettings(80, alpha.getSystemSettings())
+              logger.info("Battery percent will be: 80%")
             }
             case x if x<6000 => {
               alpha.setSystemSettings(95, alpha.getSystemSettings())
