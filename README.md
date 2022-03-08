@@ -245,8 +245,8 @@ Usefull to see how much energy is going to your car over time and as a percentag
 
 The following metric's are available
  ```sh
- tapo.EnergyUsageCounter    (Counter: The total wattage over a period of time)
- tapo.tapoEnergyUsageGauge  (Gauge : The Watage right now)
+ myenergy.zapiEnergyUsageCounter    (Counter: The total wattage over a period of time)
+ myenergy.zapiEnergyUsageGauge      (Gauge : The Watage right now)
  ``` 
 
 # _Forecasting_
