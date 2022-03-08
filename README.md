@@ -226,7 +226,11 @@ export EMBER_PASSWORD=password       # The Registered password on your Ember Hea
  
  
 # _Zappi Tracking_
- todo  
+```diff
+- Please note All metric's are miltiplied by 10 as the kamon library can't push doubles to DataDog, 
+- Please divide by 10 on the DataDog side.   
+- Example : A grid pull of 5000 watts is actaully 500.0 watts
+``` 
 [My Energi - Zappi](https://myenergi.com/product/zappi/)   
 Be sure to set the enviromental variables if you wish to use these metrics   
 ```sh
@@ -235,6 +239,15 @@ export MYENERGI_USERNAME=username       # The Hub ID on your MyEnergi System.
 export MYENERGI_PASSWORD=password       # The Registered password on your MyEnergi System.   
 ```
 
+This will show you how much wattage you are sending to your car from either excess solar energy or grill pull.   
+Usefull to see how much energy is going to your car over time and as a percentage of your total energy usage
+![MyEnergiZappi](https://github.com/DarkSlice1/AlphaEss_Monitor/blob/master/readmeImages/MyEnergiZappi.png)
+
+The following metric's are available
+ ```sh
+ tapo.EnergyUsageCounter    (Counter: The total wattage over a period of time)
+ tapo.tapoEnergyUsageGauge  (Gauge : The Watage right now)
+ ``` 
 
 # _Forecasting_
  todo  
