@@ -1,3 +1,4 @@
+import api.alpha.AlphaObjectMapper.AlphaESSSendSetting
 import api.alpha.alpha
 import api.ember.ember
 import api.forecast.solar.SolarForecast
@@ -6,10 +7,13 @@ import api.tapo.{Tapo, tapoMiddleMan}
 import com.typesafe.config.{Config, ConfigFactory}
 import kamon.Kamon
 import metrics.KamonMetrics
+
 import java.time.temporal.ChronoUnit
-import java.time.{Duration, Instant, OffsetDateTime, ZoneOffset}
+import java.time.{Duration, Instant, LocalDateTime, OffsetDateTime, ZoneOffset}
 import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
 import com.typesafe.scalalogging.LazyLogging
+
+import java.util.Calendar
 
 
 object Main extends App with LazyLogging {
@@ -23,6 +27,7 @@ object Main extends App with LazyLogging {
   val tapoEnabled = conf2.getBoolean("tapo.enabled")
   val myEnergiEnabled = conf2.getBoolean("myenergi.enabled")
   val forecastEnabled = conf2.getBoolean("forecasting.enabled")
+  val controlEnabled = conf2.getBoolean("alphaess.allow_control")
 
   logger.info("KAMON_DATADOG_API_KEY = " + conf2.getString("kamon.datadog.api.api-key"))
 
@@ -64,6 +69,7 @@ object Main extends App with LazyLogging {
   val tapo = new tapoMiddleMan(new Tapo(), conf2, reporterKamon)
   val forecast = new SolarForecast(conf2, reporterKamon)
   val myenergi = new myenergi_zappie(conf2, reporterKamon)
+  val systemControl = new api.forecast.solar.SystemControl(alpha,forecast)
 
   val GatherRealTimeMetrics = new Runnable {
     override def run(): Unit = {
@@ -73,6 +79,7 @@ object Main extends App with LazyLogging {
        if (tapoEnabled) {tapo.Run()}
        if (emberEnabled) {ember.Run()}
        if (myEnergiEnabled) {myenergi.Run()}
+        if(controlEnabled) {systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())}
         logger.info("All Metrics Gathered : " + Instant.now())
       }
       catch {
@@ -81,56 +88,18 @@ object Main extends App with LazyLogging {
     }
   }
 
-  val now = OffsetDateTime.now(ZoneOffset.UTC)
+  val now = LocalDateTime.now()
   val ex = new ScheduledThreadPoolExecutor(1)
+  // run Every 10 seconds
   ex.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
+  // run at the top of every hour
+  ex.scheduleAtFixedRate(HourlyRun, Duration.between(now, now.plusHours(1).truncatedTo(ChronoUnit.HOURS)).toMillis+1000, TimeUnit.HOURS.toMillis(1), TimeUnit.MILLISECONDS)
 
 
-  //runs at 1 am each day - get forecast
-  val GatherSolarForecastMetrics = new Runnable {
-    override def run(): Unit = {
-      try {
-        //what do we predict for today's solar generation
-        val todaysForecast = forecast.getTodaysForcast()
-        forecast.publishTodaysForcast(todaysForecast)
-        logger.info("Publish forecasting Metrics")
 
-        //TODO - Make configurable
-        if(conf2.getBoolean("alphaess.allow_control")) {
-          todaysForecast match
-          {
-            case x if x>15000 => {
-              alpha.setSystemSettings(30, alpha.getSystemSettings())
-              logger.info("Battery percent will be: 30%")
-            }
-            case x if(x<15000 && x>10000) => {
-              alpha.setSystemSettings(50, alpha.getSystemSettings())
-              logger.info("Battery percent will be: 50%")
-            }
-            case x if(x<10000 && x>6000) => {
-              alpha.setSystemSettings(80, alpha.getSystemSettings())
-              logger.info("Battery percent will be: 80%")
-            }
-            case x if x<6000 => {
-              alpha.setSystemSettings(95, alpha.getSystemSettings())
-              logger.info("Battery percent will be: 95%")
-            }
-            case _ =>  {
-              alpha.setSystemSettings(95, alpha.getSystemSettings())
-              logger.info("Battery charge percent will be defaulted 95%")
-            }
-          }
-        }
-      }
-      catch {
-        case ex: Exception => logger.info("ERROR: " + ex.toString);
-      }
-    }
-  }
 
-  //run at 11pm every day - publish forecast accuracy
-  val PublishSolarForecastNightlySummaryMetrics = new Runnable {
-    override def run(): Unit = {
+  //Publish forecast accuracy
+  def PublishSolarForecastNightlySummaryMetrics()= {
       try {
         //make sure we have a full days set of data first
         if (applicationStartTime.until(Instant.now(), ChronoUnit.HOURS) > 24) {
@@ -146,34 +115,22 @@ object Main extends App with LazyLogging {
       catch {
         case ex: Exception => logger.info("ERROR: " + ex.toString);
       }
+  }
+
+
+
+  val HourlyRun = new Runnable {
+    override def run(): Unit = {
+      Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match //.HOUR_OF_DAY) match
+      {
+        //what do we want to run at what hour
+        case 1  if(forecastEnabled && controlEnabled) => systemControl.setSystemSettingsBasedOnGeneratedForecast()
+        case 23 if (forecastEnabled) => PublishSolarForecastNightlySummaryMetrics()
+        case 6 if(forecastEnabled && controlEnabled) => systemControl.EnableBatteryNightCharging()
+      }
     }
   }
 
-  if (forecastEnabled) {
-    //Run at 1am Each day
-    ex.scheduleAtFixedRate(GatherSolarForecastMetrics, Duration.between(
-      now,
-      now.toLocalDate()
-        .plusDays(1)
-        .atStartOfDay(ZoneOffset.UTC)
-        .plusHours(1)
-    ).toMillis,
-      TimeUnit.DAYS.toMillis(1),
-      TimeUnit.MILLISECONDS
-    )
-
-    //Run at 11pm Each day
-    ex.scheduleAtFixedRate(PublishSolarForecastNightlySummaryMetrics, Duration.between(
-      now,
-      now.toLocalDate()
-        .plusDays(1)
-        .atStartOfDay(ZoneOffset.UTC)
-        .minusHours(1)
-    ).toMillis,
-      TimeUnit.DAYS.toMillis(1),
-      TimeUnit.MILLISECONDS
-    )
-  }
 
   private def startKamon(config: Config) = {
     logger.info("Starting Kamon reporters...." + config.getStringList("kamon.reporters").toString)

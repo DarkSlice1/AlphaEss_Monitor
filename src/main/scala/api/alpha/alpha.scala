@@ -14,14 +14,16 @@ import java.util
 class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
 
-  var username = config.getString("alphaess.username")
-  var password = config.getString("alphaess.password")
-  var sys_sn = config.getString("alphaess.system_sn")
+  val username = config.getString("alphaess.username")
+  val password = config.getString("alphaess.password")
+  val sys_sn = config.getString("alphaess.system_sn")
 
-  var reporter = new reportHome(config,reporterKamon)
-
+  val reporter = new reportHome(config,reporterKamon)
   val eplBaseHost = "https://www.alphaess.com"
+
   var token = Token.empty()
+  var currentBatteryPercentage = 0.0
+  var currentGridPull = 0.0
 
   def run(): Unit = {
     //Do we have an access token
@@ -68,6 +70,8 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
     Token.empty()
   }
 
+
+
   def getMetrics() = {
     //logger.info("Calling getMetrics ")
     val urlExtension= "/api/ESS/GetSecondDataBySn?sys_sn="+sys_sn+"&noLoading=true"
@@ -81,6 +85,8 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
       parameters = postParameters)
     val metrics = (jsonMapper.readValue(reply, classOf[SystemDetailsReply]).data)
     logger.info("AlphaEss Metrics Completed")
+    currentBatteryPercentage = metrics.pbat
+    currentGridPull = metrics.pmeter_l1
     reporter.write(metrics)
   }
 
@@ -105,15 +111,21 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
   }
 
-  def setSystemSettings(BatteryLevel :Int, data: AlphaESSReceivedSettingData)
+  def setSystemSettings(convertedPayload: AlphaESSSendSetting)
   {
     val urlExtension= "/api/Account/CustomUseESSSetting"
     //convert to AlphaESSSendSetting - what they give and what they expect are not the same :(
-    val convertedPayload =  AlphaESSSendSetting.from(data).copy(bat_high_cap=""+BatteryLevel)
+
     val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension,convertedPayload,true,token.AccessToken)
     val result = jsonMapper.readValue(reply, classOf[LoginReply])
 
     if(result.code == 200)
-      logger.info("Updated Battery to a max charge of "+BatteryLevel)
+      logger.info("Updated System Settings")
+  }
+
+  def getBatteryPercentage(): Double = currentBatteryPercentage
+
+  def getCurrentGridPull():Double = {
+    currentGridPull
   }
 }
