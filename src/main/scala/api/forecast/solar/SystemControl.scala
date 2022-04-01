@@ -3,20 +3,12 @@ package api.forecast.solar
 import api.alpha.AlphaObjectMapper.AlphaESSSendSetting
 import api.alpha.alpha
 import com.typesafe.scalalogging.LazyLogging
-import java.time.Instant
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
 class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
 
   private var batteryChargeEnabled = true
-  val ChargingWindowStart = Calendar.getInstance
-  ChargingWindowStart.setTime(new SimpleDateFormat("HH:mm:ss").parse("02:05:00"))
-  ChargingWindowStart.add(Calendar.DATE, 1)
-
-  val ChargingWindowEnd = Calendar.getInstance
-  ChargingWindowEnd.setTime(new SimpleDateFormat("HH:mm:ss").parse("05:55:00"))
-  ChargingWindowEnd.add(Calendar.DATE, 1)
 
   def setSystemSettingsBasedOnGeneratedForecast(): Unit ={
     val todaysForecast = forecast.getTodaysForcast()
@@ -34,8 +26,10 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
   }
 
   def canWeTurnOffNightCharging(CurrentGridPull:Double)={
-    if(batteryChargeEnabled && CurrentGridPull < 1000.0) {
-      if (Calendar.getInstance().getTime.after(ChargingWindowStart.getTime) &&  Calendar.getInstance().getTime.before(ChargingWindowEnd.getTime)) {
+    if(batteryChargeEnabled && CurrentGridPull > 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid
+      if (areWeInTheChargingWindow(Calendar.getInstance())) {
+        //stop using the grid for power - switch to the battery
+        alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
         batteryChargeEnabled = false
         logger.info("Battery charging Disabled")
       }
@@ -55,5 +49,17 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
     val newBatterySettings  =  AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(bat_high_cap=""+batteryPercentage)
     logger.info("Battery percent will be: "+batteryPercentage+"%")
     newBatterySettings
+  }
+
+  def areWeInTheChargingWindow(now :Calendar): Boolean = {
+    val ChargingWindowStart = Calendar.getInstance
+    ChargingWindowStart.setTime(new SimpleDateFormat("HH:mm:ss").parse("02:05:00"))
+    ChargingWindowStart.add(Calendar.DATE, 1)
+
+    val ChargingWindowEnd = Calendar.getInstance
+    ChargingWindowEnd.setTime(new SimpleDateFormat("HH:mm:ss").parse("05:55:00"))
+    ChargingWindowEnd.add(Calendar.DATE, 1)
+
+    (now.getTime.after(ChargingWindowStart.getTime) && now.getTime.before(ChargingWindowEnd.getTime))
   }
 }

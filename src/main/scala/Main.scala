@@ -58,7 +58,6 @@ object Main extends App with LazyLogging {
     logger.info("FORECAST_KWH = " + conf2.getString("forecasting.kwh"))
   }
 
-
   var applicationStartTime: Instant = Instant.now()
 
   startKamon(conf1.withFallback(conf2).resolve())
@@ -75,10 +74,10 @@ object Main extends App with LazyLogging {
     override def run(): Unit = {
       //run in a 10 second loop
       try {
-       if (alphaEnabled) {alpha.run()}
-       if (tapoEnabled) {tapo.Run()}
-       if (emberEnabled) {ember.Run()}
-       if (myEnergiEnabled) {myenergi.Run()}
+        if (alphaEnabled) {alpha.run()}
+        if (tapoEnabled) {tapo.Run()}
+        if (emberEnabled) {ember.Run()}
+        if (myEnergiEnabled) {myenergi.Run()}
         if(controlEnabled) {systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())}
         logger.info("All Metrics Gathered : " + Instant.now())
       }
@@ -88,17 +87,6 @@ object Main extends App with LazyLogging {
     }
   }
 
-  val now = LocalDateTime.now()
-  val ex = new ScheduledThreadPoolExecutor(1)
-  // run Every 10 seconds
-  ex.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
-  // run at the top of every hour
-  ex.scheduleAtFixedRate(HourlyRun, Duration.between(now, now.plusHours(1).truncatedTo(ChronoUnit.HOURS)).toMillis+1000, TimeUnit.HOURS.toMillis(1), TimeUnit.MILLISECONDS)
-
-
-
-
-  //Publish forecast accuracy
   def PublishSolarForecastNightlySummaryMetrics()= {
       try {
         //make sure we have a full days set of data first
@@ -117,19 +105,24 @@ object Main extends App with LazyLogging {
       }
   }
 
-
-
   val HourlyRun = new Runnable {
     override def run(): Unit = {
       Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match //.HOUR_OF_DAY) match
       {
         //what do we want to run at what hour
         case 1  if(forecastEnabled && controlEnabled) => systemControl.setSystemSettingsBasedOnGeneratedForecast()
-        case 23 if (forecastEnabled) => PublishSolarForecastNightlySummaryMetrics()
-        case 6 if(forecastEnabled && controlEnabled) => systemControl.EnableBatteryNightCharging()
+        case 6  if(forecastEnabled && controlEnabled) => systemControl.EnableBatteryNightCharging()
+        case 23 if(forecastEnabled) => PublishSolarForecastNightlySummaryMetrics()
       }
     }
   }
+
+  val now = LocalDateTime.now()
+  val ex = new ScheduledThreadPoolExecutor(3)
+  // run Every 10 seconds
+  ex.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
+  // run at the top of every hour
+  ex.scheduleAtFixedRate(HourlyRun, Duration.between(now, now.plusHours(1).truncatedTo(ChronoUnit.HOURS)).toMillis+1000, TimeUnit.HOURS.toMillis(1), TimeUnit.MILLISECONDS)
 
 
   private def startKamon(config: Config) = {
