@@ -26,10 +26,12 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
   }
 
   def canWeTurnOffNightCharging(CurrentGridPull:Double)={
+    logger.info("Battery Control charge value ="+CurrentGridPull)
+    areWeInTheChargingWindow(Calendar.getInstance()))
     if(batteryChargeEnabled && CurrentGridPull > 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid
       if (areWeInTheChargingWindow(Calendar.getInstance())) {
         //stop using the grid for power - switch to the battery
-        alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
+        //alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
         batteryChargeEnabled = false
         logger.info("Battery charging Disabled")
       }
@@ -38,7 +40,7 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
 
   def EnableBatteryNightCharging()={
     if(!batteryChargeEnabled) {
-      alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 1))
+      //alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 1))
       batteryChargeEnabled = true
       logger.info("Battery charging Enabled")
     }
@@ -59,6 +61,9 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
     val ChargingWindowEnd = Calendar.getInstance
     ChargingWindowEnd.setTime(new SimpleDateFormat("HH:mm:ss").parse("05:55:00"))
     ChargingWindowEnd.add(Calendar.DATE, 1)
+
+    logger.info("Are we after 02:05"+now.getTime.after(ChargingWindowStart.getTime))
+    logger.info("Are we before 05:55"+now.getTime.before(ChargingWindowEnd.getTime))
 
     (now.getTime.after(ChargingWindowStart.getTime) && now.getTime.before(ChargingWindowEnd.getTime))
   }

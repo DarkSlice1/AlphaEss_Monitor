@@ -40,8 +40,8 @@ class SolarForecast(config : Config, reporterKamon : KamonMetrics) extends LazyL
       val reply = EntityUtils.toString(response.getEntity, "UTF-8")
 
       //due to the bad json format received from the service (dynamic name values), mapping to too much work for now
-      todaysForecast = jsonMapper.readTree(reply).get("result").elements().next().asInt()
-      logger.info("Forecaster Generation for today is :"+todaysForecast+" watts")
+    todaysForecast = jsonMapper.readTree(reply).get("result").elements().next().asInt()
+    logger.info("Forecaster Generation for today is :"+todaysForecast+" watts")
     todaysForecast
     }
 

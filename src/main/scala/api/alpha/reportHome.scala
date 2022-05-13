@@ -63,7 +63,7 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
     SolarFlowMetrics(metrics,solarGeneration)
 
     houseLoad.update(CheckForZero(solarGeneration + gridConsumption + batteryConsumption))
-    reporterKamon.invertorPower.increment(CheckForZero(metrics.varac), "sys_name", syn_name)
+    reporterKamon.invertorPower.increment(CheckForZero(Math.abs(metrics.varac)), "sys_name", syn_name) // can be negative whe charging the battery???
 
     //Misc Metrics Below
 
@@ -197,10 +197,7 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
 
     //charging battery
     else if (metrics.pbat < 0) {
-      // don't increment if battery charge as part of SOC if battery is full
-      if (metrics.soc != 100) {
-        reporterKamon.pbatChargeCounter.increment(Math.abs(CheckForZero(metrics.pbat)), "sys_name", syn_name)
-      }
+
       //battery still get charged when full (apparently)
       pbatChargeGauge.update(Math.abs(CheckForZero(metrics.pbat)))
       pbatDischargeGauge.update(0)

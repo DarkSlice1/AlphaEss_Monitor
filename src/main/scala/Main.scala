@@ -107,12 +107,14 @@ object Main extends App with LazyLogging {
 
   val HourlyRun = new Runnable {
     override def run(): Unit = {
-      Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match //.HOUR_OF_DAY) match
+      logger.info("running hourly Check")
+      Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match
       {
         //what do we want to run at what hour
         case 1  if(forecastEnabled && controlEnabled) => systemControl.setSystemSettingsBasedOnGeneratedForecast()
         case 6  if(forecastEnabled && controlEnabled) => systemControl.EnableBatteryNightCharging()
         case 23 if(forecastEnabled) => PublishSolarForecastNightlySummaryMetrics()
+        case x:Any => logger.info("current hour is '"+x+"' nothing planned to run")
       }
     }
   }
