@@ -3,7 +3,9 @@ package api.forecast.solar
 import api.alpha.AlphaObjectMapper.AlphaESSSendSetting
 import api.alpha.alpha
 import com.typesafe.scalalogging.LazyLogging
+
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.Calendar
 
 class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
@@ -27,7 +29,7 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
 
   def canWeTurnOffNightCharging(CurrentGridPull:Double)={
     logger.info("Battery Control charge value ="+CurrentGridPull)
-    areWeInTheChargingWindow(Calendar.getInstance()))
+    areWeInTheChargingWindow(Calendar.getInstance())
     if(batteryChargeEnabled && CurrentGridPull > 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid
       if (areWeInTheChargingWindow(Calendar.getInstance())) {
         //stop using the grid for power - switch to the battery
@@ -40,7 +42,7 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
 
   def EnableBatteryNightCharging()={
     if(!batteryChargeEnabled) {
-      //alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 1))
+      alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 1))
       batteryChargeEnabled = true
       logger.info("Battery charging Enabled")
     }
@@ -54,14 +56,19 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
   }
 
   def areWeInTheChargingWindow(now :Calendar): Boolean = {
-    val ChargingWindowStart = Calendar.getInstance
-    ChargingWindowStart.setTime(new SimpleDateFormat("HH:mm:ss").parse("02:05:00"))
-    ChargingWindowStart.add(Calendar.DATE, 1)
+    val ChargingWindowStart = Calendar.getInstance()
+    ChargingWindowStart.set(Calendar.HOUR_OF_DAY,2);
+    ChargingWindowStart.set(Calendar.MINUTE,5);
+    ChargingWindowStart.set(Calendar.SECOND,0);
 
     val ChargingWindowEnd = Calendar.getInstance
-    ChargingWindowEnd.setTime(new SimpleDateFormat("HH:mm:ss").parse("05:55:00"))
-    ChargingWindowEnd.add(Calendar.DATE, 1)
+    ChargingWindowEnd.set(Calendar.HOUR_OF_DAY,5);
+    ChargingWindowEnd.set(Calendar.MINUTE,55);
+    ChargingWindowEnd.set(Calendar.SECOND,0);
 
+
+    logger.info(""+ChargingWindowStart.getTime)
+    logger.info(""+ChargingWindowEnd.getTime)
     logger.info("Are we after 02:05"+now.getTime.after(ChargingWindowStart.getTime))
     logger.info("Are we before 05:55"+now.getTime.before(ChargingWindowEnd.getTime))
 
