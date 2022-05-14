@@ -79,7 +79,7 @@ object Main extends App with LazyLogging {
         if (emberEnabled) {ember.Run()}
         if (myEnergiEnabled) {myenergi.Run()}
         if(controlEnabled) {systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())}
-        logger.info("All Metrics Gathered : " + Instant.now())
+        logger.info("All Metrics Gathered : " + Calendar.getInstance().getTime)
       }
       catch {
         case ex: Exception => logger.info("ERROR Running - cleaning token, Exception : " + ex.toString);

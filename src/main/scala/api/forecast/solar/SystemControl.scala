@@ -3,9 +3,6 @@ package api.forecast.solar
 import api.alpha.AlphaObjectMapper.AlphaESSSendSetting
 import api.alpha.alpha
 import com.typesafe.scalalogging.LazyLogging
-
-import java.text.SimpleDateFormat
-import java.time.Instant
 import java.util.Calendar
 
 class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
@@ -33,7 +30,7 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
     if(batteryChargeEnabled && CurrentGridPull > 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid
       if (areWeInTheChargingWindow(Calendar.getInstance())) {
         //stop using the grid for power - switch to the battery
-        //alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
+        alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
         batteryChargeEnabled = false
         logger.info("Battery charging Disabled")
       }
@@ -57,14 +54,14 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
 
   def areWeInTheChargingWindow(now :Calendar): Boolean = {
     val ChargingWindowStart = Calendar.getInstance()
-    ChargingWindowStart.set(Calendar.HOUR_OF_DAY,2);
-    ChargingWindowStart.set(Calendar.MINUTE,5);
-    ChargingWindowStart.set(Calendar.SECOND,0);
+    ChargingWindowStart.set(Calendar.HOUR_OF_DAY,2)
+    ChargingWindowStart.set(Calendar.MINUTE,5)
+    ChargingWindowStart.set(Calendar.SECOND,0)
 
     val ChargingWindowEnd = Calendar.getInstance
-    ChargingWindowEnd.set(Calendar.HOUR_OF_DAY,5);
-    ChargingWindowEnd.set(Calendar.MINUTE,55);
-    ChargingWindowEnd.set(Calendar.SECOND,0);
+    ChargingWindowEnd.set(Calendar.HOUR_OF_DAY,4)
+    ChargingWindowEnd.set(Calendar.MINUTE,55)
+    ChargingWindowEnd.set(Calendar.SECOND,0)
 
 
     logger.info(""+ChargingWindowStart.getTime)
