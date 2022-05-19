@@ -113,7 +113,8 @@ object Main extends App with LazyLogging {
         //what do we want to run at what hour
         case 1  if(forecastEnabled && controlEnabled) => systemControl.setSystemSettingsBasedOnGeneratedForecast()
         case 6  if(forecastEnabled && controlEnabled) => systemControl.EnableBatteryNightCharging()
-        case 23 if(forecastEnabled) => PublishSolarForecastNightlySummaryMetrics()
+        case 16 if(forecastEnabled) => forecast.getTomorrowForcast()
+        case 23 if(forecastEnabled) => PublishSolarForecastNightlySummaryMetrics() // get most up to date metrics before we set battery charge %
         case x:Any => logger.info("current hour is '"+x+"' nothing planned to run")
       }
     }

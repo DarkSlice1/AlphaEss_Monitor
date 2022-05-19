@@ -63,12 +63,6 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
     ChargingWindowEnd.set(Calendar.MINUTE,55)
     ChargingWindowEnd.set(Calendar.SECOND,0)
 
-
-    logger.info(""+ChargingWindowStart.getTime)
-    logger.info(""+ChargingWindowEnd.getTime)
-    logger.info("Are we after 02:05"+now.getTime.after(ChargingWindowStart.getTime))
-    logger.info("Are we before 05:55"+now.getTime.before(ChargingWindowEnd.getTime))
-
     (now.getTime.after(ChargingWindowStart.getTime) && now.getTime.before(ChargingWindowEnd.getTime))
   }
 }
