@@ -19,7 +19,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
   val sys_sn = config.getString("alphaess.system_sn")
 
   val reporter = new reportHome(config,reporterKamon)
-  val eplBaseHost = "https://www.alphaess.com"
+  val eplBaseHost = "https://cloud.alphaess.com"
 
   var token = Token.empty()
   var currentBatteryPercentage = 0.0
