@@ -68,12 +68,12 @@ public class Tapo {
         }
     }
 
-    public Integer Run(String ipAddress) throws Exception {
+    public Integer Run(String ipAddress, String tag) throws Exception {
         TapoFlow tapoFlow = new TapoFlow(ipAddress);
         KspDebug.out("Will try to Get Energy Info!");
         Integer value = tapoFlow.getPlugEnergyUsage(c658a.get(ipAddress), token.get(ipAddress), handshakeResponse.get(ipAddress).getCookie());
         if(value != null) {
-            System.out.println("Tapo Energy: " + ipAddress + " = " + value);
+            System.out.println("Tapo Energy: " + ipAddress + ":"+tag+" = " + value);
             return value;
         }
         else

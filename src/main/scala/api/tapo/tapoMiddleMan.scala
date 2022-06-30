@@ -18,26 +18,31 @@ class tapoMiddleMan(tapoParamenter: Tapo, config :Config, reporterKamon : KamonM
     val addresses: Array[String] = config.getString("tapo.addresses").split(",")
 
     addresses foreach { case (address) =>
+      val trueAddress = ExtractAddress(address)
+
       try {
-        if (tapo.token.getOrElse(address, "") == "") {
-          tapo.Setup(username, password, address)
+        if (tapo.token.getOrElse(trueAddress, "") == "") {
+          tapo.Setup(username, password, trueAddress)
         }
       }
       catch {
         case ex: Exception =>
-          logger.info("Tapo Energy: " + address + " = " + ex.getMessage)
+          logger.info("Tapo Energy: " + trueAddress + " = " + ex.getMessage)
           //reset the device to start over
-          tapo.token.remove(address)
-          tapo.c658a.remove(address)
-          tapo.handshakeResponse.remove(address)
+          tapo.token.remove(trueAddress)
+          tapo.c658a.remove(trueAddress)
+          tapo.handshakeResponse.remove(trueAddress)
       }
     }
 
     addresses foreach { case (address) => {
+      val trueAddress = ExtractAddress(address)
+      val trueTag = ExtractTag(address)
+
       try {
-        if (tapo.token.getOrElse(address, "") != "") {
-          val energyUsage = tapo.Run(address)
-          reporterKamon.tapoEnergyUsageCounter.increment((energyUsage / 100).toLong, "ipAddress", address)
+        if (tapo.token.getOrElse(trueAddress, "") != "") {
+          val energyUsage = tapo.Run(trueAddress,trueTag)
+          reporterKamon.tapoEnergyUsageCounter.increment((energyUsage / 100).toLong, "ipAddress", address, "device",trueTag)
           if (energyUsage == 0) {
             reporterKamon.tapoEnergyUsageGauge.set(0, "ipAddress", address)
           }
@@ -56,4 +61,27 @@ class tapoMiddleMan(tapoParamenter: Tapo, config :Config, reporterKamon : KamonM
     }
     }
   }
+
+  def ExtractAddress(address:String): String={
+    var trueAddress = ""
+    if(address.contains(":")) { //encase we want to add our own tags to the IP address
+      trueAddress=address.split(":").head
+    }
+    else
+      trueAddress=address
+
+    trueAddress
+  }
+
+  def ExtractTag(address:String): String={
+    var trueAddress = ""
+    if(address.contains(":")) { //encase we want to add our own tags to the IP address
+      trueAddress=address.split(":").last
+    }
+    else
+      trueAddress=address
+
+    trueAddress
+  }
+
 }

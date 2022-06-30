@@ -1,6 +1,7 @@
 package metrics
 
 import kamon.Kamon
+import kamon.tag.TagSet
 
 
 final class KamonMetrics() {
@@ -25,6 +26,12 @@ final class KamonMetrics() {
       else
         Kamon.counter(name).withoutTags.increment(amount)
     }
+   /* def increment(amount: Long, TagName:String, TagValue:String,TagName2:String, TagValue2:String) = {
+      if (TagName.nonEmpty)
+        Kamon.counter(name).withTag(new TagSet(Map(TagName->TagValue,TagName2->TagValue2).increment(amount)
+      else
+        Kamon.counter(name).withoutTags.increment(amount)
+    }*/
 
     def remove() = {
       Kamon.counter(name).withoutTags.remove()
