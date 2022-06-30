@@ -115,6 +115,12 @@ final class KamonMetrics() {
   object forecasting_todaysAccuracy extends Gauge {
     val name = "forecasting.Accuracy"
   }
+  object forecasting_todaysForecast extends Gauge {
+    val name = "forecasting.todaysForecast"
+  }
+  object forecasting_tomorrowsForecast extends Gauge {
+    val name = "forecasting.tomorrowsForecast"
+  }
 
 
   //Tapo engergy Metrics

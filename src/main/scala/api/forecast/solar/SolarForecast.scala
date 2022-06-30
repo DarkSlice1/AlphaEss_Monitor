@@ -26,24 +26,58 @@ class SolarForecast(config : Config, reporterKamon : KamonMetrics) extends LazyL
 
   private var todaysForecast = 0
 
-  def getTodaysForcast():Integer ={
-      // create an HttpGet object
-      val uri = "https://api.forecast.solar/estimate/watthours/day/"+lat+"/"+lon+"/"+dec+"/"+az+"/"+kwh
-      val get = new HttpGet(uri)
+  def getTodaysForcast():Integer = {
+    // create an HttpGet object
+    val uri = "https://api.forecast.solar/estimate/watthours/day/" + lat + "/" + lon + "/" + dec + "/" + az + "/" + kwh
+    val get = new HttpGet(uri)
 
-      // set the Content-type
-      get.setHeader("Content-type", "application/json")
-      get.setHeader("Host", "api.forecast.solar")
-      // send the get request
-      val response = (new DefaultHttpClient).execute(get)
-      // print the response headers
-      val reply = EntityUtils.toString(response.getEntity, "UTF-8")
+    // set the Content-type
+    get.setHeader("Content-type", "application/json")
+    get.setHeader("Host", "api.forecast.solar")
+    // send the get request
+    val response = (new DefaultHttpClient).execute(get)
+    // print the response headers
+    val reply = EntityUtils.toString(response.getEntity, "UTF-8")
 
-      //due to the bad json format received from the service (dynamic name values), mapping to too much work for now
-      todaysForecast = jsonMapper.readTree(reply).get("result").elements().next().asInt()
-      logger.info("Forecaster Generation for today is :"+todaysForecast+" watts")
+    //due to the bad json format received from the service (dynamic name values), mapping to too much work for now
+    todaysForecast = jsonMapper.readTree(reply).get("result").elements().next().asInt()
+    reporterKamon.forecasting_todaysForecast.set(todaysForecast)
+
+    logger.info("Forecaster Generation for today is :" + todaysForecast + " watts")
     todaysForecast
+  }
+
+  def getTomorrowForcast() = {
+
+    val uri = "https://api.forecast.solar/estimate/watthours/day/" + lat + "/" + lon + "/" + dec + "/" + az + "/" + kwh
+    val get = new HttpGet(uri)
+
+    // set the Content-type
+    get.setHeader("Content-type", "application/json")
+    get.setHeader("Host", "api.forecast.solar")
+    // send the get request
+    val response = (new DefaultHttpClient).execute(get)
+    // print the response headers
+    val reply = EntityUtils.toString(response.getEntity, "UTF-8")
+
+    try{
+     // val tomorrowsForecast = jsonMapper.readTree(reply).get("result").get(2).asInt()
+      val it = jsonMapper.readTree(reply).get("result").iterator()
+      while (it.hasNext()) {
+        val thisValue = it.next()
+        if(!it.hasNext)
+          reporterKamon.forecasting_tomorrowsForecast.set(thisValue.asInt())
+      }
+    //}
+      //jsonMapper.readTree(reply).get("result").elements().hasNext.forEachRemaining(x => {
+       // x.toString
+     // })
+      //reporterKamon.forecasting_tomorrowsForecast.set(tomorrowsForecast)
     }
+    catch {
+      case _ => logger.error("Failed to get tomorrows forecast")
+    }
+  }
 
   def publishTodaysForcast(value: Integer) = {
     reporterKamon.forecasting_todaysGeneration.set(value.longValue())
