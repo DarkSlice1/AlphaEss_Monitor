@@ -20,7 +20,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
   var reporter = new reportHome(config,reporterKamon)
 
-  val eplBaseHost = "https://www.alphaess.com"
+  val eplBaseHost = "https://cloud.alphaess.com"
   var token = Token.empty()
 
   def run(): Unit = {
