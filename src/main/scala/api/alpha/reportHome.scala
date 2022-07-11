@@ -199,6 +199,7 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
     else if (metrics.pbat < 0) {
 
       //battery still get charged when full (apparently)
+      reporterKamon.pbatChargeCounter.increment(CheckForZero(metrics.pbat), "sys_name", syn_name)
       pbatChargeGauge.update(Math.abs(CheckForZero(metrics.pbat)))
       pbatDischargeGauge.update(0)
     }
