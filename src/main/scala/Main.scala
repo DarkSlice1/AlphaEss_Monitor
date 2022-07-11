@@ -130,6 +130,6 @@ object Main extends App with LazyLogging {
 
   private def startKamon(config: Config) = {
     logger.info("Starting Kamon reporters...." + config.getStringList("kamon.reporters").toString)
-    //Kamon.init(config)
+    Kamon.init(config)
   }
 }
