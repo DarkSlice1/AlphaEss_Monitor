@@ -15,6 +15,7 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
   val password = config.getString("myenergi.password")
   val myenergi_BaseHost = "https://director.myenergi.net"
   var asn_url = ""
+  var serial = 0
 
   def Run(): Unit = {
 
@@ -63,13 +64,40 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
         reporterKamon.zappiEnergyUsageGauge.set(0, "hub", username)
       }
       else {
-        reporterKamon.zappiEnergyUsageGauge.set((conversion.zappi.head.ectp1*10).toLong, "hub", username)
+        reporterKamon.zappiEnergyUsageGauge.set((conversion.zappi.head.ectp1 * 10).toLong, "hub", username)
       }
+      if (serial == 0) {
+        serial = conversion.zappi.head.sno
+        logger.info("Zappi serial captured "+serial)
+      }
+      logger.info("Zappi Metrics Completed")
+
     }
     catch {
       case ex: Exception => logger.error("ERROR: " + ex.toString);
     }
 
-    logger.info("Zappi Metrics Completed")
+
+  }
+
+  def DoNightBoost(Quantity:Int, EndTime : String): Unit =
+  {
+    if(serial != 0)
+      {
+        try {
+          val urlExtension = "/cgi-zappi-mode-Z" + serial + "-0-10-" + Quantity + "-" + EndTime
+          restCaller.simpleRestGetCallDigest(
+            url = "https://" + asn_url + urlExtension,
+            username = username,
+            password = password,
+            host = asn_url,
+            digestUri = urlExtension
+          )
+          logger.info("Zappi boost set for "+Quantity+"Kw and due to end at "+EndTime)
+        }
+        catch {
+          case ex: Exception => logger.error("ERROR: " + ex.toString);
+        }
+      }
   }
 }

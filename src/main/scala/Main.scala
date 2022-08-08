@@ -112,6 +112,7 @@ object Main extends App with LazyLogging {
       {
         //what do we want to run at what hour
         case 1  if(forecastEnabled && controlEnabled) => systemControl.setSystemSettingsBasedOnGeneratedForecast()
+        case 2  if(myEnergiEnabled) => myenergi.DoNightBoost(21,"0500")
         case 6  if(forecastEnabled && controlEnabled) => systemControl.EnableBatteryNightCharging()
         case 16 if(forecastEnabled) => forecast.getTomorrowForcast()
         case 23 if(forecastEnabled) => PublishSolarForecastNightlySummaryMetrics() // get most up to date metrics before we set battery charge %
