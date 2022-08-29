@@ -42,6 +42,7 @@ object MyEnergiObjectMapper {
                           bss: Int,
                           lck: Int,
                           pst: String,
+                          tbk: Int,
                           zmo: Int,
                           zs: Int,
                           ectp4: Int,

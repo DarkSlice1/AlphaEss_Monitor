@@ -14,18 +14,13 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
   val username = config.getString("myenergi.username")
   val password = config.getString("myenergi.password")
   val myenergi_BaseHost = "https://director.myenergi.net"
-  var asn_url = ""
+  var asn_url = "s18.myenergi.net"
   var serial = 0
 
   def Run(): Unit = {
 
     try {
-      asn_url match {
-        // No - empty url
-        case "" => Login();getMetrics();
-        // Yes
-        case _ => getMetrics()
-      }
+       getMetrics()
     }
     catch {
       case ex: Exception => logger.error("Zappie ERROR: " + ex.toString + " Trying to login again")
@@ -34,7 +29,7 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
     }
   }
 
-
+//api broken (now just returns "hello world""), hard coding url to be "s18.myenergi.net"
   def Login() = {
     val urlExtension = ""
     val reply = restCaller.simpleRestGetCallDigest(
@@ -76,14 +71,14 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
     catch {
       case ex: Exception => logger.error("ERROR: " + ex.toString);
     }
-
-
   }
 
   def DoNightBoost(Quantity:Int, EndTime : String): Unit =
   {
     if(serial != 0)
       {
+        //set to EcoPlus first
+        SetEcoPlusMode()
         try {
           val urlExtension = "/cgi-zappi-mode-Z" + serial + "-0-10-" + Quantity + "-" + EndTime
           restCaller.simpleRestGetCallDigest(
@@ -99,5 +94,41 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
           case ex: Exception => logger.error("ERROR: " + ex.toString);
         }
       }
+  }
+
+  def SetEcoPlusMode(): Unit =
+  {
+    try {
+      val urlExtension = "/cgi-zappi-mode-Z" + serial + "-3-0-0-0000"
+      restCaller.simpleRestGetCallDigest(
+        url = "https://" + asn_url + urlExtension,
+        username = username,
+        password = password,
+        host = asn_url,
+        digestUri = urlExtension
+      )
+      logger.info("Zappi Set to EcoPlus Mode")
+    }
+    catch {
+      case ex: Exception => logger.error("ERROR: " + ex.toString);
+    }
+  }
+
+  def SetStopMode(): Unit =
+  {
+    try {
+      val urlExtension = "/cgi-zappi-mode-Z" + serial + "-4-0-0-0000"
+      restCaller.simpleRestGetCallDigest(
+        url = "https://" + asn_url + urlExtension,
+        username = username,
+        password = password,
+        host = asn_url,
+        digestUri = urlExtension
+      )
+      logger.info("Zappi Set to Stop Mode")
+    }
+    catch {
+      case ex: Exception => logger.error("ERROR: " + ex.toString);
+    }
   }
 }

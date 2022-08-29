@@ -13,7 +13,7 @@ import scala.util.Try
 object FileIO extends LazyLogging{
 
   val jsonMapper = new ObjectMapper()
-  val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  val df = new SimpleDateFormat("yyyy-dd-MM HH:mm:ss");
   df.setTimeZone(TimeZone.getTimeZone("UTC"));
   jsonMapper.registerModule(DefaultScalaModule)
   jsonMapper.registerModule(new JavaTimeModule())
