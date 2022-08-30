@@ -1,6 +1,7 @@
 import api.alpha.AlphaObjectMapper.AlphaESSSendSetting
 import api.alpha.alpha
 import api.common.FileIO.jsonMapper
+import api.common.Token
 import api.ember.ember
 import api.forecast.solar.SolarForecast
 import api.myenergi.MyEnergiObjectMapper.jstatusZReply
@@ -76,16 +77,49 @@ object Main extends App with LazyLogging {
     override def run(): Unit = {
       //run in a 10 second loop
       try {
-        if (alphaEnabled) {alpha.run()}
-        if (tapoEnabled) {tapo.Run()}
-        if (emberEnabled) {ember.Run()}
-        if (myEnergiEnabled) {myenergi.Run()}
-        if(controlEnabled) {systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())}
-        logger.info("All Metrics Gathered : " + Calendar.getInstance().getTime)
+        if (alphaEnabled) {
+          alpha.run()
+        }
       }
       catch {
-        case ex: Exception => logger.info("ERROR Running - cleaning token, Exception : " + ex.toString);
+        case ex: Exception =>
+          alpha.token = Token.empty() //it appears that the token should last 2 years , but we get a 401 after a few hours....
+          logger.error("ERROR Running alphaEss - cleaning token, Exception : " + ex.printStackTrace());
       }
+      try {
+        if (tapoEnabled) {
+          tapo.Run()
+        }
+      }
+      catch {
+        case ex: Exception => logger.error("ERROR Running tapo - cleaning token, Exception : " + ex.printStackTrace());
+      }
+      try {
+        if (emberEnabled) {
+          ember.Run()
+        }
+      }
+      catch {
+        case ex: Exception => logger.error("ERROR Running ember - cleaning token, Exception : " + ex.printStackTrace());
+      }
+      try {
+        if (myEnergiEnabled) {
+          myenergi.Run()
+        }
+      }
+      catch {
+        case ex: Exception => logger.error("ERROR Running myEnergi - cleaning token, Exception : " + ex.printStackTrace());
+      }
+      try {
+        if (controlEnabled) {
+          systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())
+        }
+      }
+      catch {
+        case ex: Exception => logger.error("ERROR Running SystemControl - cleaning token, Exception : " + ex.printStackTrace());
+      }
+
+      logger.info("All Metrics Gathered : " + Calendar.getInstance().getTime)
     }
   }
 
@@ -143,6 +177,6 @@ object Main extends App with LazyLogging {
 
   private def startKamon(config: Config) = {
     logger.info("Starting Kamon reporters...." + config.getStringList("kamon.reporters").toString)
-    //Kamon.init(config)
+    Kamon.init(config)
   }
 }

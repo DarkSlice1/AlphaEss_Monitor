@@ -14,7 +14,7 @@ object FileIO extends LazyLogging{
 
   val jsonMapper = new ObjectMapper()
   val df = new SimpleDateFormat("yyyy-dd-MM HH:mm:ss");
-  df.setTimeZone(TimeZone.getTimeZone("UTC"));
+  df.setTimeZone(TimeZone.getTimeZone("GMT"));
   jsonMapper.registerModule(DefaultScalaModule)
   jsonMapper.registerModule(new JavaTimeModule())
   jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
