@@ -16,6 +16,6 @@ object Token {
 case class Token(
                   AccessToken: String,
                   ExpiresIn: Double = 36000.0,
-                  @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy/dd/MM HH:mm:ss", timezone="GMT")
+                  @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy/MM/dd HH:mm:ss", timezone="GMT")
                   TokenCreateTime: Date = new Date(),
                   RefreshTokenKey: String)
