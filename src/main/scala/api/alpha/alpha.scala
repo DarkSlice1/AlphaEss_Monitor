@@ -40,7 +40,6 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
           //refreshToken()
          //TODO figure out fresh token command
           Login();
-          run()
         }
         else{
           getMetrics()
