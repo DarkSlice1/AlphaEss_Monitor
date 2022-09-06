@@ -168,11 +168,12 @@ object Main extends App with LazyLogging {
   }
 
   val now = LocalDateTime.now()
-  val ex = new ScheduledThreadPoolExecutor(3)
+  val TenSecondCycle = new ScheduledThreadPoolExecutor(3)
+  val OneHourCycle = new ScheduledThreadPoolExecutor(3)
   // run Every 10 seconds
-  ex.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
+  TenSecondCycle.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
   // run at the top of every hour
-  ex.scheduleAtFixedRate(HourlyRun, Duration.between(now, now.plusHours(1).truncatedTo(ChronoUnit.HOURS)).toMillis+1000, TimeUnit.HOURS.toMillis(1), TimeUnit.MILLISECONDS)
+  OneHourCycle.scheduleAtFixedRate(HourlyRun, Duration.between(now, now.plusHours(1).truncatedTo(ChronoUnit.HOURS)).toMillis+1000, TimeUnit.HOURS.toMillis(1), TimeUnit.MILLISECONDS)
 
 
   private def startKamon(config: Config) = {
