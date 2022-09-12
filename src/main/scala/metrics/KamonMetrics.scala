@@ -110,6 +110,21 @@ final class KamonMetrics() {
   object zappiVoltageGauge extends Gauge {
     val name = "myenergy.zapiVoltageGauge"
   }
+  object zappiVoltageFrequencyGauge extends Gauge {
+    val name = "myenergy.zapiVoltageFrequencyGauge"
+  }
+  object eddiEnergyUsageCounter extends Counter {
+    val name = "myenergy.eddiEnergyUsageCounter"
+  }
+  object eddiEnergyUsageGauge extends Gauge {
+    val name = "myenergy.eddiEnergyUsageGauge"
+  }
+  object eddiEnergyTemperature1 extends Gauge {
+    val name = "myenergy.eddiTemperature1"
+  }
+  object eddiEnergyTemperature2 extends Gauge {
+    val name = "myenergy.eddiTemperature2"
+  }
 
 
 

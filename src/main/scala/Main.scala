@@ -5,7 +5,7 @@ import api.common.Token
 import api.ember.ember
 import api.forecast.solar.SolarForecast
 import api.myenergi.MyEnergiObjectMapper.jstatusZReply
-import api.myenergi.myenergi_zappie
+import api.myenergi.{myenergi_eddie, myenergi_zappie}
 import api.tapo.{Tapo, tapoMiddleMan}
 import com.typesafe.config.{Config, ConfigFactory}
 import kamon.Kamon
@@ -70,7 +70,8 @@ object Main extends App with LazyLogging {
   val ember = new ember(conf2, reporterKamon)
   val tapo = new tapoMiddleMan(new Tapo(), conf2, reporterKamon)
   val forecast = new SolarForecast(conf2, reporterKamon)
-  val myenergi = new myenergi_zappie(conf2, reporterKamon)
+  val myenergi_zappi = new myenergi_zappie(conf2, reporterKamon)
+  val myenergi_eddi = new myenergi_eddie(conf2, reporterKamon)
   val systemControl = new api.forecast.solar.SystemControl(alpha,forecast)
 
   val GatherRealTimeMetrics = new Runnable {
@@ -104,7 +105,8 @@ object Main extends App with LazyLogging {
       }
       try {
         if (myEnergiEnabled) {
-          myenergi.Run()
+          myenergi_zappi.Run()
+          myenergi_eddi.Run()
         }
       }
       catch {
@@ -148,7 +150,7 @@ object Main extends App with LazyLogging {
       {
         //what do we want to run at what hour
         case 1  if(forecastEnabled && controlEnabled) => systemControl.setSystemSettingsBasedOnGeneratedForecast()
-        case 2  if(myEnergiEnabled) => myenergi.DoNightBoost(21,"0500")
+        case 2  if(myEnergiEnabled) => myenergi_zappi.DoNightBoost(21,"0500")
         case 6  => Handle6amCalls()
         case 16 if(forecastEnabled) => forecast.getTomorrowForcast()
         case 23 if(forecastEnabled) => PublishSolarForecastNightlySummaryMetrics() // get most up to date metrics before we set battery charge %
@@ -163,7 +165,7 @@ object Main extends App with LazyLogging {
       systemControl.EnableBatteryNightCharging()
     }
     if(myEnergiEnabled) {
-      myenergi.SetStopMode()
+      myenergi_zappi.SetStopMode()
     }
   }
 

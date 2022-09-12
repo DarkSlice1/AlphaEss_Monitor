@@ -52,4 +52,39 @@ object MyEnergiObjectMapper {
                           mgl: Int,
                           sbh: Int,
                           sbk: Int)
+
+  case class jstatusEReply(
+                            eddi: Array[EddiMapper]
+                          )
+
+case class EddiMapper(
+                        sno: Int,
+                        dat:String,
+                        tim: String,
+                        ectt1: String,
+                        ectt2: String,
+                        ectt3: String,
+                        bsm: Int,
+                        bst: Int,
+                        cmt: Int,
+                        dst: Int,
+                        div: Int,
+                        frq: Double,
+                        fwv: String,
+                        pha: Int,
+                        pri: Int,
+                        sta: Int,
+                        tz: Int,
+                        vol: Int,
+                        hpri: Int,
+                        hno: Int,
+                        ht1: String,
+                        ht2: String,
+                        r1a: Int,
+                        r2a: Int,
+                        r1b: Int,
+                        r2b: Int,
+                        rbc: Int,
+                        tp1: Int,
+                        tp2: Int)
 }
