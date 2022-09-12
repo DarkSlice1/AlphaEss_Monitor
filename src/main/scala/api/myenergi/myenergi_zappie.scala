@@ -55,16 +55,16 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
      //multiplying by 10 to align with other metrics
     try{
       reporterKamon.zappiEnergyUsageCounter.increment((conversion.zappi.head.ectp1*10).toLong, "hub", username)
+      reporterKamon.zappiVoltageGauge.set(conversion.zappi.head.vol, "hub", username)
+      reporterKamon.zappiVoltageFrequencyGauge.set((conversion.zappi.head.frq).toInt, "hub", username)
+
       if (conversion.zappi.head.div == 0) {
         reporterKamon.zappiEnergyUsageGauge.set(0, "hub", username)
-        reporterKamon.zappiVoltageGauge.set(0, "hub", username)
-        reporterKamon.zappiVoltageFrequencyGauge.set(0, "hub", username)
       }
       else {
         reporterKamon.zappiEnergyUsageGauge.set((conversion.zappi.head.ectp1 * 10).toLong, "hub", username)
-        reporterKamon.zappiVoltageGauge.set(conversion.zappi.head.vol, "hub", username)
-        reporterKamon.zappiVoltageFrequencyGauge.set((conversion.zappi.head.frq).toInt, "hub", username)
       }
+
       if (serial == 0) {
         serial = conversion.zappi.head.sno
         logger.info("Zappi serial captured "+serial)

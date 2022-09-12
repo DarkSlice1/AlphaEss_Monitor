@@ -55,17 +55,13 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
      //multiplying by 10 to align with other metrics
     try{
       //reporterKamon.zappiEnergyUsageCounter.increment((conversion.eddi.head.ectp1*10).toLong, "hub", username)
+      reporterKamon.eddiEnergyTemperature1.set(conversion.eddi.head.tp1, "hub", username)
+      reporterKamon.eddiEnergyTemperature2.set(conversion.eddi.head.tp2, "hub", username)
       if (conversion.eddi.head.div == 0) {
         //reporterKamon.eddiEnergyUsageGauge.set(0, "hub", username)
-        reporterKamon.eddiEnergyTemperature1.set(0, "hub", username)
-        reporterKamon.eddiEnergyTemperature2.set(0, "hub", username)
-
       }
       else {
         //reporterKamon.eddiEnergyUsageGauge.set((conversion.eddi.head.ectp1 * 10).toLong, "hub", username)
-        reporterKamon.eddiEnergyTemperature1.set(conversion.eddi.head.tp1, "hub", username)
-        reporterKamon.eddiEnergyTemperature2.set(conversion.eddi.head.tp2, "hub", username)
-
       }
       if (serial == 0) {
         serial = conversion.eddi.head.sno
