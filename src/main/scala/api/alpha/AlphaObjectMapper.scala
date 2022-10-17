@@ -14,6 +14,11 @@ object AlphaObjectMapper {
                            password: String
                          ) extends RestBody
 
+  case class GetMetricsDetails(
+                          sys_sn: String,
+                          noLoading: Boolean
+                         ) extends RestBody
+
   case class LoginReply(
                          code: Int,
                          info: String,
