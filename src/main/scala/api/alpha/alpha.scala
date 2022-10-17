@@ -90,14 +90,12 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
   def getSystemSettings(): AlphaESSReceivedSettingData =
   {
-    val urlExtension= "/api/Account/GetCustomUseESSSetting?sys_sn="+sys_sn
-    val getParameters = new util.ArrayList[NameValuePair](2)
-    getParameters.add(new BasicNameValuePair("sys_sn", sys_sn))
+    val urlExtension= "/api/Account/GetCustomUseESSSetting"//?system_id="+sys_sn
+    //val getParameters = new util.ArrayList[NameValuePair](2)
+    //getParameters.add(new BasicNameValuePair("sys_sn", sys_sn))
     val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
       withToken = true,
-      token = token.AccessToken,
-      withParameters = true,
-      parameters = getParameters)
+      token = token.AccessToken)
 
     jsonMapper.readValue(reply, classOf[AlphaESSReceivedSetting]).data
 

@@ -65,10 +65,10 @@ object restCaller {
     }
 
     val authtimestamp = Splitter.fixedLength(10).split(Instant.now().toEpochMilli().toString).iterator().next()
-    post.setHeader("authtimestamp", authtimestamp)
+    get.setHeader("authtimestamp", authtimestamp)
     val constant_with_timestamp = authconstant + authtimestamp
     val authsignature = "al8e4s" + Hashing.sha512().hashString(constant_with_timestamp,StandardCharsets.UTF_8) + "ui893ed"
-    post.setHeader("authsignature", authsignature)
+    get.setHeader("authsignature", authsignature)
 
     // set the Content-type
     get.setHeader("Content-type", "application/json")

@@ -27,7 +27,7 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
   def canWeTurnOffNightCharging(CurrentGridPull:Double)={
     logger.info("Battery Control charge value ="+CurrentGridPull)
     areWeInTheChargingWindow(Calendar.getInstance())
-    if(batteryChargeEnabled && CurrentGridPull > 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid
+    if(batteryChargeEnabled && CurrentGridPull >= 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid
       if (areWeInTheChargingWindow(Calendar.getInstance())) {
         //stop using the grid for power - switch to the battery
         alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
