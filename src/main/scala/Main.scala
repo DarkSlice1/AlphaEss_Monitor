@@ -77,8 +77,6 @@ object Main extends App with LazyLogging {
   val GatherRealTimeMetrics = new Runnable {
     override def run(): Unit = {
 
-
-
       //run in a 10 second loop
       try {
         if (alphaEnabled) {
