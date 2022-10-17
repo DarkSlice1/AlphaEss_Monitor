@@ -15,7 +15,7 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
   val password = config.getString("myenergi.password")
   val myenergi_BaseHost = "https://director.myenergi.net"
   var asn_url = "s18.myenergi.net"
-  var serial = 0
+  var serial = 21139095
 
   def Run(): Unit = {
 
@@ -69,6 +69,42 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
       }
       logger.info("Eddi Metrics Completed")
 
+    }
+    catch {
+      case ex: Exception => logger.error("ERROR: " + ex.toString);
+    }
+  }
+
+  def SetNormalMode(): Unit =
+  {
+    try {
+      val urlExtension = "/cgi-eddi-mode-E" + serial + "-1"
+      restCaller.simpleRestGetCallDigest(
+        url = "https://" + asn_url + urlExtension,
+        username = username,
+        password = password,
+        host = asn_url,
+        digestUri = urlExtension
+      )
+      logger.info("Eddie Set to Stop Mode")
+    }
+    catch {
+      case ex: Exception => logger.error("ERROR: " + ex.toString);
+    }
+  }
+
+  def SetStopMode(): Unit =
+  {
+    try {
+      val urlExtension = "/cgi-eddi-mode-E" + serial + "-0"
+      restCaller.simpleRestGetCallDigest(
+        url = "https://" + asn_url + urlExtension,
+        username = username,
+        password = password,
+        host = asn_url,
+        digestUri = urlExtension
+      )
+      logger.info("Eddie Set to Stop Mode")
     }
     catch {
       case ex: Exception => logger.error("ERROR: " + ex.toString);
