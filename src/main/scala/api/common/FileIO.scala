@@ -1,9 +1,10 @@
 package api.common
 
-import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
+import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.typesafe.scalalogging.LazyLogging
+
 import java.io.{BufferedWriter, File, FileWriter}
 import java.text.SimpleDateFormat
 import java.util.TimeZone
@@ -17,6 +18,7 @@ object FileIO extends LazyLogging{
   df.setTimeZone(TimeZone.getTimeZone("GMT"));
   jsonMapper.registerModule(DefaultScalaModule)
   jsonMapper.registerModule(new JavaTimeModule())
+  jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
   jsonMapper.setDateFormat(df);
 

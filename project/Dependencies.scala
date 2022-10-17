@@ -22,12 +22,14 @@ object Dependencies {
   private val squareup              = "com.squareup.okhttp"             % "okhttp"                  % "2.7.5"
   private val bouncycastle          = "org.bouncycastle"                % "bcprov-ext-jdk16"        % "1.46"
 
+  private val guava                 = "com.google.guava"                % "guava"                   % "31.1-jre"
 
   private val kamonDeps = Seq(kamon_core, kamon_datadog, aspectj_weaver,kamon_scala)
   private val JSONDeps = Seq(jackson_core, jackson_databind, jackson_module, jackson_datatype_jdk8, json4s_base, json4s_jackson)
   private val logger = Seq(scala_logger,logback)
+  private val misc = Seq(guava)
 
-  val coreDependencies =  logger ++ kamonDeps ++ JSONDeps  ++ Seq(gson,apache_http,squareup,bouncycastle)
+  val coreDependencies =  logger ++ kamonDeps ++ JSONDeps ++ misc ++ Seq(gson,apache_http,squareup,bouncycastle)
 
   lazy val resolverSettings = Seq()
 }

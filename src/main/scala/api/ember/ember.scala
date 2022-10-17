@@ -28,22 +28,21 @@ class ember(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
       case token if (token.AccessToken == "") => Login(); Run;
       // Yes
       case token =>
-        val expiry = LocalDateTime.ofInstant(token.TokenCreateTime.toInstant, ZoneId.of("GMT")).plusSeconds(token.ExpiresIn.toLong)
-        val today = LocalDateTime.ofInstant(Instant.now(), ZoneId.of("GMT"))
-        if (today.isAfter(expiry)) {
+       // val expiry = LocalDateTime.ofInstant(token.TokenCreateTime.toInstant, ZoneId.of("GMT")).plusSeconds(token.ExpiresIn.toLong)
+        //val today = LocalDateTime.ofInstant(Instant.now(), ZoneId.of("GMT"))
+        //if (today.isAfter(expiry)) {
           //token expired - lets refresh
-          logger.info("Ember Token is Expired")
+          //logger.info("Ember Token is Expired")
           //refreshToken()
           //TODO figure out fresh token command
-          Login()
-          Run()
-        }
-        else {
+         // Login()
+          //Run()
+        //}
+        //else {
           if (gatewayId.isEmpty)
             GetGatewayId()
-
           getMetrics()
-        }
+        //}
     }
   }
 
