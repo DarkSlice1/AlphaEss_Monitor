@@ -52,20 +52,37 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
       digestUri = urlExtension
     )
    val conversion = jsonMapper.readValue(reply, classOf[jstatusEReply])
-     //multiplying by 10 to align with other metrics
-    try{
-      //reporterKamon.zappiEnergyUsageCounter.increment((conversion.eddi.head.ectp1*10).toLong, "hub", username)
-      reporterKamon.eddiEnergyTemperature1.set(conversion.eddi.head.tp1, "hub", username)
-      reporterKamon.eddiEnergyTemperature2.set(conversion.eddi.head.tp2, "hub", username)
-      if (conversion.eddi.head.div == 0) {
-        //reporterKamon.eddiEnergyUsageGauge.set(0, "hub", username)
+    try {
+      if (conversion.eddi.head.hno == 1) //which tank is being heated
+      {
+        reporterKamon.eddiEnergyUsageCounter.increment((conversion.eddi.head.div * 10).toLong, "Tank1", username)
       }
       else {
-        //reporterKamon.eddiEnergyUsageGauge.set((conversion.eddi.head.ectp1 * 10).toLong, "hub", username)
+        reporterKamon.eddiEnergyUsageCounter.increment((conversion.eddi.head.div * 10).toLong, "Tank2", username)
+      }
+
+      reporterKamon.eddiEnergyTemperature1.set(conversion.eddi.head.tp1, "hub", username)
+      reporterKamon.eddiEnergyTemperature2.set(conversion.eddi.head.tp2, "hub", username)
+
+      if (conversion.eddi.head.div == 0) { //clear values if no longer drawing energy
+        reporterKamon.eddiEnergyUsageGauge.set(0, "Tank1", username)
+        reporterKamon.eddiEnergyUsageGauge.set(0, "Tank2", username)
+      }
+      else {
+        if (conversion.eddi.head.hno == 1) //which tank is being heated
+        {
+          reporterKamon.eddiEnergyUsageGauge.set((conversion.eddi.head.div * 10).toLong, "Tank1", username)
+          reporterKamon.eddiEnergyUsageGauge.set(0, "Tank2", username)
+        }
+        else {
+          reporterKamon.eddiEnergyUsageGauge.set((conversion.eddi.head.div * 10).toLong, "Tank2", username)
+          reporterKamon.eddiEnergyUsageGauge.set(0, "Tank1", username)
+        }
+
       }
       if (serial == 0) {
         serial = conversion.eddi.head.sno
-        logger.info("Eddi serial captured "+serial)
+        logger.info("Eddi serial captured " + serial)
       }
       logger.info("Eddi Metrics Completed")
 
@@ -86,7 +103,7 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
         host = asn_url,
         digestUri = urlExtension
       )
-      logger.info("Eddie Set to Stop Mode")
+      logger.info("Eddie Set to Normal Mode")
     }
     catch {
       case ex: Exception => logger.error("ERROR: " + ex.toString);

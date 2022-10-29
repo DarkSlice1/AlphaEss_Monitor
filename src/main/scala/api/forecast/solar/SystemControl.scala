@@ -8,6 +8,7 @@ import java.util.Calendar
 class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
 
   private var batteryChargeEnabled = true
+  private var batteryControlGridPullNoLongerNeededCounter = 0
 
   def setSystemSettingsBasedOnGeneratedForecast(): Unit ={
     val todaysForecast = forecast.getTodaysForcast()
@@ -25,14 +26,21 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
   }
 
   def canWeTurnOffNightCharging(CurrentGridPull:Double)={
-    logger.info("Battery Control charge value ="+CurrentGridPull)
+    logger.info("Battery Control, Grid pull = "+CurrentGridPull)
     areWeInTheChargingWindow(Calendar.getInstance())
     if(batteryChargeEnabled && CurrentGridPull >= 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid
       if (areWeInTheChargingWindow(Calendar.getInstance())) {
         //stop using the grid for power - switch to the battery
-        alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
-        batteryChargeEnabled = false
-        logger.info("Battery charging Disabled")
+        if(batteryControlGridPullNoLongerNeededCounter >= 6) {
+          alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
+          batteryChargeEnabled = false
+          logger.info("Battery charging Disabled")
+          batteryControlGridPullNoLongerNeededCounter = 0
+        }
+        else {
+          logger.info("Battery Control - waiting for another iteration where grid pull is under 1kw/h ("+batteryControlGridPullNoLongerNeededCounter+"/6)")
+          batteryControlGridPullNoLongerNeededCounter+=1
+        }
       }
     }
   }

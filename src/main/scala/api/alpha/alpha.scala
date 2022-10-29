@@ -73,7 +73,12 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
   def getMetrics() = {
     val urlExtension= "/api/ESS/GetLastPowerDataBySN"
-    val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension,  new GetMetricsDetails(sys_sn, true),true,token.AccessToken)
+
+    val postParameters = new util.ArrayList[NameValuePair](2);
+    postParameters.add(new BasicNameValuePair("sys_sn", "ALL"));
+    postParameters.add(new BasicNameValuePair("noLoading", "true"));
+
+    val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,true, postParameters, true, token.AccessToken)
 
     val metrics = (jsonMapper.readValue(reply, classOf[SystemDetailsReply]).data)
     logger.info("AlphaEss Metrics Completed")
