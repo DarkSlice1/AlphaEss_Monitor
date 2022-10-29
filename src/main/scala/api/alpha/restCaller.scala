@@ -61,7 +61,7 @@ object restCaller {
     val uri = url
     val get = new HttpGet(uri)
     if (withParameters) {
-      new URIBuilder(get.getURI()).addParameters(parameters).build()
+      get.setURI(new URIBuilder(get.getURI()).addParameters(parameters).build())
     }
 
     val authtimestamp = Splitter.fixedLength(10).split(Instant.now().toEpochMilli().toString).iterator().next()
