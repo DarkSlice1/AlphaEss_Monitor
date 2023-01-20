@@ -129,7 +129,7 @@ object Main extends App with LazyLogging {
   def PublishSolarForecastNightlySummaryMetrics()= {
       try {
         //make sure we have a full days set of data first
-        if (applicationStartTime.until(Instant.now(), ChronoUnit.HOURS) > 24) {
+        if (applicationStartTime.until(Instant.now(), ChronoUnit.HOURS) > 12) {
           //what was today's solar generation as a percentage of forecasted
           forecast.RunNightlySummaryMetrics(alpha.reporter.DailySolarGeneration)
           logger.info("Publish Daily forecasting Metrics")

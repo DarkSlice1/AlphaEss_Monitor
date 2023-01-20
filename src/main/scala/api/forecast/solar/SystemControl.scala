@@ -31,7 +31,7 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
     if(batteryChargeEnabled && CurrentGridPull >= 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid
       if (areWeInTheChargingWindow(Calendar.getInstance())) {
         //stop using the grid for power - switch to the battery
-        if(batteryControlGridPullNoLongerNeededCounter >= 6) {
+        if(batteryControlGridPullNoLongerNeededCounter >= 18) { // 3 minutes
           alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
           batteryChargeEnabled = false
           logger.info("Battery charging Disabled")

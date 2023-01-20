@@ -22,7 +22,7 @@ import java.util.ArrayList
 object restCaller {
 
   val timeout = 1000
-  val authconstant = "LSZYDA95JVFQKV7PQNODZRDZIS4EDS0EED8BCWSS"
+  val authconstant = "LS885ZYDA95JVFQKUIUUUV7PQNODZRDZIS4ERREDS0EED8BCWSS"
 
   def simpleRestPostCall(url: String, data: RestBody,
                          withToken: Boolean = false,
