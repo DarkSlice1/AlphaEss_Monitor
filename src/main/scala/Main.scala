@@ -149,7 +149,7 @@ object Main extends App with LazyLogging {
       logger.info("running hourly Check")
       Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match
       {
-        //what do we want to run at what hour
+        //what do we want to run at what hour/
         case 1  if(forecastEnabled && controlEnabled) => systemControl.setSystemSettingsBasedOnGeneratedForecast()
         case 2  => Handle2amCalls()
         case 5  => Handle5amCalls()
@@ -190,6 +190,7 @@ object Main extends App with LazyLogging {
 
   private def startKamon(config: Config) = {
     logger.info("Starting Kamon reporters...." + config.getStringList("kamon.reporters").toString)
-   Kamon.init(config)
+    Kamon.loadModules()
+    Kamon.init(config)
   }
 }
