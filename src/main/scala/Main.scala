@@ -11,12 +11,13 @@ import com.typesafe.config.{Config, ConfigFactory}
 import kamon.Kamon
 import metrics.KamonMetrics
 
-import java.time.temporal.ChronoUnit
+import java.time.temporal.{ChronoUnit, TemporalUnit}
 import java.time.{Duration, Instant, LocalDateTime, OffsetDateTime, ZoneOffset}
 import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
 import com.typesafe.scalalogging.LazyLogging
 
 import java.util.Calendar
+import scala.concurrent.duration.MINUTES
 
 
 object Main extends App with LazyLogging {
@@ -62,7 +63,7 @@ object Main extends App with LazyLogging {
   }
 
   var applicationStartTime: Instant = Instant.now()
-
+  var lastMetricCheckTime = applicationStartTime
   startKamon(conf1.withFallback(conf2).resolve())
   val reporterKamon = new KamonMetrics()
 
@@ -72,7 +73,13 @@ object Main extends App with LazyLogging {
   val forecast = new SolarForecast(conf2, reporterKamon)
   val myenergi_zappi = new myenergi_zappie(conf2, reporterKamon)
   val myenergi_eddi = new myenergi_eddie(conf2, reporterKamon)
-  val systemControl = new api.forecast.solar.SystemControl(alpha,forecast)
+  val systemControl = new api.forecast.solar.SystemControl(alpha,myenergi_zappi,myenergi_eddi,forecast)
+
+  val now = LocalDateTime.now()
+  var TenSecondCycle = new ScheduledThreadPoolExecutor(3)
+  val OneHourCycle = new ScheduledThreadPoolExecutor(3)
+  var HeartBeatCycle = new ScheduledThreadPoolExecutor(3)
+
 
   val GatherRealTimeMetrics = new Runnable {
     override def run(): Unit = {
@@ -122,6 +129,7 @@ object Main extends App with LazyLogging {
         case ex: Exception => logger.error("ERROR Running SystemControl - cleaning token, Exception : " + ex.printStackTrace());
       }
 
+      lastMetricCheckTime = Instant.now()
       logger.info("All Metrics Gathered : " + Calendar.getInstance().getTime)
     }
   }
@@ -144,9 +152,30 @@ object Main extends App with LazyLogging {
       }
   }
 
-  val HourlyRun = new Runnable {
+  val HeatBeatCheck = new Runnable {
+    override def run(): Unit = {
+      logger.info("Running HeartBeatCheck")
+
+      if(Instant.now().isAfter(lastMetricCheckTime.plus(1, ChronoUnit.MINUTES)))
+      {
+        logger.info("We've stopped collecting metric data...")
+        logger.info("Stopping... ")
+        TenSecondCycle.shutdown()
+        logger.info("Starting up again... ")
+        TenSecondCycle = new ScheduledThreadPoolExecutor(3)
+        TenSecondCycle.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
+        logger.info("Running again... ")
+      }
+    }
+  }
+
+
+      val HourlyRun = new Runnable {
     override def run(): Unit = {
       logger.info("running hourly Check")
+
+
+
       Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match
       {
         //what do we want to run at what hour/
@@ -179,18 +208,19 @@ object Main extends App with LazyLogging {
     }
   }
 
-  val now = LocalDateTime.now()
-  val TenSecondCycle = new ScheduledThreadPoolExecutor(3)
-  val OneHourCycle = new ScheduledThreadPoolExecutor(3)
+
   // run Every 10 seconds
   TenSecondCycle.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
+
+  // run Every 30 seconds
+  HeartBeatCycle.scheduleAtFixedRate(HeatBeatCheck, 1, 30, TimeUnit.SECONDS)
+
   // run at the top of every hour
   OneHourCycle.scheduleAtFixedRate(HourlyRun, Duration.between(now, now.plusHours(1).truncatedTo(ChronoUnit.HOURS)).toMillis+1000, TimeUnit.HOURS.toMillis(1), TimeUnit.MILLISECONDS)
 
 
   private def startKamon(config: Config) = {
     logger.info("Starting Kamon reporters...." + config.getStringList("kamon.reporters").toString)
-    kamon.
     Kamon.loadModules()
     Kamon.init(config)
   }

@@ -1,11 +1,14 @@
 package api.forecast.solar
 
+
 import api.alpha.AlphaObjectMapper.AlphaESSSendSetting
 import api.alpha.alpha
+import api.myenergi.{myenergi_eddie, myenergi_zappie}
 import com.typesafe.scalalogging.LazyLogging
+
 import java.util.Calendar
 
-class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
+class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, forecast:SolarForecast) extends LazyLogging {
 
   private var batteryChargeEnabled = true
   private var batteryControlGridPullNoLongerNeededCounter = 0
@@ -35,6 +38,8 @@ class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
           alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
           batteryChargeEnabled = false
           logger.info("Battery charging Disabled")
+          zappi.SetStopMode()
+          eddi.SetStopMode()
           batteryControlGridPullNoLongerNeededCounter = 0
         }
         else {
