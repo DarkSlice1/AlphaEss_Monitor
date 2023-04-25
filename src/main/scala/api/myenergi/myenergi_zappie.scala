@@ -103,7 +103,7 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
   def SetEcoPlusMode(): Unit =
   {
     try {
-      val urlExtension = "/cgi-zappi-mode-Z" + serial + "-3-0-0-0000"
+      val urlExtension = "/cgi-zappi-mode-Z" + serial + "-1-0-0-0000"
       restCaller.simpleRestGetCallDigest(
         url = "https://" + asn_url + urlExtension,
         username = username,
@@ -111,7 +111,7 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
         host = asn_url,
         digestUri = urlExtension
       )
-      logger.info("Zappi Set to EcoPlus Mode")
+      logger.info("Zappi Set to Fast Charge Mode")
     }
     catch {
       case ex: Exception => logger.error("ERROR: " + ex.toString);
