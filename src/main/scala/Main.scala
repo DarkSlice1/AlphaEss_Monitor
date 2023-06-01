@@ -64,6 +64,7 @@ object Main extends App with LazyLogging {
 
   var applicationStartTime: Instant = Instant.now()
   var lastMetricCheckTime = applicationStartTime
+  var lastHourlyRunCheckTime = applicationStartTime
   startKamon(conf1.withFallback(conf2).resolve())
   val reporterKamon = new KamonMetrics()
 
@@ -75,11 +76,15 @@ object Main extends App with LazyLogging {
   val myenergi_eddi = new myenergi_eddie(conf2, reporterKamon)
   val systemControl = new api.forecast.solar.SystemControl(alpha,myenergi_zappi,myenergi_eddi,forecast)
 
-  val now = LocalDateTime.now()
-  var TenSecondCycle = new ScheduledThreadPoolExecutor(3)
-  val OneHourCycle = new ScheduledThreadPoolExecutor(3)
-  var HeartBeatCycle = new ScheduledThreadPoolExecutor(3)
+  var now = LocalDateTime.now()
+  var TenSecondCycle = new ScheduledThreadPoolExecutor(10)
+  var OneHourCycle = new ScheduledThreadPoolExecutor(10)
+  var HeartBeatCycle = new ScheduledThreadPoolExecutor(10)
 
+
+  alpha.run()
+  //systemControl.batteryChargeEnabled = false
+  val x = systemControl.EnableBatteryNightCharging
 
   val GatherRealTimeMetrics = new Runnable {
     override def run(): Unit = {
@@ -158,20 +163,33 @@ object Main extends App with LazyLogging {
 
       if(Instant.now().isAfter(lastMetricCheckTime.plus(1, ChronoUnit.MINUTES)))
       {
-        logger.info("We've stopped collecting metric data...")
+        logger.error("We've stopped collecting metric data...")
         logger.info("Stopping... ")
         TenSecondCycle.shutdown()
         logger.info("Starting up again... ")
-        TenSecondCycle = new ScheduledThreadPoolExecutor(3)
+        TenSecondCycle = new ScheduledThreadPoolExecutor(10)
         TenSecondCycle.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
+        logger.info("Running again... ")
+      }
+
+      if(Instant.now().isAfter(lastHourlyRunCheckTime.plus(1, ChronoUnit.HOURS).plus(1, ChronoUnit.MINUTES)))
+      {
+        logger.error("Hourly Run has stopped...")
+        logger.info("Stopping... ")
+        OneHourCycle.shutdown()
+        logger.info("Starting up again... ")
+        now = LocalDateTime.now()
+        OneHourCycle = new ScheduledThreadPoolExecutor(10)
+        OneHourCycle.scheduleAtFixedRate(HourlyRun, Duration.between(now, now.plusHours(1).truncatedTo(ChronoUnit.HOURS)).toMillis+1000, TimeUnit.HOURS.toMillis(1), TimeUnit.MILLISECONDS)
+        HourlyRun.run()
         logger.info("Running again... ")
       }
     }
   }
 
 
-      val HourlyRun = new Runnable {
-    override def run(): Unit = {
+  val HourlyRun = new Runnable {
+      override def run(): Unit = {
       logger.info("running hourly Check")
 
 
@@ -186,6 +204,8 @@ object Main extends App with LazyLogging {
         case 23 if(forecastEnabled) => PublishSolarForecastNightlySummaryMetrics() // get most up to date metrics before we set battery charge %
         case x:Any => logger.info("current hour is '"+x+"' nothing planned to run")
       }
+
+      lastHourlyRunCheckTime = Instant.now()
     }
   }
 

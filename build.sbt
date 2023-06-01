@@ -1,7 +1,7 @@
 import BuildSettings._
 import Dependencies._
 
-javaOptions <++= AspectjKeys.weaverOptions in Aspectj
+//javaOptions <++= AspectjKeys.weaverOptions in Aspectj
 fork in (Test, run) := true
 
 
