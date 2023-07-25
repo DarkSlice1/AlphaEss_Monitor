@@ -15,7 +15,7 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
   val password = config.getString("myenergi.password")
   val myenergi_BaseHost = "https://director.myenergi.net"
   var asn_url = "s18.myenergi.net"
-  var serial = 21139095
+  var serial = 24459385
 
   def Run(): Unit = {
 
@@ -72,11 +72,11 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
         if (conversion.eddi.head.hno == 1) //which tank is being heated
         {
           reporterKamon.eddiEnergyUsageGauge.set((conversion.eddi.head.div * 10).toLong, "Tank1", username)
-          reporterKamon.eddiEnergyUsageGauge.set(0, "Tank2", username)
+          reporterKamon.eddiEnergyUsageGauge.set(0, "Tank1", username)
         }
         else {
           reporterKamon.eddiEnergyUsageGauge.set((conversion.eddi.head.div * 10).toLong, "Tank2", username)
-          reporterKamon.eddiEnergyUsageGauge.set(0, "Tank1", username)
+          reporterKamon.eddiEnergyUsageGauge.set(0, "Tank2", username)
         }
 
       }

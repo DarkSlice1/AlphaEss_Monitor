@@ -34,7 +34,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
     if(batteryChargeEnabled && CurrentGridPull >= 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid
       if (areWeInTheChargingWindow(Calendar.getInstance())) {
         //stop using the grid for power - switch to the battery
-        if(batteryControlGridPullNoLongerNeededCounter >= 18) { // 3 minutes
+        if(batteryControlGridPullNoLongerNeededCounter > 18) { // 3 minutes
           alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
           batteryChargeEnabled = false
           logger.info("Battery charging Disabled")
@@ -43,7 +43,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
           batteryControlGridPullNoLongerNeededCounter = 0
         }
         else {
-          logger.info("Battery Control - waiting for another iteration where grid pull is under 1kw/h ("+batteryControlGridPullNoLongerNeededCounter+"/6)")
+          logger.info("Battery Control - waiting for another iteration where grid pull is under 1kw/h ("+batteryControlGridPullNoLongerNeededCounter+"/18)")
           batteryControlGridPullNoLongerNeededCounter+=1
         }
       }

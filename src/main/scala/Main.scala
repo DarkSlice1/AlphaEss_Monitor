@@ -81,10 +81,7 @@ object Main extends App with LazyLogging {
   var OneHourCycle = new ScheduledThreadPoolExecutor(10)
   var HeartBeatCycle = new ScheduledThreadPoolExecutor(10)
 
-
-  alpha.run()
-  //systemControl.batteryChargeEnabled = false
-  val x = systemControl.EnableBatteryNightCharging
+  //Handle2amCalls()
 
   val GatherRealTimeMetrics = new Runnable {
     override def run(): Unit = {
