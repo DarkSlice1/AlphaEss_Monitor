@@ -1,7 +1,7 @@
 package api.forecast.solar
 
 
-import api.alpha.AlphaObjectMapper.AlphaESSSendSetting
+import api.alpha.AlphaObjectMapper.AlphaESSUpdateChargeConfigInfo
 import api.alpha.alpha
 import api.myenergi.{myenergi_eddie, myenergi_zappie}
 import com.typesafe.scalalogging.LazyLogging
@@ -35,7 +35,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
       if (areWeInTheChargingWindow(Calendar.getInstance())) {
         //stop using the grid for power - switch to the battery
         if(batteryControlGridPullNoLongerNeededCounter > 18) { // 3 minutes
-          alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
+          alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(gridCharge = 0))
           batteryChargeEnabled = false
           logger.info("Battery charging Disabled")
           zappi.SetStopMode()
@@ -52,15 +52,15 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
 
   def EnableBatteryNightCharging()={
     if(!batteryChargeEnabled) {
-      alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 1))
+      alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(gridCharge = 1))
       batteryChargeEnabled = true
       logger.info("Battery charging Enabled")
     }
   }
 
-  def SetBatteryToX(batteryPercentage : Int): AlphaESSSendSetting =
+  def SetBatteryToX(batteryPercentage : Int): AlphaESSUpdateChargeConfigInfo =
   {
-    val newBatterySettings  =  AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(bat_high_cap=""+batteryPercentage)
+    val newBatterySettings  =  AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(batHighCap=batteryPercentage)
     logger.info("Battery percent will be: "+batteryPercentage+"%")
     newBatterySettings
   }

@@ -51,8 +51,8 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
   def write(metrics : AlphaMetrics): Unit = {
 
     //House load calc
-    val solarGeneration = (metrics.ppv1+metrics.ppv2+metrics.ppv3+metrics.ppv4)
-    val gridConsumption = (metrics.pmeter_l1+metrics.pmeter_l2+metrics.pmeter_l3)
+    val solarGeneration = (metrics.ppv)
+    val gridConsumption = (metrics.pgrid)
     val batteryConsumption = metrics.pbat
 
     //Handle Grid flow Metrics
@@ -63,42 +63,17 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
     SolarFlowMetrics(metrics,solarGeneration)
 
     houseLoad.update(CheckForZero(solarGeneration + gridConsumption + batteryConsumption))
-    reporterKamon.invertorPower.increment(CheckForZero(Math.abs(metrics.varac)), "sys_name", syn_name) // can be negative whe charging the battery???
 
     //Misc Metrics Below
 
     //preal_l1 is the output of the inverter "Inverter L1 real-time output power, this parameter has positive and negative"
     //should be equal to the PPV's minus the discharge of the battery
-    preal_l1.update(CheckForZero(metrics.preal_l1))
-    preal_l2.update(CheckForZero(metrics.preal_l2))
-    preal_l3.update(CheckForZero(metrics.preal_l3))
-    pmeter_l1.update(CheckForZero(metrics.pmeter_l1))
-    pmeter_l2.update(CheckForZero(metrics.pmeter_l2))
-    pmeter_l3.update(CheckForZero(metrics.pmeter_l3))
-    pmeter_dc.update(CheckForZero(metrics.pmeter_dc))
+
     soc.update(CheckForZero(metrics.soc))
-    factory_flag.update(metrics.factory_flag)
-    sva.update(CheckForZero(metrics.sva))
 
     //guessing this is the total Wattage the inverter is pulling to do its job ???
     //need to confirm - not sure how - CT-Clamp???
-    varac.update(CheckForZero(metrics.varac))
-    vardc.update(CheckForZero(metrics.vardc))
-    ev1_power.update(metrics.ev1_power)
-    ev1_chgenergy_real.update(CheckForZero(metrics.ev1_chgenergy_real))
-    ev1_mode.update(metrics.ev1_mode)
-    ev2_power.update(metrics.ev2_power)
-    ev2_chgenergy_real.update(CheckForZero(metrics.ev2_chgenergy_real))
-    ev2_mode.update(metrics.ev2_mode)
-    ev3_power.update(metrics.ev3_power)
-    ev3_chgenergy_real.update(CheckForZero(metrics.ev3_chgenergy_real))
-    ev3_mode.update(metrics.ev3_mode)
-    ev4_power.update(metrics.ev4_power)
-    ev4_chgenergy_real.update((metrics.ev4_chgenergy_real))
-    ev4_mode.update(metrics.ev4_mode)
-    poc_meter_l1.update(CheckForZero(metrics.poc_meter_l1))
-    poc_meter_l2.update(CheckForZero(metrics.poc_meter_l2))
-    poc_meter_l3.update(CheckForZero(metrics.poc_meter_l3))
+
   }
 
   //seems metrics are given in double we * 10 here and divide by 10 on DD
@@ -111,20 +86,20 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
 
   def GridFlowMetrics(metrics: AlphaMetrics, gridConsumption: Double): Unit = {
     //Grid Push or Pull ?
-    if (metrics.pmeter_l1 > 0) {
+    if (metrics.pgrid > 0) {
       //update our counter for tracking grid pull
       reporterKamon.totalGridConsumption.increment(CheckForZero(gridConsumption), "sys_name", syn_name)
       //update our gauge for tracking grid pull
-      gridPull_l1.update(CheckForZero(metrics.pmeter_l1))
+      gridPull_l1.update(CheckForZero(metrics.pgrid))
       // set our grid push to 0
       gridPush_l1.update(0)
       //add cost metric
-      CostPerKwMetric(metrics.pmeter_l1)
+      CostPerKwMetric(metrics.pgrid)
     } else {
       //update our counter for tracking grid push
       reporterKamon.totalGridPush.increment(CheckForZero(Math.abs(gridConsumption)), "sys_name", syn_name)
       //update our counter for tracking grid push
-      gridPush_l1.update(CheckForZero(Math.abs(metrics.pmeter_l1)))
+      gridPush_l1.update(CheckForZero(Math.abs(metrics.pgrid)))
       // set our grid pull to 0
       gridPull_l1.update(0)
     }
@@ -213,10 +188,7 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
 
   def SolarFlowMetrics(metrics: AlphaMetrics, solarGeneration : Double): Unit =
   {
-    ppv1.update(CheckForZero(metrics.ppv1))
-    ppv2.update(CheckForZero(metrics.ppv2))
-    ppv3.update(CheckForZero(metrics.ppv3))
-    ppv4.update(CheckForZero(metrics.ppv4))
+    ppv1.update(CheckForZero(metrics.ppv))
 
     DailySolarGeneration += solarGeneration
     reporterKamon.totalSolarGeneration.increment(CheckForZero(solarGeneration),"sys_name", syn_name)

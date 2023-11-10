@@ -17,6 +17,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
   val username = config.getString("alphaess.username")
   val password = config.getString("alphaess.password")
   val sys_sn = config.getString("alphaess.system_sn")
+  var systemId = ""
 
   val reporter = new reportHome(config,reporterKamon)
   val eplBaseHost = "https://cloud.alphaess.com"
@@ -28,28 +29,20 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
   def run(): Unit = {
     //Do we have an access token
     token match {
+
       // No - empty token object returned
-      case token if (token.AccessToken == "") => Login(); run;
+      case token if (token.token == "") =>
+        Login(); getSystemID(); run;
+
       // Yes
-      case token =>
-        //val expiry = LocalDateTime.ofInstant(token.TokenCreateTime.toInstant,ZoneId.of("GMT")).plusSeconds(token.ExpiresIn.toLong)
-        //val today = LocalDateTime.ofInstant(Instant.now(),ZoneId.of("GMT"))
-        //if(today.isAfter(expiry)){
-          //token expired - lets refresh
-          //logger.info("Alpha Token is Expired")
-          //refreshToken()
-         //TODO figure out fresh token command
-         // Login();
-        //}
-        //else{
+      case token if (token.token != "")=>
           getMetrics()
-        //}
     }
   }
 
   def Login():LoginReply ={
-    val urlExtension= "/api/Account/Login"
-    val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension,new LoginDetails(username,password))
+    val urlExtension= "/api/base/user/login"
+    val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension, "{\"username\": \""+username+"\",\"password\": \""+password+"\"}")
     val result: LoginReply = jsonMapper.readValue(reply, classOf[LoginReply])
 
     result.data match {
@@ -60,30 +53,21 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
   }
 
   def refreshToken(): Token = {
-   // logger.info("Calling refreshToken()")
-   // val urlExtension= "Api/Account/Login"
-   // val reply = restCaller.get(eplBaseHost+urlExtension, readToken)
-   // val result = jsonMapper.readValue(reply, classOf[token])
-   // writeToken(Some(result))
-  //  result
     Token.empty()
   }
 
 
 
   def getMetrics() = {
-    val urlExtension= "/api/ESS/GetLastPowerDataBySN"
+    val urlExtension= "/api/base/energyStorage/getLastPowerData"
 
     val postParameters = new util.ArrayList[NameValuePair](2);
-    postParameters.add(new BasicNameValuePair("sys_sn", sys_sn));
-    postParameters.add(new BasicNameValuePair("noLoading", "true"));
-
-    val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,true, postParameters, true, token.AccessToken)
-
+    postParameters.add(new BasicNameValuePair("sysSn", sys_sn));
+    val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,true, postParameters, true, token.token)
     val metrics = (jsonMapper.readValue(reply, classOf[SystemDetailsReply]).data)
     logger.info("AlphaEss Metrics Completed")
     currentBatteryPercentage = metrics.pbat
-    currentGridPull = metrics.pmeter_l1
+    currentGridPull = metrics.pgrid
     reporter.write(metrics)
   }
 
@@ -93,25 +77,38 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
     reporter.DailySolarGeneration = 0
   }
 
-  def getSystemSettings(): AlphaESSReceivedSettingData =
+  def getSystemID() =
   {
-    val urlExtension= "/api/Account/GetCustomUseESSSetting"//?system_id="+sys_sn
-    //val getParameters = new util.ArrayList[NameValuePair](2)
-    //getParameters.add(new BasicNameValuePair("sys_sn", sys_sn))
+    val urlExtension= "/api/web/home/getCustomMenuEssList"
     val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
       withToken = true,
-      token = token.AccessToken)
+      token = token.token)
+
+    val array = jsonMapper.readValue(reply, classOf[AlphaESSGetCustomMenuEssList]).data
+
+    array.foreach{x =>
+      if(x.sysSn == sys_sn) {
+        systemId = x.systemId
+      }
+    }
+  }
+
+
+  def getSystemSettings(): AlphaESSChargeConfigInfo =
+  {
+    val urlExtension= "/api/base/sysSet/getChargeConfigInfo?id="+systemId //? what is this value...
+    val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
+      withToken = true,
+      token = token.token)
 
     jsonMapper.readValue(reply, classOf[AlphaESSReceivedSetting]).data
 
   }
 
-  def setSystemSettings(convertedPayload: AlphaESSSendSetting)
+  def setSystemSettings(convertedPayload: AlphaESSUpdateChargeConfigInfo)
   {
-    val urlExtension= "/api/Account/CustomUseESSSetting"
-    //convert to AlphaESSSendSetting - what they give and what they expect are not the same :(
-
-    val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension,convertedPayload,true,token.AccessToken)
+    val urlExtension= "/api/base/sysSet/updateChargeConfigInfo"
+    val reply = restCaller.simpleRestPutCall(eplBaseHost+urlExtension, jsonMapper.writeValueAsString(convertedPayload),true,token.token)
     val result = jsonMapper.readValue(reply, classOf[LoginReply])
 
     if(result.code == 200)

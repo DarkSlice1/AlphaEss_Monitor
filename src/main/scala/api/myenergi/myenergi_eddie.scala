@@ -43,7 +43,7 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
   }
 
   def getMetrics() = {
-    val urlExtension = "/cgi-jstatus-E"
+    val urlExtension = "/cgi-jstatus-E"+serial
     val reply = restCaller.simpleRestGetCallDigest(
       url = "https://"+asn_url + urlExtension,
       username = username,

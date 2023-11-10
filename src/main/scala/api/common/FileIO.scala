@@ -33,7 +33,7 @@ object FileIO extends LazyLogging{
   def writeToken(tokenFile:File, token : Option[Token])= {
     val bw = new BufferedWriter(new FileWriter(tokenFile))
     token match{
-      case Some(value) => logger.info("Access Token received : " + value.AccessToken + ", expires on "+value.ExpiresIn+" minutes, created at "+value.TokenCreateTime)
+      case Some(value) => logger.info("Access Token received : " + value.token + ", expires on "+value.ExpiresIn+" minutes, created at "+value.TokenCreateTime)
         bw.write(jsonMapper.writeValueAsString(value))
       //clean the file
       case None =>  bw.write("")

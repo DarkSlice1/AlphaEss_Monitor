@@ -25,7 +25,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
     token match {
       // No - empty token object returned
-      case token if (token.AccessToken == "") => Login(); Run;
+      case token if (token.token == "") => Login(); Run;
       // Yes
       case token =>
        // val expiry = LocalDateTime.ofInstant(token.TokenCreateTime.toInstant, ZoneId.of("GMT")).plusSeconds(token.ExpiresIn.toLong)
@@ -54,7 +54,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
     result.data match {
       case null => logger.info("ERROR : " + result.toString)
-      case value: Any => token =  new Token(AccessToken = value.token, RefreshTokenKey = value.refresh_token)
+      case value: Any => token =  new Token(token = value.token, "", RefreshTokenKey = value.refresh_token)
     }
     result
   }
@@ -63,7 +63,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
     val urlExtension = "homes/list"
     val reply = restCaller.simpleRestGetCall(eplBaseHost + urlExtension,
       withToken = true,
-      token = token.AccessToken,
+      token = token.token,
       hostname = "eu-https.topband-cloud.com")
 
     gatewayId = (jsonMapper.readValue(reply, classOf[GatewayReply]).data.head.gatewayid)
@@ -86,7 +86,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
     val reply = restCaller.simpleRestPostCall(eplBaseHost + urlExtension,
       GatewayID(gatewayId),
       withToken = true,
-      token = token.AccessToken,
+      token = token.token,
       hostname = "eu-https.topband-cloud.com")
 
     val mapper = (jsonMapper.readValue(reply, classOf[HomeMetrics]))

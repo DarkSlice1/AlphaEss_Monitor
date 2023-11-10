@@ -1,4 +1,4 @@
-import api.alpha.AlphaObjectMapper.AlphaESSSendSetting
+import api.alpha.AlphaObjectMapper.{AlphaESSUpdateChargeConfigInfo, LoginReply}
 import api.alpha.alpha
 import api.common.FileIO.jsonMapper
 import api.common.Token
@@ -81,7 +81,10 @@ object Main extends App with LazyLogging {
   var OneHourCycle = new ScheduledThreadPoolExecutor(10)
   var HeartBeatCycle = new ScheduledThreadPoolExecutor(10)
 
-  //Handle2amCalls()
+  //alpha.run()
+  //val config = alpha.getSystemSettings()
+  //alpha.setSystemSettings(systemControl.SetBatteryToX(50))
+  //systemControl.EnableBatteryNightCharging()
 
   val GatherRealTimeMetrics = new Runnable {
     override def run(): Unit = {
