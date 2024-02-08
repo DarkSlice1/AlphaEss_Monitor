@@ -199,7 +199,7 @@ object Main extends App with LazyLogging {
         //what do we want to run at what hour/
         case 1  if(forecastEnabled && controlEnabled) => systemControl.setSystemSettingsBasedOnGeneratedForecast()
         case 2  => Handle2amCalls()
-        case 5  => Handle5amCalls()
+        case 6  => Handle6amCalls()
         case 16 if(forecastEnabled) => forecast.getTomorrowForcast()
         case 23 if(forecastEnabled) => PublishSolarForecastNightlySummaryMetrics() // get most up to date metrics before we set battery charge %
         case x:Any => logger.info("current hour is '"+x+"' nothing planned to run")
@@ -212,12 +212,12 @@ object Main extends App with LazyLogging {
   def Handle2amCalls(): Unit =
   {
     if(myEnergiEnabled) {
-      myenergi_zappi.DoNightBoost(21,"0500")
+      myenergi_zappi.DoNightBoost(28,"0600")
       myenergi_eddi.SetNormalMode()
     }
   }
 
-  def Handle5amCalls(): Unit =
+  def Handle6amCalls(): Unit =
   {
     if(forecastEnabled && controlEnabled) {
       systemControl.EnableBatteryNightCharging()

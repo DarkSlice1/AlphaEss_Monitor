@@ -31,7 +31,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
   def canWeTurnOffNightCharging(CurrentGridPull:Double)={
     logger.info("Battery Control, Grid pull = "+CurrentGridPull)
     areWeInTheChargingWindow(Calendar.getInstance())
-    if(batteryChargeEnabled && CurrentGridPull >= 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid
+    if(batteryChargeEnabled && CurrentGridPull > 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid - if the value is 0, then we we are no longer get data from alpha- keep working as expected
       if (areWeInTheChargingWindow(Calendar.getInstance())) {
         //stop using the grid for power - switch to the battery
         if(batteryControlGridPullNoLongerNeededCounter > 18) { // 3 minutes
@@ -67,12 +67,12 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
 
   def areWeInTheChargingWindow(now :Calendar): Boolean = {
     val ChargingWindowStart = Calendar.getInstance()
-    ChargingWindowStart.set(Calendar.HOUR_OF_DAY,2)
+    ChargingWindowStart.set(Calendar.HOUR_OF_DAY,2) //2:05am
     ChargingWindowStart.set(Calendar.MINUTE,5)
     ChargingWindowStart.set(Calendar.SECOND,0)
 
     val ChargingWindowEnd = Calendar.getInstance
-    ChargingWindowEnd.set(Calendar.HOUR_OF_DAY,4)
+    ChargingWindowEnd.set(Calendar.HOUR_OF_DAY,5) //5:55am
     ChargingWindowEnd.set(Calendar.MINUTE,55)
     ChargingWindowEnd.set(Calendar.SECOND,0)
 
