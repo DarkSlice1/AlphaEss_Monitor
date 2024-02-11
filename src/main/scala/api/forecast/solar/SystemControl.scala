@@ -20,9 +20,9 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
 
     todaysForecast match
     {
-      case x if x>15000 => alpha.setSystemSettings(SetBatteryToX(30))
-      case x if(x<15000 && x>10000) => alpha.setSystemSettings(SetBatteryToX(50))
-      case x if(x<10000 && x>6000) => alpha.setSystemSettings(SetBatteryToX(80))
+      case x if x>15000 => alpha.setSystemSettings(SetBatteryToX(95))
+      case x if(x<15000 && x>10000) => alpha.setSystemSettings(SetBatteryToX(95))
+      case x if(x<10000 && x>6000) => alpha.setSystemSettings(SetBatteryToX(95))
       case x if x<6000 => alpha.setSystemSettings(SetBatteryToX(95))
       case _ =>  alpha.setSystemSettings(SetBatteryToX(95))
     }
