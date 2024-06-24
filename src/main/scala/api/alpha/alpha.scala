@@ -39,8 +39,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
           getMetrics()
     }
   }
-//"{\"username\": \"DarkSlice\",\"password\": \"vHNzmMBt5ZHrlJ/S0aFUYQ==\"}")
-  //{\"username\":\"DarkSlice\",\"password\":\"vHNzmMBt5ZHrlJ/S0aFUYQ==\"}")
+
   def Login():LoginReply ={
     val urlExtension= "/api/stable/user/login"
     val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension, "{\"username\":\""+username+"\",\"password\":\""+password+"\"}")
