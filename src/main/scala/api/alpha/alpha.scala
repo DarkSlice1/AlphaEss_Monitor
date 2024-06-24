@@ -39,10 +39,11 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
           getMetrics()
     }
   }
-
+//"{\"username\": \"DarkSlice\",\"password\": \"vHNzmMBt5ZHrlJ/S0aFUYQ==\"}")
+  //{\"username\":\"DarkSlice\",\"password\":\"vHNzmMBt5ZHrlJ/S0aFUYQ==\"}")
   def Login():LoginReply ={
-    val urlExtension= "/api/base/user/login"
-    val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension, "{\"username\": \""+username+"\",\"password\": \""+password+"\"}")
+    val urlExtension= "/api/stable/user/login"
+    val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension, "{\"username\":\""+username+"\",\"password\":\""+password+"\"}")
     val result: LoginReply = jsonMapper.readValue(reply, classOf[LoginReply])
 
     result.data match {
@@ -59,14 +60,14 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
 
   def getMetrics() = {
-    val urlExtension= "/api/base/energyStorage/getLastPowerData"
+    val urlExtension= "/api/report/energyStorage/getLastPowerData"
 
     val postParameters = new util.ArrayList[NameValuePair](2);
     postParameters.add(new BasicNameValuePair("sysSn", sys_sn));
     val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,true, postParameters, true, token.token)
     val metrics = (jsonMapper.readValue(reply, classOf[SystemDetailsReply]).data)
     logger.info("AlphaEss Metrics Completed")
-    currentBatteryPercentage = metrics.pbat
+    currentBatteryPercentage = metrics.soc
     currentGridPull = metrics.pgrid
     reporter.write(metrics)
   }
@@ -79,7 +80,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
   def getSystemID() =
   {
-    val urlExtension= "/api/web/home/getCustomMenuEssList"
+    val urlExtension= "/api/stable/home/getCustomMenuEssList"
     val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
       withToken = true,
       token = token.token)
@@ -96,7 +97,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
   def getSystemSettings(): AlphaESSChargeConfigInfo =
   {
-    val urlExtension= "/api/base/sysSet/getChargeConfigInfo?id="+systemId //? what is this value...
+    val urlExtension= "/api/iterate/sysSet/getChargeConfigInfo?id="+systemId //? what is this value...
     val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
       withToken = true,
       token = token.token)
@@ -107,7 +108,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
   def setSystemSettings(convertedPayload: AlphaESSUpdateChargeConfigInfo)
   {
-    val urlExtension= "/api/base/sysSet/updateChargeConfigInfo"
+    val urlExtension= "/api/iterate/sysSet/updateChargeConfigInfo"
     val reply = restCaller.simpleRestPutCall(eplBaseHost+urlExtension, jsonMapper.writeValueAsString(convertedPayload),true,token.token)
     val result = jsonMapper.readValue(reply, classOf[LoginReply])
 

@@ -10,7 +10,8 @@ import java.util.Calendar
 
 class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, forecast:SolarForecast) extends LazyLogging {
 
-  private var batteryChargeEnabled = true
+  private var batteryChargeEnabled = false //default to false, we want to prioritize enabling in te event of an issue
+  private var gridDumpEnabled = false
   private var batteryControlGridPullNoLongerNeededCounter = 0
 
   def setSystemSettingsBasedOnGeneratedForecast(): Unit ={
@@ -55,6 +56,8 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
       alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(gridCharge = 1))
       batteryChargeEnabled = true
       logger.info("Battery charging Enabled")
+      alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(timeChaf2="00:00",timeChae2 = "00:00"))
+      logger.info("Battery charging Period 2 reset")
     }
   }
 
@@ -77,5 +80,25 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
     ChargingWindowEnd.set(Calendar.SECOND,0)
 
     (now.getTime.after(ChargingWindowStart.getTime) && now.getTime.before(ChargingWindowEnd.getTime))
+  }
+
+
+  def canWeDumpExcessEnergyToGrid(batteryPercentage: Double, CurrentGridPull:Double)= {
+    //only disable charging battery if - Battery is above 96% and we are not pulling from the grid
+    if(!gridDumpEnabled && batteryPercentage >= 96.0 && CurrentGridPull <= 400.0) //required SOC to be 95%
+      {
+        //disable changing at send excess to grid by setting now as the changing window
+        alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(timeChaf2="07:00",timeChae2 = "23:00"))
+        gridDumpEnabled = true
+        logger.info("Battery charging Period 2 enable - battery at "+batteryPercentage+"%, so dumping excess to grid")
+      }
+    //if we pull from the grid - stop and use the battery
+    if(gridDumpEnabled && (CurrentGridPull > 400.0))
+      {
+        //enable normal battery use by clearing this changing window
+        alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(timeChaf2="00:00",timeChae2 = "00:00"))
+        gridDumpEnabled= false
+        logger.info("Battery charging Period 2 reset")
+      }
   }
 }

@@ -81,8 +81,8 @@ object Main extends App with LazyLogging {
   var OneHourCycle = new ScheduledThreadPoolExecutor(10)
   var HeartBeatCycle = new ScheduledThreadPoolExecutor(10)
 
-  //alpha.run()
-  //val config = alpha.getSystemSettings()
+ // alpha.run()
+ // val config = alpha.getSystemSettings()
   //alpha.setSystemSettings(systemControl.SetBatteryToX(50))
   //systemControl.EnableBatteryNightCharging()
 
@@ -128,6 +128,7 @@ object Main extends App with LazyLogging {
       try {
         if (controlEnabled) {
           systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())
+          systemControl.canWeDumpExcessEnergyToGrid(alpha.getBatteryPercentage,alpha.getCurrentGridPull())
         }
       }
       catch {
@@ -201,7 +202,7 @@ object Main extends App with LazyLogging {
         case 2  => Handle2amCalls()
         case 6  => Handle6amCalls()
         case 16 if(forecastEnabled) => forecast.getTomorrowForcast()
-        case 23 if(forecastEnabled) => PublishSolarForecastNightlySummaryMetrics() // get most up to date metrics before we set battery charge %
+        case 23 => Handle23amCalls
         case x:Any => logger.info("current hour is '"+x+"' nothing planned to run")
       }
 
@@ -227,6 +228,17 @@ object Main extends App with LazyLogging {
       myenergi_eddi.SetStopMode()
     }
   }
+
+  def Handle23amCalls(): Unit =
+    {
+      //always make sure this is enabled for the night charging - seen issue where it gets missed
+      systemControl.EnableBatteryNightCharging()
+      logger.info("Battery charging Enabled")
+
+      if(forecastEnabled){
+        PublishSolarForecastNightlySummaryMetrics() // get most up to date metrics before we set battery charge %
+      }
+    }
 
 
   // run Every 10 seconds

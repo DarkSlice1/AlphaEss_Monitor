@@ -32,7 +32,7 @@ object restCaller {
 
     // set the Content-type
     post.setHeader("Content-type", "application/json")
-    post.setHeader("Host", "www.alphaess.com")
+    //post.setHeader("Host", "www.alphaess.com")
     if (withToken) {
       post.setHeader("Authorization", "Bearer " + token)
     }
@@ -50,7 +50,7 @@ object restCaller {
     val post = new HttpPut(url)
 
     post.setHeader("Content-type", "application/json")
-    post.setHeader("Host", "www.alphaess.com")
+    //post.setHeader("Host", "www.alphaess.com")
     if (withToken) {
       post.setHeader("Authorization", "Bearer " + token)
     }
