@@ -1,28 +1,16 @@
 package api.alpha
 
-
-import api.common.RestBody
-import com.google.common.base.Splitter
-import com.google.common.hash.Hashing
-import com.google.gson.Gson
-import com.sun.org.apache.xerces.internal.impl.dv.xs.DateTimeDV
-import org.apache.commons.codec.binary.Hex.encodeHexString
 import org.apache.http.NameValuePair
-import org.apache.http.client.methods.RequestBuilder.post
 import org.apache.http.client.methods.{HttpGet, HttpPost, HttpPut}
 import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.{ByteArrayEntity, StringEntity}
-import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.impl.client.{DefaultHttpClient, HttpClientBuilder}
 import org.apache.http.util.EntityUtils
 
-import java.nio.charset.StandardCharsets
-import java.time.{Instant, LocalDateTime}
 import java.util.ArrayList
 
 object restCaller {
 
-  val timeout = 1000
-  val authconstant = "LS885ZYDA95JVFQKUIUUUV7PQNODZRDZIS4ERREDS0EED8BCWSS"
 
   def simpleRestPostCall(url: String, data: String,
                          withToken: Boolean = false,
@@ -37,9 +25,20 @@ object restCaller {
       post.setHeader("Authorization", "Bearer " + token)
     }
     val entity = new ByteArrayEntity(data.getBytes("UTF-8"));
+
+    //val json = new StringBuilder
+    //json.append("{")
+    //json.append("\"username\":\"DarkSlice\",")
+    //json.append("\"password\":\"vHNzmMBt5ZHrlJ/S0aFUYQ==")
+    //json.append("}")
+
+    // send a JSON data
+    //post.setEntity(new StringEntity(json.toString))
+
     post.setEntity(entity);
     // send the post request
-    val response = (new DefaultHttpClient).execute(post)
+    val  response = (HttpClientBuilder.create().build()).execute(post)
+    //val response = (new DefaultHttpClient).execute(post)
     // print the response headers
     EntityUtils.toString(response.getEntity, "UTF-8")
   }

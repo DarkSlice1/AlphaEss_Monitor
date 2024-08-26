@@ -30,3 +30,5 @@ project/boot/
 #My Specific
 push2pie.sh
 getLogsFromPie.sh
+.DS_Store
+runAlpha.sh
