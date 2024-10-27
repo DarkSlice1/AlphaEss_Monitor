@@ -6,7 +6,7 @@ object Dependencies {
   private val kamon_scala           = "io.kamon"                        %% "kamon-scala"            % "0.6.7"
   private val kamon_datadog         = "io.kamon"                        %% "kamon-datadog"          % "2.3.1"
   private val kamon_system          = "io.kamon"                        %% "kamon-system-metrics"   % "2.3.1"
-  private val aspectj_weaver        = "org.aspectj"                     % "aspectjweaver"           % "1.9.22" % "runtime"
+  private val aspectj_weaver        = "org.aspectj"                     % "aspectjweaver"           % "1.8.9"
 
   private val scala_logger          = "com.typesafe.scala-logging"      %% "scala-logging"          % "3.1.0"
   private val logback               = "ch.qos.logback"                  % "logback-classic"         % "1.1.2"
@@ -34,7 +34,3 @@ object Dependencies {
 
   lazy val resolverSettings = Seq()
 }
-
-
-
-

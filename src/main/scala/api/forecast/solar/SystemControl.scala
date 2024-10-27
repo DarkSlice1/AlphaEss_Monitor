@@ -14,6 +14,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
   private var gridDumpEnabled = false
   private var batteryControlGridPullNoLongerNeededCounter = 0
 
+
   def setSystemSettingsBasedOnGeneratedForecast(): Unit ={
     val todaysForecast = forecast.getTodaysForcast()
     forecast.publishTodaysForcast(todaysForecast)
@@ -57,7 +58,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
       batteryChargeEnabled = true
       logger.info("Battery charging Enabled")
       alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(timeChaf2="00:00",timeChae2 = "00:00"))
-      logger.info("Battery charging Period 2 reset")
+      logger.info("Battery charging Period 2 to - 00:00 - 00:00")
     }
   }
 
@@ -85,12 +86,12 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
 
   def canWeDumpExcessEnergyToGrid(batteryPercentage: Double, CurrentGridPull:Double)= {
     //only disable charging battery if - Battery is above 96% and we are not pulling from the grid
-    if(!gridDumpEnabled && batteryPercentage >= 96.0 && CurrentGridPull <= 400.0) //required SOC to be 95%
+    if(!gridDumpEnabled && batteryPercentage >= 96.0 && CurrentGridPull <= 400.0 && CurrentGridPull != 0.0) //required SOC to be 95%
       {
         //disable changing at send excess to grid by setting now as the changing window
         alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(timeChaf2="07:00",timeChae2 = "23:00"))
         gridDumpEnabled = true
-        logger.info("Battery charging Period 2 enable - battery at "+batteryPercentage+"%, so dumping excess to grid")
+        logger.info("Battery charging Period 2 to - 07:00 - 23:00 - battery at "+batteryPercentage+"%, so dumping excess to grid")
       }
     //if we pull from the grid - stop and use the battery
     if(gridDumpEnabled && (CurrentGridPull > 400.0))
@@ -98,7 +99,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
         //enable normal battery use by clearing this changing window
         alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(timeChaf2="00:00",timeChae2 = "00:00"))
         gridDumpEnabled= false
-        logger.info("Battery charging Period 2 reset")
+        logger.info("Battery charging Period 2 to - 00:00 - 00:00")
       }
   }
 }

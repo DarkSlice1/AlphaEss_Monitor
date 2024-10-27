@@ -26,19 +26,9 @@ object restCaller {
     }
     val entity = new ByteArrayEntity(data.getBytes("UTF-8"));
 
-    //val json = new StringBuilder
-    //json.append("{")
-    //json.append("\"username\":\"DarkSlice\",")
-    //json.append("\"password\":\"vHNzmMBt5ZHrlJ/S0aFUYQ==")
-    //json.append("}")
-
-    // send a JSON data
-    //post.setEntity(new StringEntity(json.toString))
-
     post.setEntity(entity);
     // send the post request
     val  response = (HttpClientBuilder.create().build()).execute(post)
-    //val response = (new DefaultHttpClient).execute(post)
     // print the response headers
     EntityUtils.toString(response.getEntity, "UTF-8")
   }
@@ -56,7 +46,7 @@ object restCaller {
     val entity = new ByteArrayEntity(data.getBytes("UTF-8"));
     post.setEntity(entity);
     // send the post request
-    val response = (new DefaultHttpClient).execute(post)
+    val response = (HttpClientBuilder.create().build()).execute(post)
     // print the response headers
     EntityUtils.toString(response.getEntity, "UTF-8")
   }
@@ -77,7 +67,7 @@ object restCaller {
       get.setHeader("Authorization", "Bearer " + token)
     }
     // send the get request
-    val response = (new DefaultHttpClient).execute(get)
+    val response = (HttpClientBuilder.create().build()).execute(get)
     // print the response headers
     EntityUtils.toString(response.getEntity, "UTF-8")
   }
