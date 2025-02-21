@@ -82,9 +82,13 @@ object Main extends App with LazyLogging {
   var HeartBeatCycle = new ScheduledThreadPoolExecutor(10)
 
  // alpha.run()
- // val config = alpha.getSystemSettings()
+  val config = alpha.getSystemSettings()
   //alpha.setSystemSettings(systemControl.SetBatteryToX(50))
   //systemControl.EnableBatteryNightCharging()
+  //myenergi_eddi.Run()
+  //myenergi_eddi.SetNormalMode()
+  //myenergi_eddi.SetBoostMode()
+  //myenergi_zappi.DoNightBoost(28,"0600")
 
   val GatherRealTimeMetrics = new Runnable {
     override def run(): Unit = {
@@ -201,8 +205,11 @@ object Main extends App with LazyLogging {
         case 1  if(forecastEnabled && controlEnabled) => systemControl.setSystemSettingsBasedOnGeneratedForecast()
         case 2  => Handle2amCalls()
         case 6  => Handle6amCalls()
+        case 7  => Handle7amCalls()
+        case 8  => Handle8amCalls()
+        case 9  => Handle9amCalls()
         case 16 if(forecastEnabled) => forecast.getTomorrowForcast()
-        case 23 => Handle23amCalls
+        case 23 => Handle23amCalls()
         case x:Any => logger.info("current hour is '"+x+"' nothing planned to run")
       }
 
@@ -214,7 +221,11 @@ object Main extends App with LazyLogging {
   {
     if(myEnergiEnabled) {
       myenergi_zappi.DoNightBoost(28,"0600")
-      myenergi_eddi.SetNormalMode()
+      myenergi_zappi.DoNightBoost(28,"0600")
+      myenergi_zappi.DoNightBoost(28,"0600") //hasn't run in 3 days - but api call is fine, guessing issues is on the myenregi side
+      myenergi_eddi.SetBoostMode()
+      myenergi_eddi.SetBoostMode()
+      myenergi_eddi.SetBoostMode()
     }
   }
 
@@ -223,6 +234,30 @@ object Main extends App with LazyLogging {
     if(forecastEnabled && controlEnabled) {
       systemControl.EnableBatteryNightCharging()
     }
+    if(myEnergiEnabled) {
+      myenergi_zappi.SetStopMode()
+      myenergi_eddi.SetStopMode()
+    }
+  }
+
+  def Handle7amCalls(): Unit =
+  {//still seeing eddi turned on at this time, a lot of failed events
+    if(myEnergiEnabled) {
+      myenergi_zappi.SetStopMode()
+      myenergi_eddi.SetStopMode()
+    }
+  }
+
+  def Handle8amCalls(): Unit =
+  {//still seeing eddi turned on at this time, a lot of failed events
+    if(myEnergiEnabled) {
+      myenergi_zappi.SetStopMode()
+      myenergi_eddi.SetStopMode()
+    }
+  }
+
+  def Handle9amCalls(): Unit =
+  {//still seeing eddi turned on at this time, a lot of failed events
     if(myEnergiEnabled) {
       myenergi_zappi.SetStopMode()
       myenergi_eddi.SetStopMode()

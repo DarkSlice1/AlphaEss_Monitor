@@ -92,18 +92,18 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
     }
   }
 
-  def SetNormalMode(): Unit =
+  def SetBoostMode(): Unit =
   {
     try {
-      val urlExtension = "/cgi-eddi-mode-E" + serial + "-1"
-      restCaller.simpleRestGetCallDigest(
+      val urlExtension = "/cgi-eddi-boost-E" + serial + "-10-1-240" //https://github.com/twonk/MyEnergi-App-Api/blob/master/README.md
+      val reply = restCaller.simpleRestGetCallDigest(
         url = "https://" + asn_url + urlExtension,
         username = username,
         password = password,
         host = asn_url,
         digestUri = urlExtension
       )
-      logger.info("Eddie Set to Normal Mode")
+      logger.info("Eddie Set to Normal Mode - REST reply : "+reply)
     }
     catch {
       case ex: Exception => logger.error("ERROR: " + ex.toString);
@@ -114,14 +114,14 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
   {
     try {
       val urlExtension = "/cgi-eddi-mode-E" + serial + "-0"
-      restCaller.simpleRestGetCallDigest(
+      val reply = restCaller.simpleRestGetCallDigest(
         url = "https://" + asn_url + urlExtension,
         username = username,
         password = password,
         host = asn_url,
         digestUri = urlExtension
       )
-      logger.info("Eddie Set to Stop Mode")
+      logger.info("Eddie Set to Stop Mode - REST reply : "+reply)
     }
     catch {
       case ex: Exception => logger.error("ERROR: " + ex.toString);
