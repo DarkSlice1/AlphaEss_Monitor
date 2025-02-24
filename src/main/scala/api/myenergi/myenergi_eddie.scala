@@ -92,10 +92,10 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
     }
   }
 
-  def SetBoostMode(): Unit =
+  def SetNormalMode(): Unit =
   {
     try {
-      val urlExtension = "/cgi-eddi-boost-E" + serial + "-10-1-240" //https://github.com/twonk/MyEnergi-App-Api/blob/master/README.md
+      val urlExtension = "/cgi-eddi-mode-E" + serial + "-1" //https://github.com/twonk/MyEnergi-App-Api/blob/master/README.md
       val reply = restCaller.simpleRestGetCallDigest(
         url = "https://" + asn_url + urlExtension,
         username = username,

@@ -85,14 +85,14 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
         SetEcoPlusMode()
         try {
           val urlExtension = "/cgi-zappi-mode-Z" + serial + "-0-10-" + Quantity + "-" + EndTime
-          restCaller.simpleRestGetCallDigest(
+          val reply =restCaller.simpleRestGetCallDigest(
             url = "https://" + asn_url + urlExtension,
             username = username,
             password = password,
             host = asn_url,
             digestUri = urlExtension
           )
-          logger.info("Zappi boost set for "+Quantity+"Kw and due to end at "+EndTime)
+          logger.info("Zappi boost set for "+Quantity+"Kw and due to end at "+EndTime+" - REST reply : "+reply)
         }
         catch {
           case ex: Exception => logger.error("ERROR: " + ex.toString);
@@ -104,14 +104,14 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
   {
     try {
       val urlExtension = "/cgi-zappi-mode-Z" + serial + "-1-0-0-0000"
-      restCaller.simpleRestGetCallDigest(
+      val reply = restCaller.simpleRestGetCallDigest(
         url = "https://" + asn_url + urlExtension,
         username = username,
         password = password,
         host = asn_url,
         digestUri = urlExtension
       )
-      logger.info("Zappi Set to Fast Charge Mode")
+      logger.info("Zappi Set to Fast Charge Mode - REST reply : "+reply)
     }
     catch {
       case ex: Exception => logger.error("ERROR: " + ex.toString);
@@ -122,14 +122,14 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
   {
     try {
       val urlExtension = "/cgi-zappi-mode-Z" + serial + "-4-0-0-0000"
-      restCaller.simpleRestGetCallDigest(
+      val reply = restCaller.simpleRestGetCallDigest(
         url = "https://" + asn_url + urlExtension,
         username = username,
         password = password,
         host = asn_url,
         digestUri = urlExtension
       )
-      logger.info("Zappi Set to Stop Mode")
+      logger.info("Zappi Set to Stop Mode  - REST reply : "+reply)
     }
     catch {
       case ex: Exception => logger.error("ERROR: " + ex.toString);

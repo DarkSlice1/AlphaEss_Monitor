@@ -223,9 +223,9 @@ object Main extends App with LazyLogging {
       myenergi_zappi.DoNightBoost(28,"0600")
       myenergi_zappi.DoNightBoost(28,"0600")
       myenergi_zappi.DoNightBoost(28,"0600") //hasn't run in 3 days - but api call is fine, guessing issues is on the myenregi side
-      myenergi_eddi.SetBoostMode()
-      myenergi_eddi.SetBoostMode()
-      myenergi_eddi.SetBoostMode()
+      myenergi_eddi.SetNormalMode()
+      myenergi_eddi.SetNormalMode()
+      myenergi_eddi.SetNormalMode()
     }
   }
 
