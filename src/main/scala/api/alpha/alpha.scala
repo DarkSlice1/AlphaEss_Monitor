@@ -120,4 +120,27 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
   def getCurrentGridPull():Double = {
     currentGridPull
   }
+
+  def getFeedStrategyList(): AlphaEssFeedStrategyData = {
+
+    val urlExtension= "/api/iterate/sysSet/getFeedStrategyList?id="+systemId //? what is this value...
+    val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
+      withToken = true,
+      token = token.token)
+
+    jsonMapper.readValue(reply, classOf[AlphaESSFeedStrategyList]).data
+  }
+
+  def setFeedStrategy(config : AlphaEssFeedStrategyConfig): Unit = {
+
+    val urlExtension= "/api/iterate/sysSet/saveFeedStrategy"
+    //val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension, "{\"username\":\""+username+"\",\"password\":\""+password+"\"}")
+
+    val jsonString: String = jsonMapper.writeValueAsString(config)
+    val reply = restCaller.simpleRestPostCall(eplBaseHost+urlExtension, jsonString ,true,token.token)
+    val result = jsonMapper.readValue(reply, classOf[UpdateFITReply])
+
+    if(result.code == 200)
+      logger.info("Updated FIT System Settings")
+  }
 }

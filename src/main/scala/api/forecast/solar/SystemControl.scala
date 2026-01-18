@@ -1,7 +1,7 @@
 package api.forecast.solar
 
 
-import api.alpha.AlphaObjectMapper.AlphaESSUpdateChargeConfigInfo
+import api.alpha.AlphaObjectMapper.{AlphaESSUpdateChargeConfigInfo, AlphaEssFeedStrategyConfig, AlphaEssFeedStrategyData, FeedStrategyVO}
 import api.alpha.alpha
 import api.myenergi.{myenergi_eddie, myenergi_zappie}
 import com.typesafe.scalalogging.LazyLogging
@@ -101,5 +101,65 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
         gridDumpEnabled= false
         logger.info("Battery charging Period 2 to - 00:00 - 00:00")
       }
+  }
+
+  /**
+   * We want to dump the batter to the Grid in a Safe manner
+   * we have 22k to work with at a 5kw per hour drain
+   * battery charging starts at 2am and drops to a max of 10%
+   * Starting at 23:00 we can start dumping depending on % percentage.
+   * Let's review every few seconds and adjust to maximize drain before 2am but maintain enough charge for usagae
+   * @param batteryPercentage
+   * @return
+   */
+  def canWeDumpBatteryToGrid(batteryPercentage: Double) ={
+    try {
+      logger.info("Reviewing FIT Options")
+
+      Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match {
+        case 19 |23 | 0 | 1 => {
+
+
+          //at 11pp
+          //battery at 90%+ Drain at 5kw
+          if(batteryPercentage >90) {alpha.setFeedStrategy(UpdateFITConfig(1, 15,"23:00","23:59",5000))}
+          //battery at 80%+ Drain at 4kw
+          //Battery at 70%+ Drain at 3kw
+          //Battery at 60%+ Drain at 2kw
+          //Battery at 50%+ Drain at 1kw
+          //Battery less than 50% - DON'T DRAIN
+
+          //at 00:00
+          //battery at 90%+ Drain at 5kw
+          //battery at 80%+ Drain at 5kw
+          //Battery at 70%+ Drain at 5kw
+          //Battery at 60%+ Drain at 4kw
+          //Battery at 50%+ Drain at 3kw
+          //Battery at 40%+ Drain at 2kw
+          //Battery less than 40% - DON'T DRAIN
+
+          //at 01:00
+          //battery at 90%+ Drain at 5kw
+          //battery at 80%+ Drain at 5kw
+          //Battery at 70%+ Drain at 5kw
+          //Battery at 60%+ Drain at 5kw
+          //Battery at 50%+ Drain at 5kw
+          //Battery at 40%+ Drain at 5kw
+          //Battery at 30%+ Drain at 4kw
+          //Battery less than 30% - DON'T DRAIN
+
+          //at 01:30
+          //Battery at 20%+ Drain at 2kw
+          //Battery at 10%+ Drain at 0.5kw
+          //Battery less than 10% - DON'T DRAIN
+          logger.info("Updated FIT Options")
+        }
+        case _ =>
+      }
+    }
+    def UpdateFITConfig(Enabled : Int, percentage :BigDecimal, start: String, end : String, FITPower:Int) : AlphaEssFeedStrategyConfig= {
+      AlphaEssFeedStrategyConfig(Enabled,percentage, alpha.systemId,  List(FeedStrategyVO.from(alpha.getFeedStrategyList().feedStrategyVOList.head).copy(start=start,end = end,feedPower = FITPower)), 0)
+    }
+
   }
 }

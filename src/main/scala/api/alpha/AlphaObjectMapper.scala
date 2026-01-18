@@ -2,7 +2,7 @@ package api.alpha
 
 import api.common.RestBody
 import api.common.Token
-import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonInclude}
 
 import java.util.Date
 import scala.util.Try
@@ -24,6 +24,13 @@ object AlphaObjectMapper {
                          msg: String,
                          expMsg: String,
                          data: Token)
+
+  case class UpdateFITReply(
+                         code: Int,
+                         msg: String,
+                         expMsg: String,
+                         data: Boolean,
+                         extra:Option[String])
 
 
   case class SystemDetails(
@@ -84,7 +91,59 @@ object AlphaObjectMapper {
                                       data: AlphaESSChargeConfigInfo
                                     )
 
+  case class AlphaESSFeedStrategyList(
+                                       code: Int,
+                                       msg: String,
+                                       expMsg : String,
+                                       data: AlphaEssFeedStrategyData,
+                                       extra: Option[String]
+                                     )
 
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  case class AlphaEssFeedStrategyConfig(
+                                       batteryEn: Int,
+                                       batteryFeedCutoffSoc: BigDecimal,              // 15 -> 15
+                                       id: String,                                    // "zuUVCm..."
+                                       feedStrategyDTOList: List[FeedStrategyVO],
+                                       prechargeEn: Int
+                                     )
+
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  case class AlphaEssFeedStrategyData(
+                                     batteryEn: Int,
+                                     batteryFeedCutoffSoc: BigDecimal,
+                                     poinv: BigDecimal,
+                                     timePeriodLimit: Int,
+                                     batUseCap: BigDecimal,
+                                     feedStrategyVOList: List[FeedStrategyVO],
+                                     prechargeEn: Int,
+                                     prechargeSoc: Option[BigDecimal],     // null -> None
+                                     feedInAlertContent: String,
+                                     strategyStatus: String
+                                   )
+
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  case class FeedStrategyVO(
+                                   id: Long,
+                                   sysSn: String,
+                                   start: String,   // "HH:mm"
+                                   end: String,     // "HH:mm"
+                                   feedPower: Int,
+                                   sort: Int
+                           )
+
+  object FeedStrategyVO {
+    def from(receivedType: FeedStrategyVO): FeedStrategyVO = {
+      new FeedStrategyVO(
+        id = receivedType.id,
+        sysSn = receivedType.sysSn,
+        start = receivedType.start, // "HH:mm"
+        end = receivedType.end, // "HH:mm"
+        feedPower = receivedType.feedPower,
+        sort = receivedType.sort
+      )
+    }
+  }
   case class AlphaESSChargeConfigInfo(
                                           id: String,
                                           basicModeJp: String,//null
@@ -108,6 +167,8 @@ object AlphaObjectMapper {
                                           upsReserve: Int,
                                           mbat: String
                                         )
+
+
   object AlphaESSUpdateChargeConfigInfo{
     def from(receivedType: AlphaESSChargeConfigInfo) : AlphaESSUpdateChargeConfigInfo= {
       new AlphaESSUpdateChargeConfigInfo(

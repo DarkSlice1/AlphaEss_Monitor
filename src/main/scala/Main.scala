@@ -82,8 +82,9 @@ object Main extends App with LazyLogging {
   var OneHourCycle = new ScheduledThreadPoolExecutor(10)
   var HeartBeatCycle = new ScheduledThreadPoolExecutor(10)
 
- // alpha.run()
-  val config = alpha.getSystemSettings()
+  alpha.run()
+  systemControl.canWeDumpBatteryToGrid(alpha.getBatteryPercentage)
+  //val config = alpha.getFeedStrategyList()
   //alpha.setSystemSettings(systemControl.SetBatteryToX(50))
   //systemControl.EnableBatteryNightCharging()
   //myenergi_eddi.Run()
@@ -107,7 +108,7 @@ object Main extends App with LazyLogging {
       }
       try {
         if (tapoEnabled) {
-          //tapo.Run()
+          tapo.Run()
         }
       }
       catch {
@@ -115,7 +116,7 @@ object Main extends App with LazyLogging {
       }
       try {
         if (emberEnabled) {
-          //ember.Run()
+          ember.Run()
         }
       }
       catch {
@@ -135,6 +136,7 @@ object Main extends App with LazyLogging {
         if (controlEnabled) {
           systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())
           systemControl.canWeDumpExcessEnergyToGrid(alpha.getBatteryPercentage,alpha.getCurrentGridPull())
+          systemControl.canWeDumpBatteryToGrid(alpha.getBatteryPercentage)
         }
       }
       catch {
@@ -290,7 +292,7 @@ object Main extends App with LazyLogging {
 
   private def startKamon(config: Config) = {
     logger.info("Starting Kamon reporters...." + config.getStringList("kamon.reporters").toString)
-    Kamon.loadModules()
-    Kamon.init(config)
+    //Kamon.loadModules()
+    //Kamon.init(config)
   }
 }
