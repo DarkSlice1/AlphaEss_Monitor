@@ -97,7 +97,7 @@ object Main extends App with LazyLogging {
       //run in a 10 second loop
       try {
         if (alphaEnabled) {
-         // alpha.run()
+          alpha.run()
         }
       }
       catch {
