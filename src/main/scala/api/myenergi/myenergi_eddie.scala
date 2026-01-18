@@ -2,6 +2,7 @@ package api.myenergi
 
 import api.common.FileIO._
 import api.myenergi.MyEnergiObjectMapper._
+import com.fasterxml.jackson.core.`type`.TypeReference
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import metrics.KamonMetrics
@@ -43,7 +44,7 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
   }
 
   def getMetrics() = {
-    val urlExtension = "/cgi-jstatus-E"+serial
+    val urlExtension = "/cgi-jstatus-*"
     val reply = restCaller.simpleRestGetCallDigest(
       url = "https://"+asn_url + urlExtension,
       username = username,
@@ -51,37 +52,42 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
       host = asn_url,
       digestUri = urlExtension
     )
-   val conversion = jsonMapper.readValue(reply, classOf[jstatusEReply])
+
+   val conversion:List[MyEnergiEntry] = jsonMapper.readValue(reply,  new TypeReference[List[MyEnergiEntry]]() {})
     try {
-      if (conversion.eddi.head.hno == 1) //which tank is being heated
+      val eddi  = conversion.flatMap(_.eddi.getOrElse(Nil))
+      val harvi = conversion.flatMap(_.harvi.getOrElse(Nil))
+      val libbi = conversion.flatMap(_.libbi.getOrElse(Nil))
+      val zappi = conversion.flatMap(_.zappi.getOrElse(Nil))
+      if(eddi.head.hno == 1) //which tank is being heated
       {
-        reporterKamon.eddiEnergyUsageCounter.increment((conversion.eddi.head.div * 10).toLong, "Tank1", username)
+        reporterKamon.eddiEnergyUsageCounter.increment((eddi.head.div * 10).toLong, "Tank1", username)
       }
       else {
-        reporterKamon.eddiEnergyUsageCounter.increment((conversion.eddi.head.div * 10).toLong, "Tank2", username)
+        reporterKamon.eddiEnergyUsageCounter.increment((eddi.head.div * 10).toLong, "Tank2", username)
       }
 
-      reporterKamon.eddiEnergyTemperature1.set(conversion.eddi.head.tp1, "hub", username)
-      reporterKamon.eddiEnergyTemperature2.set(conversion.eddi.head.tp2, "hub", username)
+      reporterKamon.eddiEnergyTemperature1.set(eddi.head.tp1, "hub", username)
+      reporterKamon.eddiEnergyTemperature2.set(eddi.head.tp2, "hub", username)
 
-      if (conversion.eddi.head.div == 0) { //clear values if no longer drawing energy
+      if (eddi.head.div == 0) { //clear values if no longer drawing energy
         reporterKamon.eddiEnergyUsageGauge.set(0, "Tank1", username)
         reporterKamon.eddiEnergyUsageGauge.set(0, "Tank2", username)
       }
       else {
-        if (conversion.eddi.head.hno == 1) //which tank is being heated
+        if (eddi.head.hno == 1) //which tank is being heated
         {
-          reporterKamon.eddiEnergyUsageGauge.set((conversion.eddi.head.div * 10).toLong, "Tank1", username)
+          reporterKamon.eddiEnergyUsageGauge.set((eddi.head.div * 10).toLong, "Tank1", username)
           reporterKamon.eddiEnergyUsageGauge.set(0, "Tank1", username)
         }
         else {
-          reporterKamon.eddiEnergyUsageGauge.set((conversion.eddi.head.div * 10).toLong, "Tank2", username)
+          reporterKamon.eddiEnergyUsageGauge.set((eddi.head.div * 10).toLong, "Tank2", username)
           reporterKamon.eddiEnergyUsageGauge.set(0, "Tank2", username)
         }
 
       }
       if (serial == 0) {
-        serial = conversion.eddi.head.sno
+        serial = eddi.head.sno
         logger.info("Eddi serial captured " + serial)
       }
       logger.info("Eddi Metrics Completed")

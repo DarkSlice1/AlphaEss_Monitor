@@ -5,7 +5,7 @@ import api.common.Token
 import api.ember.ember
 import api.forecast.solar.SolarForecast
 import api.myenergi.MyEnergiObjectMapper.jstatusZReply
-import api.myenergi.{myenergi_eddie, myenergi_zappie}
+import api.myenergi.{myenergi_eddie, myenergi_zappie,myenergi_harvi}
 import api.tapo.{Tapo, tapoMiddleMan}
 import com.typesafe.config.{Config, ConfigFactory}
 import kamon.Kamon
@@ -74,6 +74,7 @@ object Main extends App with LazyLogging {
   val forecast = new SolarForecast(conf2, reporterKamon)
   val myenergi_zappi = new myenergi_zappie(conf2, reporterKamon)
   val myenergi_eddi = new myenergi_eddie(conf2, reporterKamon)
+  val myenergi_harvi = new myenergi_harvi(conf2, reporterKamon)
   val systemControl = new api.forecast.solar.SystemControl(alpha,myenergi_zappi,myenergi_eddi,forecast)
 
   var now = LocalDateTime.now()
@@ -96,7 +97,7 @@ object Main extends App with LazyLogging {
       //run in a 10 second loop
       try {
         if (alphaEnabled) {
-          alpha.run()
+         // alpha.run()
         }
       }
       catch {
@@ -106,7 +107,7 @@ object Main extends App with LazyLogging {
       }
       try {
         if (tapoEnabled) {
-          tapo.Run()
+          //tapo.Run()
         }
       }
       catch {
@@ -114,7 +115,7 @@ object Main extends App with LazyLogging {
       }
       try {
         if (emberEnabled) {
-          ember.Run()
+          //ember.Run()
         }
       }
       catch {
@@ -124,6 +125,7 @@ object Main extends App with LazyLogging {
         if (myEnergiEnabled) {
           myenergi_zappi.Run()
           myenergi_eddi.Run()
+          myenergi_harvi.Run()
         }
       }
       catch {

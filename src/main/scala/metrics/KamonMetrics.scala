@@ -126,6 +126,21 @@ final class KamonMetrics() {
     val name = "myenergy.eddiTemperature2"
   }
 
+  //MyHarvi
+  object harviEnergyUsageCounter extends Counter {
+    val name = "myenergy.harviEnergyUsageCounter"
+  }
+  object harviEnergyUsageGauge extends Gauge {
+    val name = "myenergy.harviEnergyUsageGauge"
+  }
+  object harviVoltageGauge extends Gauge {
+    val name = "myenergy.harviVoltageGauge"
+  }
+  object harviVoltageFrequencyGauge extends Gauge {
+    val name = "myenergy.harviVoltageFrequencyGauge"
+  }
+
+
 
 
   //Forecasting Solar Generation

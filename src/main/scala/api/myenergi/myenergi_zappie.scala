@@ -2,6 +2,7 @@ package api.myenergi
 
 import api.common.FileIO._
 import api.myenergi.MyEnergiObjectMapper._
+import com.fasterxml.jackson.core.`type`.TypeReference
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import metrics.KamonMetrics
@@ -43,7 +44,7 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
   }
 
   def getMetrics() = {
-    val urlExtension = "/cgi-jstatus-Z"
+    val urlExtension = "/cgi-jstatus-*"
     val reply = restCaller.simpleRestGetCallDigest(
       url = "https://"+asn_url + urlExtension,
       username = username,
@@ -51,22 +52,22 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
       host = asn_url,
       digestUri = urlExtension
     )
-   val conversion = jsonMapper.readValue(reply, classOf[jstatusZReply])
-     //multiplying by 10 to align with other metrics
-    try{
-      reporterKamon.zappiEnergyUsageCounter.increment((conversion.zappi.head.ectp1*10).toLong, "hub", username)
-      reporterKamon.zappiVoltageGauge.set(conversion.zappi.head.vol, "hub", username)
-      reporterKamon.zappiVoltageFrequencyGauge.set((conversion.zappi.head.frq).toInt, "hub", username)
+    val conversion:List[MyEnergiEntry] = jsonMapper.readValue(reply,  new TypeReference[List[MyEnergiEntry]]() {})
+    try {
+      val zappi  = conversion.flatMap(_.zappi.getOrElse(Nil))
+      reporterKamon.zappiEnergyUsageCounter.increment((zappi.head.ectp1*10).toLong, "hub", username)
+      reporterKamon.zappiVoltageGauge.set(zappi.head.vol, "hub", username)
+      reporterKamon.zappiVoltageFrequencyGauge.set((zappi.head.frq).toInt, "hub", username)
 
-      if (conversion.zappi.head.div == 0) {
+      if (zappi.head.div == 0) {
         reporterKamon.zappiEnergyUsageGauge.set(0, "hub", username)
       }
       else {
-        reporterKamon.zappiEnergyUsageGauge.set((conversion.zappi.head.ectp1 * 10).toLong, "hub", username)
+        reporterKamon.zappiEnergyUsageGauge.set((zappi.head.ectp1 * 10).toLong, "hub", username)
       }
 
       if (serial == 0) {
-        serial = conversion.zappi.head.sno
+        serial = zappi.head.sno
         logger.info("Zappi serial captured "+serial)
       }
       logger.info("Zappi Metrics Completed")

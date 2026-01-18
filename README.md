@@ -20,6 +20,7 @@ SBT = 13.15
 Scala = 2.11.12  
 IDE config  
 Set -> build Tool -> sbt -> VM Parameters  -XX:MaxHeapSize=512m
+To compile = "sbt assembly"
 
 
 # Overview
