@@ -117,44 +117,108 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
       logger.info("Reviewing FIT Options")
 
       Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match {
-        case 19 |23 | 0 | 1 => {
-
-
-          //at 11pp
+        case  23 => {
+          //at 11pm
           //battery at 90%+ Drain at 5kw
-          if(batteryPercentage >90) {alpha.setFeedStrategy(UpdateFITConfig(1, 15,"23:00","23:59",5000))}
+          if (batteryPercentage > 90) {alpha.setFeedStrategy(UpdateFITConfig(1, 15, "23:00", "23:59", 5000))}
           //battery at 80%+ Drain at 4kw
+          if (batteryPercentage > 80) {
+            alpha.setFeedStrategy(UpdateFITConfig(1, 15, "23:00", "23:59", 4000))
+          }
           //Battery at 70%+ Drain at 3kw
+          if (batteryPercentage > 70) {
+            alpha.setFeedStrategy(UpdateFITConfig(1, 15, "23:00", "23:59", 3000))
+          }
           //Battery at 60%+ Drain at 2kw
+          if (batteryPercentage > 60) {
+            alpha.setFeedStrategy(UpdateFITConfig(1, 15, "23:00", "23:59", 2000))
+          }
           //Battery at 50%+ Drain at 1kw
+          if (batteryPercentage > 50) {
+            alpha.setFeedStrategy(UpdateFITConfig(1, 15, "23:00", "23:59", 1000))
+          }
           //Battery less than 50% - DON'T DRAIN
-
+        }
+        case 0 => {
           //at 00:00
           //battery at 90%+ Drain at 5kw
+          if (batteryPercentage > 90) {
+            alpha.setFeedStrategy(UpdateFITConfig(1, 15, "00:00", "00:59", 5000))
+          }
           //battery at 80%+ Drain at 5kw
+          if (batteryPercentage > 80) {
+            alpha.setFeedStrategy(UpdateFITConfig(1, 15, "00:00", "00:59", 5000))
+          }
           //Battery at 70%+ Drain at 5kw
+          if (batteryPercentage > 70) {
+            alpha.setFeedStrategy(UpdateFITConfig(1, 15, "00:00", "00:59", 5000))
+          }
           //Battery at 60%+ Drain at 4kw
+          if (batteryPercentage > 60) {
+            alpha.setFeedStrategy(UpdateFITConfig(1, 15, "00:00", "00:59", 4000))
+          }
           //Battery at 50%+ Drain at 3kw
+          if (batteryPercentage > 50) {
+            alpha.setFeedStrategy(UpdateFITConfig(1, 15, "00:00", "00:59", 3000))
+          }
           //Battery at 40%+ Drain at 2kw
+          if (batteryPercentage > 40) {
+            alpha.setFeedStrategy(UpdateFITConfig(1, 15, "00:00", "00:59", 2000))
+          }
           //Battery less than 40% - DON'T DRAIN
-
-          //at 01:00
-          //battery at 90%+ Drain at 5kw
-          //battery at 80%+ Drain at 5kw
-          //Battery at 70%+ Drain at 5kw
-          //Battery at 60%+ Drain at 5kw
-          //Battery at 50%+ Drain at 5kw
-          //Battery at 40%+ Drain at 5kw
-          //Battery at 30%+ Drain at 4kw
-          //Battery less than 30% - DON'T DRAIN
-
-          //at 01:30
-          //Battery at 20%+ Drain at 2kw
-          //Battery at 10%+ Drain at 0.5kw
-          //Battery less than 10% - DON'T DRAIN
+        }
+        case 1 => {
+          Calendar.getInstance().get(Calendar.MINUTE) match {
+            case minute if minute < 30 => {
+              //at 01:00
+              //battery at 90%+ Drain at 5kw
+              if (batteryPercentage > 90) {
+                alpha.setFeedStrategy(UpdateFITConfig(1, 15, "01:00", "01:30", 5000))
+              }
+              //battery at 80%+ Drain at 5kw
+              if (batteryPercentage > 80) {
+                alpha.setFeedStrategy(UpdateFITConfig(1, 15, "01:00", "01:30", 5000))
+              }
+              //Battery at 70%+ Drain at 5kw
+              if (batteryPercentage > 70) {
+                alpha.setFeedStrategy(UpdateFITConfig(1, 15, "01:00", "01:30", 5000))
+              }
+              //Battery at 60%+ Drain at 5kw
+              if (batteryPercentage > 60) {
+                alpha.setFeedStrategy(UpdateFITConfig(1, 15, "01:00", "01:30", 5000))
+              }
+              //Battery at 50%+ Drain at 5kw
+              if (batteryPercentage > 50) {
+                alpha.setFeedStrategy(UpdateFITConfig(1, 15, "01:00", "01:30", 5000))
+              }
+              //Battery at 40%+ Drain at 5kw
+              if (batteryPercentage > 40) {
+                alpha.setFeedStrategy(UpdateFITConfig(1, 15, "01:00", "01:30", 5000))
+              }
+              //Battery at 30%+ Drain at 4kw
+              if (batteryPercentage > 30) {
+                alpha.setFeedStrategy(UpdateFITConfig(1, 15, "01:00", "01:30", 4000))
+              }
+            }
+            case _ =>
+              {
+                //at 01:30+
+                //Battery at 20%+ Drain at 2kw
+                if (batteryPercentage > 20) {
+                  alpha.setFeedStrategy(UpdateFITConfig(1, 15, "01:30", "01:59", 2000))
+                }
+                //Battery at 10%+ Drain at 0.5kw
+                if (batteryPercentage > 10) {
+                  alpha.setFeedStrategy(UpdateFITConfig(1, 10, "01:30", "01:59", 500))
+                }
+                //Battery less than 10% - DON'T DRAIN
+              }
+            //Battery less than 30% - DON'T DRAIN
+          }
           logger.info("Updated FIT Options")
         }
         case _ =>
+        alpha.setFeedStrategy(UpdateFITConfig(0, 15, "00:00", "00:01", 5000))
       }
     }
     def UpdateFITConfig(Enabled : Int, percentage :BigDecimal, start: String, end : String, FITPower:Int) : AlphaEssFeedStrategyConfig= {
