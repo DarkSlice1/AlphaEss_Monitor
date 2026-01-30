@@ -1,5 +1,6 @@
 package api.myenergi
 
+
 import api.common.FileIO._
 import api.myenergi.MyEnergiObjectMapper._
 import com.fasterxml.jackson.core.`type`.TypeReference
@@ -52,36 +53,41 @@ class myenergi_harvi(config: Config, reporterKamon : KamonMetrics) extends LazyL
       digestUri = urlExtension
     )
     val conversion: List[MyEnergiEntry] = jsonMapper.readValue(reply, new TypeReference[List[MyEnergiEntry]]() {})
+
     try {
-      val harvi = conversion.flatMap(_.harvi.getOrElse(Nil))
-      //ct1 = solar
-      //ct2 = garage
-      //ct3 = heatpump
-      reporterKamon.harviEnergyUsageCounter.increment(math.abs(harvi.last.ectp2).toLong, "garage", username)
-      reporterKamon.harviEnergyUsageCounter.increment(math.abs(harvi.last.ectp3).toLong, "heatpump", username)
+      conversion.view.flatMap(_.harvi.getOrElse(Nil)).foreach {
+        //inverter
+        //ct1 = solar
+        //ct2 = garage
+        //ct3 = heat pump
+        case harvi if (harvi.sno == 14794285) =>
+          reporterKamon.harviEnergyUsageCounter.increment(math.abs(harvi.ectp2).toLong, "garage", username)
+          reporterKamon.harviEnergyUsageCounter.increment(math.abs(harvi.ectp3).toLong, "heatpump", username)
+          reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp2).toLong, "pie", "garage")
+          reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "heat pump")
 
+          if (harvi.ectp2 == 0) {reporterKamon.harviEnergyUsageGauge.set(0, "garage", username)}
+          else {reporterKamon.harviEnergyUsageGauge.set(math.abs(harvi.ectp2).toLong, "garage", username)}
 
-      if (harvi.last.ectp2 == 0) {
-        reporterKamon.harviEnergyUsageGauge.set(0, "garage", username)
-      }
-      else {
-        reporterKamon.harviEnergyUsageGauge.set(math.abs(harvi.last.ectp2).toLong, "garage", username)
-      }
+          if (harvi.ectp3 == 0) {reporterKamon.harviEnergyUsageGauge.set(0, "heatpump", username)}
+          else {reporterKamon.harviEnergyUsageGauge.set(math.abs(harvi.ectp3).toLong, "heatpump", username)}
 
-      if (harvi.last.ectp3 == 0) {
-        reporterKamon.harviEnergyUsageGauge.set(0, "heatpump", username)
-      }
-      else {
-        reporterKamon.harviEnergyUsageGauge.set(math.abs(harvi.last.ectp3).toLong, "heatpump", username)
-      }
+          logger.info("Harvi serial captured " + harvi.sno)
 
-      if (serial == 0) {
-        serial = harvi.last.sno
-        logger.info("Harvi serial captured " + serial)
-      }
+        //meter box
+        //ct1 = Grid
+        case harvi if (harvi.sno == 11608680) =>
+          reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "mains2")
+          logger.info("Harvi serial captured " + harvi.sno)
 
+        //fusebox
+        case harvi if (harvi.sno == 3162754) =>
+          reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "mains")
+          logger.info("Harvi serial captured " + harvi.sno)
+
+        case _ =>
+      }
       logger.info("Harvi Metrics Completed")
-
     }
     catch {
       case ex: Exception => logger.error("ERROR: " + ex.toString);

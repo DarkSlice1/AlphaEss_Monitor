@@ -47,6 +47,7 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
   private val poc_meter_l3 = reporterKamon.poc_meter_l3.add().withTag("sys_name",syn_name)
   private val houseLoad = reporterKamon.houseLoad.add().withTag("sys_name",syn_name)
 
+
   //https://github.com/liqun2013/alphaess-webapi/blob/93539b332f2be17240f7359be2f0c51deda06d6c/AlphaEssWeb.Api_V2.Model/Dtos/PowerDataDto.cs
   def write(metrics : AlphaMetrics): Unit = {
 
@@ -63,6 +64,7 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
     SolarFlowMetrics(metrics,solarGeneration)
 
     houseLoad.update(CheckForZero(solarGeneration + gridConsumption + batteryConsumption))
+    reporterKamon.pieEnergyUsageGauge.add((CheckForZero(solarGeneration + gridConsumption + batteryConsumption)/10),"pie","House Load")
 
     //Misc Metrics Below
 
@@ -103,6 +105,7 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
       // set our grid pull to 0
       gridPull_l1.update(0)
     }
+
   }
 
   def CostPerKwMetric(gridConsumption: Double):Unit = {

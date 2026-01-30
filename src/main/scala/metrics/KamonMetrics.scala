@@ -396,4 +396,13 @@ final class KamonMetrics() {
     val name = "alpha.ess.poc_meter_l3"
   }
 
+
+  //PieGraph
+  object pieUsageCounter extends Counter {
+    val name = "general.pieEnergyUsageCounter"
+  }
+  object pieEnergyUsageGauge extends Gauge {
+    val name = "general.pieEnergyUsageGauge"
+  }
+
 }

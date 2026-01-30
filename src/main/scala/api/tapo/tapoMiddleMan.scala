@@ -44,6 +44,65 @@ class tapoMiddleMan(tapoParamenter: Tapo, config :Config, reporterKamon : KamonM
           else {
             reporterKamon.tapoEnergyUsageGauge.set((energyUsage / 100).toLong, "ipAddress", address)
           }
+
+          address match {
+            case "192.168.1.30" =>
+              if (energyUsage == 0) {
+                reporterKamon.pieEnergyUsageGauge.add((0),"pie","Aquarium")
+              }
+              else {
+                reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Aquarium")
+              }
+            case "192.168.1.39" =>
+              if (energyUsage == 0) {
+                reporterKamon.pieEnergyUsageGauge.add((0),"pie","Office")
+              }
+              else {
+                reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Office")
+              }
+
+            case "192.168.1.56" =>
+              if (energyUsage == 0) {
+                reporterKamon.pieEnergyUsageGauge.add((0),"pie","Dishwasher")
+              }
+              else {
+                reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Dishwasher")
+              }
+
+            case "192.168.1.37" =>
+              if (energyUsage == 0) {
+                reporterKamon.pieEnergyUsageGauge.add((0),"pie","Washer_And_Dryer")
+              }
+              else {
+                reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Washer_And_Dryer")
+              }
+
+            case "192.168.1.47" =>
+              if (energyUsage == 0) {
+                reporterKamon.pieEnergyUsageGauge.add((0),"pie","TV")
+              }
+              else {
+                reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","TV")
+              }
+
+            case "192.168.1.48" =>
+              if (energyUsage == 0) {
+                reporterKamon.pieEnergyUsageGauge.add((0),"pie","Fridge")
+              }
+              else {
+                reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Fridge")
+              }
+
+            case "192.168.1.35" =>
+              if (energyUsage == 0) {
+                reporterKamon.pieEnergyUsageGauge.add((0),"pie","Modem_And_Sitting_Room_Lights")
+              }
+              else {
+                reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Modem_And_Sitting_Room_Lights")
+              }
+
+            case _ =>
+          }
         }
       }
       catch {

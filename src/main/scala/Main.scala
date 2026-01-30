@@ -292,7 +292,7 @@ object Main extends App with LazyLogging {
 
   private def startKamon(config: Config) = {
     logger.info("Starting Kamon reporters...." + config.getStringList("kamon.reporters").toString)
-    //Kamon.loadModules()
-    //Kamon.init(config)
+    Kamon.loadModules()
+    Kamon.init(config)
   }
 }
