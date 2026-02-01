@@ -8,6 +8,9 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import metrics.KamonMetrics
 
+import java.time.{Duration, Instant, LocalDateTime, ZoneId}
+import java.time.format.DateTimeFormatter
+
 //available endpoints : https://github.com/claytonn73/myenergi_api/blob/62d6915784bde9aaaa6fbfe34cc0ec6eeb2eb060/myenergi/const.py#L9
 
 class myenergi_harvi(config: Config, reporterKamon : KamonMetrics) extends LazyLogging {
@@ -63,8 +66,8 @@ class myenergi_harvi(config: Config, reporterKamon : KamonMetrics) extends LazyL
         case harvi if (harvi.sno == 14794285) =>
           reporterKamon.harviEnergyUsageCounter.increment(math.abs(harvi.ectp2).toLong, "garage", username)
           reporterKamon.harviEnergyUsageCounter.increment(math.abs(harvi.ectp3).toLong, "heatpump", username)
-          reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp2).toLong, "pie", "garage")
-          reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "heat pump")
+          reporterKamon.pieEnergyUsageGauge.set(math.abs(harvi.ectp2).toLong, "pie", "garage")
+          reporterKamon.pieEnergyUsageGauge.set(math.abs(harvi.ectp3).toLong, "pie", "heat pump")
 
           if (harvi.ectp2 == 0) {reporterKamon.harviEnergyUsageGauge.set(0, "garage", username)}
           else {reporterKamon.harviEnergyUsageGauge.set(math.abs(harvi.ectp2).toLong, "garage", username)}
@@ -77,12 +80,14 @@ class myenergi_harvi(config: Config, reporterKamon : KamonMetrics) extends LazyL
         //meter box
         //ct1 = Grid
         case harvi if (harvi.sno == 11608680) =>
-          reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "mains2")
+          //reporterKamon.pieEnergyUsageGauge.set(math.abs(harvi.ectp1).toLong, "pie", "mains2")
           logger.info("Harvi serial captured " + harvi.sno)
 
         //fusebox
         case harvi if (harvi.sno == 3162754) =>
-          reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "mains")
+          if(isHarviOlderThanOneMinute(harvi)) { reporterKamon.pieEnergyUsageGauge.set(0,"pie", "downstairs_lights")}
+          else { reporterKamon.pieEnergyUsageGauge.set(math.abs(harvi.ectp3).toLong, "pie", "downstairs_lights")}
+
           logger.info("Harvi serial captured " + harvi.sno)
 
         case _ =>
@@ -91,6 +96,24 @@ class myenergi_harvi(config: Config, reporterKamon : KamonMetrics) extends LazyL
     }
     catch {
       case ex: Exception => logger.error("ERROR: " + ex.toString);
+    }
+  }
+
+  def isHarviOlderThanOneMinute(h: HarviMapper, now: Instant = Instant.now()): Boolean = {
+    val harviInstant = HarviTime.toInstant(h)
+    Duration.between(harviInstant, now).toMinutes >= 1
+  }
+
+  object HarviTime {
+
+    // Matches "18-01-2026 14:53:34"
+    private val formatter =
+      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
+
+    def toInstant(h: HarviMapper, zone: ZoneId = ZoneId.systemDefault()): Instant = {
+      val dateTimeStr = s"${h.dat} ${h.tim}"
+      val localDateTime = LocalDateTime.parse(dateTimeStr, formatter)
+      localDateTime.atZone(zone).toInstant
     }
   }
 }

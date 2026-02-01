@@ -101,6 +101,14 @@ class tapoMiddleMan(tapoParamenter: Tapo, config :Config, reporterKamon : KamonM
                 reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Modem_And_Sitting_Room_Lights")
               }
 
+            case "192.168.1.197" =>
+              if (energyUsage == 0) {
+                reporterKamon.pieEnergyUsageGauge.add((0),"pie","Hoover")
+              }
+              else {
+                reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Hoover")
+              }
+
             case _ =>
           }
         }
