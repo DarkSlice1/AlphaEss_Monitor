@@ -65,6 +65,7 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
 
     houseLoad.update(CheckForZero(solarGeneration + gridConsumption + batteryConsumption))
     reporterKamon.pieEnergyUsageGauge.add((CheckForZero(solarGeneration + gridConsumption + batteryConsumption)/10),"pie","House Load")
+    reporterKamon.pieEnergyUsageCounter.increment((CheckForZero(solarGeneration + gridConsumption + batteryConsumption)/10),"pie","House Load")
 
     //Misc Metrics Below
 

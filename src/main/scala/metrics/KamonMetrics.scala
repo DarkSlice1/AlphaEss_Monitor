@@ -398,7 +398,7 @@ final class KamonMetrics() {
 
 
   //PieGraph
-  object pieUsageCounter extends Counter {
+  object pieEnergyUsageCounter extends Counter {
     val name = "general.pieEnergyUsageCounter"
   }
   object pieEnergyUsageGauge extends Gauge {

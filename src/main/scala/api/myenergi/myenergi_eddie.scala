@@ -74,17 +74,20 @@ class myenergi_eddie(config: Config, reporterKamon : KamonMetrics) extends LazyL
         reporterKamon.eddiEnergyUsageGauge.set(0, "Tank1", username)
         reporterKamon.eddiEnergyUsageGauge.set(0, "Tank2", username)
         reporterKamon.pieEnergyUsageGauge.add(0,"pie","Hot_Water")
+        reporterKamon.pieEnergyUsageCounter.increment(0,"pie","Hot_Water")
       }
       else {
         if (eddi.head.hno == 1) //which tank is being heated
         {
           reporterKamon.eddiEnergyUsageGauge.set((eddi.head.div * 10).toLong, "Tank1", username)
           reporterKamon.pieEnergyUsageGauge.add(math.abs(eddi.head.div).toLong,"pie","Hot_Water")
+          reporterKamon.pieEnergyUsageCounter.increment(math.abs(eddi.head.div).toLong,"pie","Hot_Water")
           reporterKamon.eddiEnergyUsageGauge.set(0, "Tank1", username)
         }
         else {
           reporterKamon.eddiEnergyUsageGauge.set((eddi.head.div * 10).toLong, "Tank2", username)
           reporterKamon.pieEnergyUsageGauge.add(math.abs(eddi.head.div).toLong,"pie","Hot_Water")
+          reporterKamon.pieEnergyUsageCounter.increment(math.abs(eddi.head.div).toLong,"pie","Hot_Water")
           reporterKamon.eddiEnergyUsageGauge.set(0, "Tank2", username)
         }
 

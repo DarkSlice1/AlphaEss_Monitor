@@ -49,64 +49,80 @@ class tapoMiddleMan(tapoParamenter: Tapo, config :Config, reporterKamon : KamonM
             case "192.168.1.30" =>
               if (energyUsage == 0) {
                 reporterKamon.pieEnergyUsageGauge.add((0),"pie","Aquarium")
+                reporterKamon.pieEnergyUsageCounter.increment((0),"pie","Aquarium")
               }
               else {
                 reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Aquarium")
+                reporterKamon.pieEnergyUsageCounter.increment((energyUsage / 1000),"pie","Aquarium")
               }
             case "192.168.1.39" =>
               if (energyUsage == 0) {
                 reporterKamon.pieEnergyUsageGauge.add((0),"pie","Office")
+                reporterKamon.pieEnergyUsageCounter.increment((0),"pie","Office")
               }
               else {
                 reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Office")
+                reporterKamon.pieEnergyUsageCounter.increment((energyUsage / 1000),"pie","Office")
               }
 
             case "192.168.1.56" =>
               if (energyUsage == 0) {
                 reporterKamon.pieEnergyUsageGauge.add((0),"pie","Dishwasher")
+                reporterKamon.pieEnergyUsageCounter.increment((0),"pie","Dishwasher")
               }
               else {
                 reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Dishwasher")
+                reporterKamon.pieEnergyUsageCounter.increment((energyUsage / 1000),"pie","Dishwasher")
               }
 
             case "192.168.1.37" =>
               if (energyUsage == 0) {
                 reporterKamon.pieEnergyUsageGauge.add((0),"pie","Washer_And_Dryer")
+                reporterKamon.pieEnergyUsageCounter.increment((0),"pie","Washer_And_Dryer")
               }
               else {
                 reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Washer_And_Dryer")
+                reporterKamon.pieEnergyUsageCounter.increment((energyUsage / 1000),"pie","Washer_And_Dryer")
               }
 
             case "192.168.1.47" =>
               if (energyUsage == 0) {
                 reporterKamon.pieEnergyUsageGauge.add((0),"pie","TV")
+                reporterKamon.pieEnergyUsageCounter.increment((0),"pie","TV")
               }
               else {
                 reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","TV")
+                reporterKamon.pieEnergyUsageCounter.increment((energyUsage / 1000),"pie","TV")
               }
 
             case "192.168.1.48" =>
               if (energyUsage == 0) {
                 reporterKamon.pieEnergyUsageGauge.add((0),"pie","Fridge")
+                reporterKamon.pieEnergyUsageCounter.increment((0),"pie","Fridge")
               }
               else {
                 reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Fridge")
+                reporterKamon.pieEnergyUsageCounter.increment((energyUsage / 1000),"pie","Fridge")
               }
 
             case "192.168.1.35" =>
               if (energyUsage == 0) {
                 reporterKamon.pieEnergyUsageGauge.add((0),"pie","Modem_And_Sitting_Room_Lights")
+                reporterKamon.pieEnergyUsageCounter.increment((0),"pie","Modem_And_Sitting_Room_Lights")
               }
               else {
                 reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Modem_And_Sitting_Room_Lights")
+                reporterKamon.pieEnergyUsageCounter.increment((energyUsage / 1000),"pie","Modem_And_Sitting_Room_Lights")
               }
 
             case "192.168.1.197" =>
               if (energyUsage == 0) {
                 reporterKamon.pieEnergyUsageGauge.add((0),"pie","Hoover")
+                reporterKamon.pieEnergyUsageCounter.increment(0,"pie","Hoover")
               }
               else {
                 reporterKamon.pieEnergyUsageGauge.add((energyUsage / 1000),"pie","Hoover")
+                reporterKamon.pieEnergyUsageCounter.increment((energyUsage / 1000),"pie","Hoover")
               }
 
             case _ =>

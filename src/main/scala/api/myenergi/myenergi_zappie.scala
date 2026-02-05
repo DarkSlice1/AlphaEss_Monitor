@@ -61,11 +61,13 @@ class myenergi_zappie(config: Config, reporterKamon : KamonMetrics) extends Lazy
 
       if (zappi.head.div == 0) {
         reporterKamon.zappiEnergyUsageGauge.set(0, "hub", username)
-        reporterKamon.pieEnergyUsageGauge.set(0,"pie","zappi")
+        reporterKamon.pieEnergyUsageGauge.add(0,"pie","zappi")
+        reporterKamon.pieEnergyUsageCounter.increment(0,"pie","zappi")
       }
       else {
         reporterKamon.zappiEnergyUsageGauge.set((zappi.head.ectp1 * 10).toLong, "hub", username)
-        reporterKamon.pieEnergyUsageGauge.set(math.abs(zappi.head.ectp1).toLong,"pie","zappi")
+        reporterKamon.pieEnergyUsageGauge.add(math.abs(zappi.head.ectp1).toLong,"pie","zappi")
+        reporterKamon.pieEnergyUsageCounter.increment(math.abs(zappi.head.ectp1).toLong,"pie","zappi")
       }
 
       if (serial == 0) {

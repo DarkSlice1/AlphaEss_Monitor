@@ -66,14 +66,28 @@ class myenergi_harvi(config: Config, reporterKamon : KamonMetrics) extends LazyL
         case harvi if (harvi.sno == 14794285) =>
           reporterKamon.harviEnergyUsageCounter.increment(math.abs(harvi.ectp2).toLong, "garage", username)
           reporterKamon.harviEnergyUsageCounter.increment(math.abs(harvi.ectp3).toLong, "heatpump", username)
-          reporterKamon.pieEnergyUsageGauge.set(math.abs(harvi.ectp2).toLong, "pie", "garage")
-          reporterKamon.pieEnergyUsageGauge.set(math.abs(harvi.ectp3).toLong, "pie", "heat pump")
+          reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp2).toLong, "pie", "garage")
+          reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "heat pump")
+          reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp2).toLong, "pie", "garage")
+          reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp3).toLong, "pie", "heat pump")
 
-          if (harvi.ectp2 == 0) {reporterKamon.harviEnergyUsageGauge.set(0, "garage", username)}
-          else {reporterKamon.harviEnergyUsageGauge.set(math.abs(harvi.ectp2).toLong, "garage", username)}
+          if (harvi.ectp2 == 0) {
+            reporterKamon.harviEnergyUsageGauge.set(0, "garage", username)
+            reporterKamon.pieEnergyUsageCounter.increment(0, "garage", username)
+          }
+          else {
+            reporterKamon.harviEnergyUsageGauge.set(math.abs(harvi.ectp2).toLong, "garage", username)
+            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp2).toLong, "garage", username)
+          }
 
-          if (harvi.ectp3 == 0) {reporterKamon.harviEnergyUsageGauge.set(0, "heatpump", username)}
-          else {reporterKamon.harviEnergyUsageGauge.set(math.abs(harvi.ectp3).toLong, "heatpump", username)}
+          if (harvi.ectp3 == 0) {
+            reporterKamon.harviEnergyUsageGauge.set(0, "heatpump", username)
+            reporterKamon.pieEnergyUsageCounter.increment(0, "heatpump", username)
+          }
+          else {
+            reporterKamon.harviEnergyUsageGauge.set(math.abs(harvi.ectp3).toLong, "heatpump", username)
+            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp3).toLong, "heatpump", username)
+          }
 
           logger.info("Harvi serial captured " + harvi.sno)
 
@@ -85,8 +99,14 @@ class myenergi_harvi(config: Config, reporterKamon : KamonMetrics) extends LazyL
 
         //fusebox
         case harvi if (harvi.sno == 3162754) =>
-          if(isHarviOlderThanOneMinute(harvi)) { reporterKamon.pieEnergyUsageGauge.set(0,"pie", "downstairs_lights")}
-          else { reporterKamon.pieEnergyUsageGauge.set(math.abs(harvi.ectp3).toLong, "pie", "downstairs_lights")}
+          if (isHarviOlderThanOneMinute(harvi)) {
+            reporterKamon.pieEnergyUsageGauge.add(0, "pie", "downstairs_lights")
+            reporterKamon.pieEnergyUsageCounter.increment(0, "pie", "downstairs_lights")
+          }
+          else {
+            reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "downstairs_lights")
+            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp3).toLong, "pie", "downstairs_lights")
+          }
 
           logger.info("Harvi serial captured " + harvi.sno)
 
