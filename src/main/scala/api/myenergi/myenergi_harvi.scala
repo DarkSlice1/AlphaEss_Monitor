@@ -73,20 +73,16 @@ class myenergi_harvi(config: Config, reporterKamon : KamonMetrics) extends LazyL
 
           if (harvi.ectp2 == 0) {
             reporterKamon.harviEnergyUsageGauge.set(0, "garage", username)
-            reporterKamon.pieEnergyUsageCounter.increment(0, "garage", username)
           }
           else {
             reporterKamon.harviEnergyUsageGauge.set(math.abs(harvi.ectp2).toLong, "garage", username)
-            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp2).toLong, "garage", username)
           }
 
           if (harvi.ectp3 == 0) {
             reporterKamon.harviEnergyUsageGauge.set(0, "heatpump", username)
-            reporterKamon.pieEnergyUsageCounter.increment(0, "heatpump", username)
           }
           else {
             reporterKamon.harviEnergyUsageGauge.set(math.abs(harvi.ectp3).toLong, "heatpump", username)
-            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp3).toLong, "heatpump", username)
           }
 
           logger.info("Harvi serial captured " + harvi.sno)
@@ -98,14 +94,25 @@ class myenergi_harvi(config: Config, reporterKamon : KamonMetrics) extends LazyL
           logger.info("Harvi serial captured " + harvi.sno)
 
         //fusebox
+        //CT1 - Oven
+        //CT2 - Downstairs Lights
+        //CT3 - Upstairs Lights
         case harvi if (harvi.sno == 3162754) =>
           if (isHarviOlderThanOneMinute(harvi)) {
+            reporterKamon.pieEnergyUsageGauge.add(0, "pie", "oven")
+            reporterKamon.pieEnergyUsageCounter.increment(0, "pie", "oven")
             reporterKamon.pieEnergyUsageGauge.add(0, "pie", "downstairs_lights")
             reporterKamon.pieEnergyUsageCounter.increment(0, "pie", "downstairs_lights")
+            reporterKamon.pieEnergyUsageGauge.add(0, "pie", "upstairs_lights")
+            reporterKamon.pieEnergyUsageCounter.increment(0, "pie", "upstairs_lights")
           }
           else {
-            reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "downstairs_lights")
-            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp3).toLong, "pie", "downstairs_lights")
+            reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp1).toLong, "pie", "oven")
+            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp1).toLong, "pie", "oven")
+            reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp2).toLong, "pie", "downstairs_lights")
+            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp2).toLong, "pie", "downstairs_lights")
+            reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "upstairs_lights")
+            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp3).toLong, "pie", "upstairs_lights")
           }
 
           logger.info("Harvi serial captured " + harvi.sno)
