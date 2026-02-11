@@ -197,6 +197,31 @@ object AlphaObjectMapper {
     }
   }
 
+  object AlphaESSUpdateChargeCycleInfo {
+    def from(receivedType: CycleData, id:String): CycleDataUpdate = {
+      new CycleDataUpdate(
+        executeCycleType = receivedType.executeCycleType,
+        gridChargeCycle  = receivedType.gridChargeCycle,
+        ctrDisCycle      = receivedType.ctrDisCycle,
+        batUseCap = receivedType.batUseCap.toInt,
+        upsReserve = receivedType.upsReserve,
+        loadcutoutEn = receivedType.loadcutoutEn,
+        cutoffSoc = receivedType.cutoffSoc,
+        wakeupSoc = receivedType.wakeupSoc,
+        isSupportDischargeSoc = receivedType.isSupportDischargeSoc,
+        isSupportChargerPower = receivedType.isSupportChargerPower,
+        loadcutoutEn2 = receivedType.loadcutoutEn2,
+        cutoffSoc2 = receivedType.cutoffSoc2,
+        wakeupSoc2 = receivedType.wakeupSoc2,
+        poinv = receivedType.poinv,
+        isMicroStorageTwoGen = receivedType.isMicroStorageTwoGen,
+        chargeTimeList = receivedType.dayChargeTimeList,
+        dischargeTimeList = receivedType.dayDischargeTimeList,
+        id = id
+      )
+    }
+  }
+
   case class AlphaESSUpdateChargeConfigInfo(
                                     id: String,
                                     basicModeJp: String,//null
@@ -222,3 +247,78 @@ object AlphaObjectMapper {
                                 ) extends RestBody
 
 }
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+final case class AlphaESSCycleStrategy(
+                              code: Int,
+                              msg: String,
+                              expMsg: Option[String],      // null -> None
+                              data: CycleData,
+                              extra: Option[String]        // null -> None (could be JsonNode if it's not always a string)
+                            )
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+final case class CycleData(
+                            executeCycleType: Int,
+                            gridChargeCycle: Int,
+                            ctrDisCycle: Int,
+                            weekChargeTimeList: Option[List[TimeWindow]] = None,     // null in sample
+                            weekDischargeTimeList: Option[List[TimeWindow]] = None,  // null in sample
+                            dayChargeTimeList: List[TimeWindow],
+                            dayDischargeTimeList: List[TimeWindow],
+                            batUseCap: BigDecimal,
+                            upsReserveEnable: Boolean,
+                            upsReserve: Int,
+                            batCapRange: List[Int],          // e.g. [4, 100]
+                            loadcutoutEn: Int,
+                            cutoffSoc: Int,
+                            wakeupSoc: Int,
+                            loadcutoutEn2: Int,
+                            cutoffSoc2: Int,
+                            wakeupSoc2: Int,
+                            isSupportDischargeSoc: Boolean,
+                            isSupportChargerPower: Boolean,
+                            poinv: Int,
+                            isSiteDevice: Option[Boolean],   // null -> None
+                            isSupportOffGridSocControl: Boolean,
+                            isSupportOffGridSocControl2: Boolean,
+                            onGridPower: Int,
+                            totalPoinv: Int,
+                            isMicroStorageTwoGen: Boolean
+                          )
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+final case class CycleDataUpdate(
+                                  id: String,
+                                  batUseCap: BigInt,
+                                  upsReserve: Int,
+                                  executeCycleType: Int,
+                                  gridChargeCycle: Int,
+                                  ctrDisCycle: Int,
+                                  loadcutoutEn: Int,
+                                  cutoffSoc: Int,
+                                  wakeupSoc: Int,
+                                  loadcutoutEn2: Int,
+                                  cutoffSoc2: Int,
+                                  wakeupSoc2: Int,
+                                  chargeTimeList: List[TimeWindow],
+                                  dischargeTimeList: List[TimeWindow],
+                                  isSupportDischargeSoc: Boolean,
+                                  isSupportChargerPower: Boolean,
+                                  isMicroStorageTwoGen: Boolean,
+                                  poinv: Int
+                                )
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+final case class TimeWindow(
+                             chargeLimit: Int,     // 95.00, 0.00
+                             beginTime: String,           // "HH:mm"
+                             endTime: String,             // "HH:mm"
+                             sort: Int,
+                             chargePower: Int,
+                             weeks: List[Int],            // [7,1,2,3,4,5,6]
+                             feedMode: Int,
+                             equipGroupId: Int,
+                             feedPower: Int
+                           )

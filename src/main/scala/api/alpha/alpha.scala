@@ -121,6 +121,29 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
     currentGridPull
   }
 
+  def getSystemSettingsV2(): CycleData =
+  {
+    val urlExtension= "/api/iterate/sysSet/getCycleStrategy?id="+systemId //? what is this value...
+    val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
+      withToken = true,
+      token = token.token)
+
+    jsonMapper.readValue(reply, classOf[AlphaESSCycleStrategy]).data
+  }
+
+  def setSystemSettingsV2(convertedPayload: CycleDataUpdate)
+  {
+    val urlExtension= "/api/iterate/sysSet/setCycleStrategy"
+    val reply = restCaller.simpleRestPutCall(eplBaseHost+urlExtension, jsonMapper.writeValueAsString(convertedPayload),true,token.token)
+    val result = jsonMapper.readValue(reply, classOf[LoginReply])
+
+    if(result.code == 200)
+      logger.info("Updated System Settings")
+  }
+
+
+
+  //for alpha gen2
   def getFeedStrategyList(): AlphaEssFeedStrategyData = {
 
     val urlExtension= "/api/iterate/sysSet/getFeedStrategyList?id="+systemId //? what is this value...
@@ -131,6 +154,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
     jsonMapper.readValue(reply, classOf[AlphaESSFeedStrategyList]).data
   }
 
+  //for alpha gen2
   def setFeedStrategy(config : AlphaEssFeedStrategyConfig): Unit = {
 
     val urlExtension= "/api/iterate/sysSet/saveFeedStrategy"

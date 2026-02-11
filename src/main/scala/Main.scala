@@ -1,11 +1,11 @@
-import api.alpha.AlphaObjectMapper.{AlphaESSUpdateChargeConfigInfo, LoginReply}
-import api.alpha.alpha
+import api.alpha.AlphaObjectMapper.{AlphaESSUpdateChargeConfigInfo, AlphaESSUpdateChargeCycleInfo, LoginReply}
+import api.alpha.{CycleData, CycleDataUpdate, alpha}
 import api.common.FileIO.jsonMapper
 import api.common.Token
 import api.ember.ember
 import api.forecast.solar.SolarForecast
 import api.myenergi.MyEnergiObjectMapper.jstatusZReply
-import api.myenergi.{myenergi_eddie, myenergi_zappie,myenergi_harvi}
+import api.myenergi.{myenergi_eddie, myenergi_harvi, myenergi_zappie}
 import api.tapo.{Tapo, tapoMiddleMan}
 import com.typesafe.config.{Config, ConfigFactory}
 import kamon.Kamon
@@ -82,15 +82,18 @@ object Main extends App with LazyLogging {
   var OneHourCycle = new ScheduledThreadPoolExecutor(10)
   var HeartBeatCycle = new ScheduledThreadPoolExecutor(10)
 
-  alpha.run()
-  systemControl.canWeDumpBatteryToGrid(alpha.getBatteryPercentage)
-  //val config = alpha.getFeedStrategyList()
-  //alpha.setSystemSettings(systemControl.SetBatteryToX(50))
+  //alpha.run()
+  // alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(x))
+
   //systemControl.EnableBatteryNightCharging()
+
   //myenergi_eddi.Run()
   //myenergi_eddi.SetNormalMode()
   //myenergi_eddi.SetBoostMode()
+
+ // myenergi_zappi.Run()
   //myenergi_zappi.DoNightBoost(28,"0600")
+
 
   val GatherRealTimeMetrics = new Runnable {
     override def run(): Unit = {

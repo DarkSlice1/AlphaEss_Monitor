@@ -94,25 +94,25 @@ class myenergi_harvi(config: Config, reporterKamon : KamonMetrics) extends LazyL
           logger.info("Harvi serial captured " + harvi.sno)
 
         //fusebox
-        //CT1 - Oven
-        //CT2 - Downstairs Lights
-        //CT3 - Upstairs Lights
+        //CT1 - grid
+        //CT2 - House Lights
+        //CT3 - Oven
         case harvi if (harvi.sno == 3162754) =>
           if (isHarviOlderThanOneMinute(harvi)) {
+            //reporterKamon.pieEnergyUsageGauge.add(0, "pie", "oven")
+            //reporterKamon.pieEnergyUsageCounter.increment(0, "pie", "oven")
+            reporterKamon.pieEnergyUsageGauge.add(0, "pie", "lights")
+            reporterKamon.pieEnergyUsageCounter.increment(0, "pie", "lights")
             reporterKamon.pieEnergyUsageGauge.add(0, "pie", "oven")
             reporterKamon.pieEnergyUsageCounter.increment(0, "pie", "oven")
-            reporterKamon.pieEnergyUsageGauge.add(0, "pie", "downstairs_lights")
-            reporterKamon.pieEnergyUsageCounter.increment(0, "pie", "downstairs_lights")
-            reporterKamon.pieEnergyUsageGauge.add(0, "pie", "upstairs_lights")
-            reporterKamon.pieEnergyUsageCounter.increment(0, "pie", "upstairs_lights")
           }
           else {
-            reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp1).toLong, "pie", "oven")
-            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp1).toLong, "pie", "oven")
-            reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp2).toLong, "pie", "downstairs_lights")
-            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp2).toLong, "pie", "downstairs_lights")
-            reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "upstairs_lights")
-            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp3).toLong, "pie", "upstairs_lights")
+            //reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp1).toLong, "pie", "oven")
+            //reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp1).toLong, "pie", "oven")
+            reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp2).toLong, "pie", "lights")
+            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp2).toLong, "pie", "lights")
+            reporterKamon.pieEnergyUsageGauge.add(math.abs(harvi.ectp3).toLong, "pie", "oven")
+            reporterKamon.pieEnergyUsageCounter.increment(math.abs(harvi.ectp3).toLong, "pie", "oven")
           }
 
           logger.info("Harvi serial captured " + harvi.sno)

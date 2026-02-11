@@ -1,7 +1,7 @@
 package api.forecast.solar
 
 
-import api.alpha.AlphaObjectMapper.{AlphaESSUpdateChargeConfigInfo, AlphaEssFeedStrategyConfig, AlphaEssFeedStrategyData, FeedStrategyVO}
+import api.alpha.AlphaObjectMapper.{AlphaESSUpdateChargeConfigInfo, AlphaESSUpdateChargeCycleInfo, AlphaEssFeedStrategyConfig, AlphaEssFeedStrategyData, FeedStrategyVO}
 import api.alpha.alpha
 import api.myenergi.{myenergi_eddie, myenergi_zappie}
 import com.typesafe.scalalogging.LazyLogging
@@ -89,7 +89,22 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
     if(!gridDumpEnabled && batteryPercentage >= 96.0 && CurrentGridPull <= 400.0 && CurrentGridPull != 0.0) //required SOC to be 95%
       {
         //disable changing at send excess to grid by setting now as the changing window
-        alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(timeChaf2="07:00",timeChae2 = "23:00"))
+        val base = alpha.getSystemSettingsV2()
+        alpha.setSystemSettingsV2(
+          AlphaESSUpdateChargeCycleInfo.from(
+            base.copy(
+              dayDischargeTimeList =
+                base.dayDischargeTimeList.updated(
+                  base.dayDischargeTimeList.size - 1,
+                  base.dayDischargeTimeList.last.copy(
+                    beginTime = "07:00",
+                    endTime   = "23:00"
+                  )
+                )
+            ),
+            alpha.systemId
+          )
+        )
         gridDumpEnabled = true
         logger.info("Battery charging Period 2 to - 07:00 - 23:00 - battery at "+batteryPercentage+"%, so dumping excess to grid")
       }
@@ -97,7 +112,22 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
     if(gridDumpEnabled && (CurrentGridPull > 400.0))
       {
         //enable normal battery use by clearing this changing window
-        alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(alpha.getSystemSettings()).copy(timeChaf2="00:00",timeChae2 = "00:00"))
+        val base = alpha.getSystemSettingsV2()
+        alpha.setSystemSettingsV2(
+          AlphaESSUpdateChargeCycleInfo.from(
+            base.copy(
+              dayDischargeTimeList =
+                base.dayDischargeTimeList.updated(
+                  base.dayDischargeTimeList.size - 1,
+                  base.dayDischargeTimeList.last.copy(
+                    beginTime = "6:00",
+                    endTime   = "1:59"
+                  )
+                )
+            ),
+            alpha.systemId
+          )
+        )
         gridDumpEnabled= false
         logger.info("Battery charging Period 2 to - 00:00 - 00:00")
       }
@@ -214,6 +244,9 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
         logger.info("Updated FIT Options, battery charge = " + batteryPercentage + ", enabled =" + enabled + ", percentage = " + percentage + ", start time = " + startTime + ", end time = " + endTime + ", wattage = " + watts)
         alpha.setFeedStrategy(UpdateFITConfig(enabled, percentage, startTime, endTime, watts))
       }
+    }
+    catch {
+      case _:Exception =>  logger.error("Error in managing FIT")
     }
     def UpdateFITConfig(Enabled : Int, percentage :BigDecimal, start: String, end : String, FITPower:Int) : AlphaEssFeedStrategyConfig= {
       AlphaEssFeedStrategyConfig(Enabled,percentage, alpha.systemId,  List(FeedStrategyVO.from(alpha.getFeedStrategyList().feedStrategyVOList.head).copy(start=start,end = end,feedPower = FITPower)), 0)
