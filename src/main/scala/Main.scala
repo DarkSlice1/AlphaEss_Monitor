@@ -82,6 +82,9 @@ object Main extends App with LazyLogging {
   var OneHourCycle = new ScheduledThreadPoolExecutor(10)
   var HeartBeatCycle = new ScheduledThreadPoolExecutor(10)
 
+  //sync settings
+ systemControl.ResetSync()
+
   //alpha.run()
   // alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(x))
 
@@ -137,7 +140,7 @@ object Main extends App with LazyLogging {
       }
       try {
         if (controlEnabled) {
-          systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())
+          //systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())
           systemControl.canWeDumpExcessEnergyToGrid(alpha.getBatteryPercentage,alpha.getCurrentGridPull())
           systemControl.canWeDumpBatteryToGrid(alpha.getBatteryPercentage)
         }
@@ -239,7 +242,7 @@ object Main extends App with LazyLogging {
   def Handle6amCalls(): Unit =
   {
     if(forecastEnabled && controlEnabled) {
-      systemControl.EnableBatteryNightCharging()
+      //systemControl.EnableBatteryNightCharging()
     }
     if(myEnergiEnabled) {
       myenergi_zappi.SetStopMode()
@@ -274,8 +277,8 @@ object Main extends App with LazyLogging {
   def Handle23amCalls(): Unit =
     {
       //always make sure this is enabled for the night charging - seen issue where it gets missed
-      systemControl.EnableBatteryNightCharging()
-      logger.info("Battery charging Enabled")
+      //systemControl.EnableBatteryNightCharging()
+      //logger.info("Battery charging Enabled")
 
       if(forecastEnabled){
         PublishSolarForecastNightlySummaryMetrics() // get most up to date metrics before we set battery charge %

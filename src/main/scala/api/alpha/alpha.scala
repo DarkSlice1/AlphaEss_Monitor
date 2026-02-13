@@ -58,7 +58,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
 
 
-  def getMetrics() = {
+  def getMetrics(): Unit = {
     val urlExtension= "/api/report/energyStorage/getLastPowerData"
 
     val postParameters = new util.ArrayList[NameValuePair](2);
@@ -72,12 +72,12 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
   }
 
 
-  def resetDailyCounter() =
+  def resetDailyCounter(): Unit =
   {
     reporter.DailySolarGeneration = 0
   }
 
-  def getSystemID() =
+  def getSystemID(): Unit =
   {
     val urlExtension= "/api/stable/home/getCustomMenuEssList"
     val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
@@ -93,35 +93,13 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
     }
   }
 
+  def getBatteryPercentage: Double = currentBatteryPercentage
 
-  def getSystemSettings(): AlphaESSChargeConfigInfo =
-  {
-    val urlExtension= "/api/iterate/sysSet/getChargeConfigInfo?id="+systemId //? what is this value...
-    val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
-      withToken = true,
-      token = token.token)
-
-    jsonMapper.readValue(reply, classOf[AlphaESSReceivedSetting]).data
-
-  }
-
-  def setSystemSettings(convertedPayload: AlphaESSUpdateChargeConfigInfo)
-  {
-    val urlExtension= "/api/iterate/sysSet/updateChargeConfigInfo"
-    val reply = restCaller.simpleRestPutCall(eplBaseHost+urlExtension, jsonMapper.writeValueAsString(convertedPayload),true,token.token)
-    val result = jsonMapper.readValue(reply, classOf[LoginReply])
-
-    if(result.code == 200)
-      logger.info("Updated System Settings")
-  }
-
-  def getBatteryPercentage(): Double = currentBatteryPercentage
-
-  def getCurrentGridPull():Double = {
+  def getCurrentGridPull:Double = {
     currentGridPull
   }
 
-  def getSystemSettingsV2(): CycleData =
+  def getSystemSettingsV2: CycleData =
   {
     val urlExtension= "/api/iterate/sysSet/getCycleStrategy?id="+systemId //? what is this value...
     val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
@@ -131,8 +109,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
     jsonMapper.readValue(reply, classOf[AlphaESSCycleStrategy]).data
   }
 
-  def setSystemSettingsV2(convertedPayload: CycleDataUpdate)
-  {
+  def setSystemSettingsV2(convertedPayload: CycleDataUpdate): Unit = {
     val urlExtension= "/api/iterate/sysSet/setCycleStrategy"
     val reply = restCaller.simpleRestPutCall(eplBaseHost+urlExtension, jsonMapper.writeValueAsString(convertedPayload),true,token.token)
     val result = jsonMapper.readValue(reply, classOf[LoginReply])
@@ -144,7 +121,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
 
   //for alpha gen2
-  def getFeedStrategyList(): AlphaEssFeedStrategyData = {
+  def getFeedStrategyList: AlphaEssFeedStrategyData = {
 
     val urlExtension= "/api/iterate/sysSet/getFeedStrategyList?id="+systemId //? what is this value...
     val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
