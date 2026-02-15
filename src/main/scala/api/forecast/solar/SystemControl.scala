@@ -11,12 +11,12 @@ import java.util.Calendar
 class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, forecast:SolarForecast) extends LazyLogging {
 
   private var gridDumpEnabled = false
+  private var fitEnabled = false
 
   def ResetSync() ={
 
     try {
-      gridDumpEnabled = false
-
+      //disable grid dump - default state
       val base = alpha.getSystemSettingsV2
       alpha.setSystemSettingsV2(
         AlphaESSUpdateChargeCycleInfo.from(
@@ -33,7 +33,13 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
           alpha.systemId
         )
       )
+      gridDumpEnabled = false
       logger.info("Battery charging Period 2 to - 02:00 - 05:59")
+
+      //disable fit - default state
+      alpha.setFeedStrategy(UpdateFITConfig(0, 15, "00:00", "00:00", 500))
+      fitEnabled = false
+
     }
     catch {
       case _:Exception =>  logger.error("Error in Reset Sync job")
@@ -152,7 +158,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
 
           //Battery less than 40% - DON'T DRAIN
         }
-        case 1 => {
+        case 14 => {
           Calendar.getInstance().get(Calendar.MINUTE) match {
             case minute if minute < 30 => {
               //at 01:00
@@ -170,12 +176,12 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
               //at 01:30+
               //Battery at 20%+ Drain at 2kw
               if (batteryPercentage > 20) {
-                enabled = 1; percentage = 20; startTime = "01:30"; endTime = "01:59"; watts = 2000
+                enabled = 0; percentage = 20; startTime = "01:30"; endTime = "01:59"; watts = 2000
               }
 
               //Battery at 10%+ Drain at 0.5kw
               if (batteryPercentage > 10) {
-                enabled = 1; percentage = 10; startTime = "01:30"; endTime = "01:59"; watts = 500
+                enabled = 0; percentage = 10; startTime = "01:30"; endTime = "01:59"; watts = 500
               }
 
               //Battery less than 10% - DON'T DRAIN
@@ -185,18 +191,24 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
         }
         case _ =>
             enabled = 0; percentage = 15; startTime = "00:00"; endTime = "00:01"; watts = 500
-
       }
-      if (alpha.getFeedStrategyList.batteryEn == 0) {
-        logger.info("Updated FIT Options, battery charge = " + batteryPercentage + ", enabled =" + enabled + ", percentage = " + percentage + ", start time = " + startTime + ", end time = " + endTime + ", wattage = " + watts)
+      if (enabled == 1) {
         alpha.setFeedStrategy(UpdateFITConfig(enabled, percentage, startTime, endTime, watts))
+        logger.info("Updated FIT Options, battery charge = " + batteryPercentage + ", enabled =" + enabled + ", percentage = " + percentage + ", start time = " + startTime + ", end time = " + endTime + ", wattage = " + watts)
+        fitEnabled = true
+      }
+      if(fitEnabled && enabled == 0) {
+        alpha.setFeedStrategy(UpdateFITConfig(enabled, percentage, startTime, endTime, watts))
+        logger.info("Updated FIT Options, battery charge = " + batteryPercentage + ", enabled =" + enabled + ", percentage = " + percentage + ", start time = " + startTime + ", end time = " + endTime + ", wattage = " + watts)
+        fitEnabled = false
       }
     }
     catch {
       case _:Exception =>  logger.error("Error in managing FIT")
     }
-    def UpdateFITConfig(Enabled : Int, percentage :BigDecimal, start: String, end : String, FITPower:Int) : AlphaEssFeedStrategyConfig= {
-      AlphaEssFeedStrategyConfig(Enabled,percentage, alpha.systemId,  List(FeedStrategyVO.from(alpha.getFeedStrategyList.feedStrategyVOList.head).copy(start=start,end = end,feedPower = FITPower)), 0)
-    }
+  }
+
+  def UpdateFITConfig(Enabled : Int, percentage :BigDecimal, start: String, end : String, FITPower:Int) : AlphaEssFeedStrategyConfig= {
+    AlphaEssFeedStrategyConfig(Enabled,percentage, alpha.systemId,  List(FeedStrategyVO.from(alpha.getFeedStrategyList.feedStrategyVOList.head).copy(start=start,end = end,feedPower = FITPower)), 0)
   }
 }
