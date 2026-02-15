@@ -17,14 +17,14 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
     try {
       gridDumpEnabled = false
 
-      val base = alpha.getSystemSettingsV2()
+      val base = alpha.getSystemSettingsV2
       alpha.setSystemSettingsV2(
         AlphaESSUpdateChargeCycleInfo.from(
           base.copy(
             dayChargeTimeList =
-              base.dayDischargeTimeList.updated(
-                base.dayDischargeTimeList.size - 1,
-                base.dayDischargeTimeList.last.copy(
+              base.dayChargeTimeList.updated(
+                base.dayChargeTimeList.size - 1,
+                base.dayChargeTimeList.last.copy(
                   beginTime = "2:00",
                   endTime = "5:59"
                 )
@@ -53,14 +53,14 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
     if(!gridDumpEnabled && batteryPercentage >= 96.0 && CurrentGridPull <= 400.0 && CurrentGridPull != 0.0) //required SOC to be 95%
       {
         //disable changing at send excess to grid by setting now as the changing window
-        val base = alpha.getSystemSettingsV2()
+        val base = alpha.getSystemSettingsV2
         alpha.setSystemSettingsV2(
           AlphaESSUpdateChargeCycleInfo.from(
             base.copy(
-              dayDischargeTimeList =
-                base.dayDischargeTimeList.updated(
-                  base.dayDischargeTimeList.size - 1,
-                  base.dayDischargeTimeList.last.copy(
+              dayChargeTimeList =
+                base.dayChargeTimeList.updated(
+                  base.dayChargeTimeList.size - 1,
+                  base.dayChargeTimeList.last.copy(
                     beginTime = "07:00",
                     endTime   = "23:59"
                   )
@@ -187,7 +187,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
             enabled = 0; percentage = 15; startTime = "00:00"; endTime = "00:01"; watts = 500
 
       }
-      if (alpha.getFeedStrategyList().batteryEn == 0) {
+      if (alpha.getFeedStrategyList.batteryEn == 0) {
         logger.info("Updated FIT Options, battery charge = " + batteryPercentage + ", enabled =" + enabled + ", percentage = " + percentage + ", start time = " + startTime + ", end time = " + endTime + ", wattage = " + watts)
         alpha.setFeedStrategy(UpdateFITConfig(enabled, percentage, startTime, endTime, watts))
       }
@@ -196,7 +196,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
       case _:Exception =>  logger.error("Error in managing FIT")
     }
     def UpdateFITConfig(Enabled : Int, percentage :BigDecimal, start: String, end : String, FITPower:Int) : AlphaEssFeedStrategyConfig= {
-      AlphaEssFeedStrategyConfig(Enabled,percentage, alpha.systemId,  List(FeedStrategyVO.from(alpha.getFeedStrategyList().feedStrategyVOList.head).copy(start=start,end = end,feedPower = FITPower)), 0)
+      AlphaEssFeedStrategyConfig(Enabled,percentage, alpha.systemId,  List(FeedStrategyVO.from(alpha.getFeedStrategyList.feedStrategyVOList.head).copy(start=start,end = end,feedPower = FITPower)), 0)
     }
   }
 }

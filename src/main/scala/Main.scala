@@ -83,7 +83,8 @@ object Main extends App with LazyLogging {
   var HeartBeatCycle = new ScheduledThreadPoolExecutor(10)
 
   //sync settings
- systemControl.ResetSync()
+  alpha.run()
+  systemControl.ResetSync()
 
   //alpha.run()
   // alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(x))
@@ -141,7 +142,7 @@ object Main extends App with LazyLogging {
       try {
         if (controlEnabled) {
           //systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())
-          systemControl.canWeDumpExcessEnergyToGrid(alpha.getBatteryPercentage,alpha.getCurrentGridPull())
+          systemControl.canWeDumpExcessEnergyToGrid(alpha.getBatteryPercentage,alpha.getCurrentGridPull)
           systemControl.canWeDumpBatteryToGrid(alpha.getBatteryPercentage)
         }
       }
