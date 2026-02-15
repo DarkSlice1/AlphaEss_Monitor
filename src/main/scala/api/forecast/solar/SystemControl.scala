@@ -158,7 +158,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
 
           //Battery less than 40% - DON'T DRAIN
         }
-        case 14 => {
+        case 1 => {
           Calendar.getInstance().get(Calendar.MINUTE) match {
             case minute if minute < 30 => {
               //at 01:00
