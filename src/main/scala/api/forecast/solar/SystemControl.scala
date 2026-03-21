@@ -39,6 +39,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
       //disable fit - default state
       alpha.setFeedStrategy(UpdateFITConfig(0, 15, "00:00", "00:00", 500))
       fitEnabled = false
+      logger.info("FIT Settings Disabled")
 
     }
     catch {
@@ -105,90 +106,66 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
       var watts = 0
 
       Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match {
-        case 23 => {
+        case 23 =>
           //at 11pm
-          //battery at 90%+ Drain at 5kw
-          if (batteryPercentage > 90) {
-            enabled = 1; percentage = 90; startTime = "23:00"; endTime = "23:59"; watts = 5000
-          }
+          batteryPercentage match {
+            case batteryPercentage if (batteryPercentage < 100 && batteryPercentage > 91) =>
+              enabled = 1; percentage = 90; startTime = "23:00"; endTime = "23:59"; watts = 5000
 
-          //battery at 80%+ Drain at 4kw
-          if (batteryPercentage > 80) {
-            enabled = 1; percentage = 80; startTime = "23:00"; endTime = "23:59"; watts = 4000
-          }
+            case batteryPercentage if (batteryPercentage < 91 && batteryPercentage > 81) =>
+              enabled = 1; percentage = 80; startTime = "23:00"; endTime = "23:59"; watts = 4000
 
-          //Battery at 70%+ Drain at 3kw
-          if (batteryPercentage > 70) {
-            enabled = 1; percentage = 70; startTime = "23:00"; endTime = "23:59"; watts = 3000
-          }
+            case batteryPercentage if (batteryPercentage < 81 && batteryPercentage > 71) =>
+              enabled = 1; percentage = 70; startTime = "23:00"; endTime = "23:59"; watts = 3000
 
-          //Battery at 60%+ Drain at 2kw
-          if (batteryPercentage > 60) {
-            enabled = 1; percentage = 60; startTime = "23:00"; endTime = "23:59"; watts = 2000
-          }
+            case batteryPercentage if (batteryPercentage < 71 && batteryPercentage > 61) =>
+              enabled = 1; percentage = 60; startTime = "23:00"; endTime = "23:59"; watts = 2000
 
-          //Battery at 50%+ Drain at 1kw
-          if (batteryPercentage > 50) {
-            enabled = 1; percentage = 50; startTime = "23:00"; endTime = "23:59"; watts = 1000
-          }
+            case batteryPercentage if (batteryPercentage < 61 && batteryPercentage > 51) =>
+              enabled = 1; percentage = 50; startTime = "23:00"; endTime = "23:59"; watts = 1000
 
-          //Battery less than 50% - DON'T DRAIN
-        }
-        case 0 => {
+            case _ =>
+              enabled = 0; percentage = 15; startTime = "00:00"; endTime = "00:01"; watts = 500
+          }
+        case 0 =>
           //at 00:00
-          //battery at 70%+ Drain at 5kw
-          if (batteryPercentage > 70) {
-            enabled = 1; percentage = 70; startTime = "00:00"; endTime = "00:59"; watts = 5000
-          }
+          batteryPercentage match {
+            case batteryPercentage if (batteryPercentage < 100 && batteryPercentage > 71) =>
+              enabled = 1; percentage = 70; startTime = "00:00"; endTime = "00:59"; watts = 5000
 
-          //Battery at 60%+ Drain at 4kw
-          if (batteryPercentage > 60) {
-            enabled = 1; percentage = 60; startTime = "00:00"; endTime = "00:59"; watts = 4000
-          }
+            case batteryPercentage if (batteryPercentage < 71 && batteryPercentage > 61) =>
+              enabled = 1; percentage = 60; startTime = "00:00"; endTime = "00:59"; watts = 4000
 
-          //Battery at 50%+ Drain at 3kw
-          if (batteryPercentage > 50) {
-            enabled = 1; percentage = 50; startTime = "00:00"; endTime = "00:59"; watts = 3000
-          }
+            case batteryPercentage if (batteryPercentage < 61 && batteryPercentage > 51) =>
+              enabled = 1; percentage = 50; startTime = "00:00"; endTime = "00:59"; watts = 3000
 
-          //Battery at 40%+ Drain at 2kw
-          if (batteryPercentage > 40) {
-            enabled = 1; percentage = 40; startTime = "00:00"; endTime = "00:59"; watts = 2000
-          }
+            case batteryPercentage if (batteryPercentage < 51 && batteryPercentage > 41) =>
+              enabled = 1; percentage = 40; startTime = "00:00"; endTime = "00:59"; watts = 2000
 
-          //Battery less than 40% - DON'T DRAIN
-        }
-        case 1 => {
+            case _ =>
+              enabled = 0; percentage = 15; startTime = "00:00"; endTime = "00:01"; watts = 500
+          }
+        case 1 =>
           Calendar.getInstance().get(Calendar.MINUTE) match {
-            case minute if minute < 30 => {
+            case minute if minute < 30 =>
               //at 01:00
-              //battery at 40%+ Drain at 5kw
-              if (batteryPercentage > 40) {
-                enabled = 1; percentage = 40; startTime = "01:00"; endTime = "01:30"; watts = 5000
-              }
+              batteryPercentage match {
+                case batteryPercentage if (batteryPercentage < 100 && batteryPercentage > 41) =>
+                  enabled = 1; percentage = 40; startTime = "01:00"; endTime = "01:30"; watts = 5000
 
-              //Battery at 30%+ Drain at 4kw
-              if (batteryPercentage > 30) {
-                enabled = 1; percentage = 30; startTime = "01:00"; endTime = "01:30"; watts = 4000
+                case batteryPercentage if (batteryPercentage < 41 && batteryPercentage > 31) =>
+                  enabled = 1; percentage = 30; startTime = "01:00"; endTime = "01:30"; watts = 4000
               }
-            }
-            case _ => {
+            case _ =>
               //at 01:30+
-              //Battery at 20%+ Drain at 2kw
-              if (batteryPercentage > 20) {
-                enabled = 0; percentage = 20; startTime = "01:30"; endTime = "01:59"; watts = 2000
-              }
+              batteryPercentage match {
+                case batteryPercentage if (batteryPercentage < 100 && batteryPercentage > 21) =>
+                  enabled = 1; percentage = 20; startTime = "01:30"; endTime = "01:59"; watts = 2000
 
-              //Battery at 10%+ Drain at 0.5kw
-              if (batteryPercentage > 10) {
-                enabled = 0; percentage = 10; startTime = "01:30"; endTime = "01:59"; watts = 500
+                case batteryPercentage if (batteryPercentage < 21 && batteryPercentage > 11) =>
+                  enabled = 1; percentage = 10; startTime = "01:30"; endTime = "01:59"; watts = 500
               }
-
-              //Battery less than 10% - DON'T DRAIN
-            }
           }
-
-        }
         case _ =>
             enabled = 0; percentage = 15; startTime = "00:00"; endTime = "00:01"; watts = 500
       }
@@ -204,7 +181,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
       }
     }
     catch {
-      case _:Exception =>  logger.error("Error in managing FIT")
+      case ex:Exception =>  logger.error("Error in managing FIT "+ex.printStackTrace())
     }
   }
 
