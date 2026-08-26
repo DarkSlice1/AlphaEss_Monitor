@@ -54,7 +54,7 @@ class ember(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
     result.data match {
       case null => logger.info("ERROR : " + result.toString)
-      case value: Any => token =  new Token(token = value.token, "", RefreshTokenKey = value.refresh_token)
+      case value: Any => token =  new Token(token = value.token, RefreshTokenKey = value.refresh_token)
     }
     result
   }

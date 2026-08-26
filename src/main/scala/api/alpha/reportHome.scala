@@ -1,6 +1,6 @@
 package api.alpha
 
-import api.alpha.AlphaObjectMapper.AlphaMetrics
+import api.alpha.AlphaObjectMapper.{PowerMetrics}
 import com.typesafe.config.Config
 import metrics.KamonMetrics
 
@@ -49,12 +49,12 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
 
 
   //https://github.com/liqun2013/alphaess-webapi/blob/93539b332f2be17240f7359be2f0c51deda06d6c/AlphaEssWeb.Api_V2.Model/Dtos/PowerDataDto.cs
-  def write(metrics : AlphaMetrics): Unit = {
+  def write(metrics : PowerMetrics): Unit = {
 
     //House load calc
-    val solarGeneration = (metrics.ppv)
-    val gridConsumption = (metrics.pgrid)
-    val batteryConsumption = metrics.pbat
+    val solarGeneration = (metrics.pv1+metrics.pv2+metrics.pv3+metrics.pv4)
+    val gridConsumption = (metrics.grid)
+    val batteryConsumption = metrics.battery
 
     //Handle Grid flow Metrics
     GridFlowMetrics(metrics, gridConsumption)
@@ -87,22 +87,22 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
       (value * 10).toLong
   }
 
-  def GridFlowMetrics(metrics: AlphaMetrics, gridConsumption: Double): Unit = {
+  def GridFlowMetrics(metrics: PowerMetrics, gridConsumption: Double): Unit = {
     //Grid Push or Pull ?
-    if (metrics.pgrid > 0) {
+    if (metrics.grid > 0) {
       //update our counter for tracking grid pull
       reporterKamon.totalGridConsumption.increment(CheckForZero(gridConsumption), "sys_name", syn_name)
       //update our gauge for tracking grid pull
-      gridPull_l1.update(CheckForZero(metrics.pgrid))
+      gridPull_l1.update(CheckForZero(metrics.grid))
       // set our grid push to 0
       gridPush_l1.update(0)
       //add cost metric
-      CostPerKwMetric(metrics.pgrid)
+      CostPerKwMetric(metrics.grid)
     } else {
       //update our counter for tracking grid push
       reporterKamon.totalGridPush.increment(CheckForZero(Math.abs(gridConsumption)), "sys_name", syn_name)
       //update our counter for tracking grid push
-      gridPush_l1.update(CheckForZero(Math.abs(metrics.pgrid)))
+      gridPush_l1.update(CheckForZero(Math.abs(metrics.grid)))
       // set our grid pull to 0
       gridPull_l1.update(0)
     }
@@ -166,20 +166,20 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
     }
   }
 
-  def BatteryFlowMetrics(metrics: AlphaMetrics): Unit = {
+  def BatteryFlowMetrics(metrics: PowerMetrics): Unit = {
     //discharging battery
-    if (metrics.pbat > 0) {
-      reporterKamon.pbatDischargeCounter.increment(CheckForZero(metrics.pbat), "sys_name", syn_name)
-      pbatDischargeGauge.update(CheckForZero(metrics.pbat))
+    if (metrics.battery > 0) {
+      reporterKamon.pbatDischargeCounter.increment(CheckForZero(metrics.battery), "sys_name", syn_name)
+      pbatDischargeGauge.update(CheckForZero(metrics.battery))
       pbatChargeGauge.update(0)
     }
 
     //charging battery
-    else if (metrics.pbat < 0) {
+    else if (metrics.battery < 0) {
 
       //battery still get charged when full (apparently)
-      reporterKamon.pbatChargeCounter.increment(Math.abs(CheckForZero(metrics.pbat)), "sys_name", syn_name)
-      pbatChargeGauge.update(Math.abs(CheckForZero(metrics.pbat)))
+      reporterKamon.pbatChargeCounter.increment(Math.abs(CheckForZero(metrics.battery)), "sys_name", syn_name)
+      pbatChargeGauge.update(Math.abs(CheckForZero(metrics.battery)))
       pbatDischargeGauge.update(0)
     }
 
@@ -190,9 +190,9 @@ class reportHome(config: Config, reporterKamon : KamonMetrics) {
     }
   }
 
-  def SolarFlowMetrics(metrics: AlphaMetrics, solarGeneration : Double): Unit =
+  def SolarFlowMetrics(metrics: PowerMetrics, solarGeneration : Double): Unit =
   {
-    ppv1.update(CheckForZero(metrics.ppv))
+    ppv1.update(CheckForZero(metrics.pv1+metrics.pv2+metrics.pv3+metrics.pv4))
 
     DailySolarGeneration += solarGeneration
     reporterKamon.totalSolarGeneration.increment(CheckForZero(solarGeneration),"sys_name", syn_name)

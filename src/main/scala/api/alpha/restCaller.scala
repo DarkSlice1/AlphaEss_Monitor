@@ -48,7 +48,10 @@ object restCaller {
     // send the post request
     val response = (HttpClientBuilder.create().build()).execute(post)
     // print the response headers
-    EntityUtils.toString(response.getEntity, "UTF-8")
+    if(response.getEntity == null)
+    {  "" }
+    else
+    {EntityUtils.toString(response.getEntity, "UTF-8")}
   }
 
   def simpleRestGetCall(url: String,

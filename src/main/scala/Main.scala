@@ -1,5 +1,6 @@
-import api.alpha.AlphaObjectMapper.{AlphaESSUpdateChargeConfigInfo, AlphaESSUpdateChargeCycleInfo, LoginReply}
-import api.alpha.{CycleData, CycleDataUpdate, alpha}
+import api.alpha.AlphaObjectMapper._
+import api.alpha
+import api.alpha.alpha
 import api.common.FileIO.jsonMapper
 import api.common.Token
 import api.ember.ember
@@ -86,17 +87,6 @@ object Main extends App with LazyLogging {
   alpha.run()
   systemControl.ResetSync()
 
-  //alpha.run()
-  // alpha.setSystemSettings(AlphaESSUpdateChargeConfigInfo.from(x))
-
-  //systemControl.EnableBatteryNightCharging()
-
-  //myenergi_eddi.Run()
-  //myenergi_eddi.SetNormalMode()
-  //myenergi_eddi.SetBoostMode()
-
- // myenergi_zappi.Run()
-  //myenergi_zappi.DoNightBoost(28,"0600")
 
 
   val GatherRealTimeMetrics = new Runnable {
@@ -141,9 +131,8 @@ object Main extends App with LazyLogging {
       }
       try {
         if (controlEnabled) {
-          //systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())
           systemControl.canWeDumpExcessEnergyToGrid(alpha.getBatteryPercentage,alpha.getCurrentGridPull)
-          systemControl.canWeDumpBatteryToGrid(alpha.getBatteryPercentage)
+          //systemControl.canWeDumpBatteryToGrid(alpha.getBatteryPercentage)
         }
       }
       catch {
@@ -278,9 +267,6 @@ object Main extends App with LazyLogging {
   def Handle23amCalls(): Unit =
     {
       //always make sure this is enabled for the night charging - seen issue where it gets missed
-      //systemControl.EnableBatteryNightCharging()
-      //logger.info("Battery charging Enabled")
-
       if(forecastEnabled){
         PublishSolarForecastNightlySummaryMetrics() // get most up to date metrics before we set battery charge %
       }
