@@ -16,8 +16,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
 
   val username = config.getString("alphaess.username")
   val password = config.getString("alphaess.password")
-  val sys_sn = config.getString("alphaess.system_sn")
-  var systemId = ""
+      var systemId = ""
 
   val reporter = new reportHome(config,reporterKamon)
   val eplBaseHost = "https://platform-eur.alphaess.com"
@@ -52,10 +51,6 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
     result
   }
 
-  def refreshToken(): Token = {
-    Token.empty()
-  }
-
   def getMetrics(): Unit = {
 
     try {
@@ -65,6 +60,7 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
       val reply = restCaller.simpleRestGetCall(eplBaseHost + urlExtension, true, postParameters, true, token.token)
       val metrics = (jsonMapper.readValue(reply, classOf[SystemDetailsReply]))
       logger.info("AlphaEss Metrics Completed")
+      systemId = metrics.batteryHeatingList.head.sysSn
       currentBatteryPercentage = metrics.power.soc
       currentGridPull = metrics.power.grid
       reporter.write(metrics.power)
@@ -99,29 +95,25 @@ class alpha(config: Config, reporterKamon : KamonMetrics) extends LazyLogging{
      jsonMapper.readValue(reply, classOf[LoginReply])
   }
 
-  //for alpha gen2
-  def setFeedStrategy(config : AlphaESSCycleStrategy): Unit = {
-
-    val urlExtension= "/api/internal/v1/sites/qt2RsJ8DRZEdUMa44e/setting"
-    val jsonString: String = jsonMapper.writeValueAsString(config)
-    val reply = restCaller.simpleRestPutCall(eplBaseHost+urlExtension, jsonString ,true,token.token)
-    val result = jsonMapper.readValue(reply, classOf[UpdateFITReply])
-
-    if(result.code == 200)
-      logger.info("Updated FIT System Settings")
-  }
-
-
-
-  //for alpha gen2
-  def getFeedStrategyList: AlphaEssFeedStrategyData = {
-
-    val urlExtension= "/api/iterate/sysSet/getFeedStrategyList?id="+systemId //? what is this value...
+  def getFeedStrategyList: AlphaESSFeedStrategyList = {
+    //TODO remove ID in URL
+    val urlExtension= "/api/internal/v1/ess/"+systemId+"?components=feedInControl" //? what is this value...
     val reply = restCaller.simpleRestGetCall(eplBaseHost+urlExtension,
       withToken = true,
       token = token.token)
 
-    jsonMapper.readValue(reply, classOf[AlphaESSFeedStrategyList]).data
+    jsonMapper.readValue(reply, classOf[AlphaESSFeedStrategyList])
+  }
+
+  def setFeedStrategy(config : AlphaESSFeedStrategyList): Unit = {
+    //TODO remove ID in URL
+    val urlExtension= "/api/internal/v1/ess/"+systemId
+    val jsonString: String = jsonMapper.writeValueAsString(config)
+    val reply = restCaller.simpleRestPutCall(eplBaseHost+urlExtension, jsonString ,true,token.token)
+    if(reply != "")
+      jsonMapper.readValue(reply, classOf[UpdateFITReply])
+
+    logger.info("Updated FIT System Settings")
   }
 
   def getBatteryPercentage: Double = currentBatteryPercentage

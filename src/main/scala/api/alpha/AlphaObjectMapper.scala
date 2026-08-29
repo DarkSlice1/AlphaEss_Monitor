@@ -87,37 +87,29 @@ object AlphaObjectMapper {
                                 )
 
 
+  @JsonIgnoreProperties(ignoreUnknown = true)
   case class AlphaESSFeedStrategyList(
-                                       code: Int,
-                                       msg: String,
-                                       expMsg: String,
-                                       data: AlphaEssFeedStrategyData,
-                                       extra: Option[String]
+                                       feedInControl: AlphaEssFeedInControl
                                      )
 
   @JsonIgnoreProperties(ignoreUnknown = true)
-  case class AlphaEssFeedStrategyData(
-                                       batteryEn: Int,
-                                       batteryFeedCutoffSoc: BigDecimal,
-                                       poinv: BigDecimal,
-                                       timePeriodLimit: Int,
-                                       batUseCap: BigDecimal,
-                                       feedStrategyVOList: List[FeedStrategyVO],
-                                       prechargeEn: Int,
-                                       prechargeSoc: Option[BigDecimal], // null -> None
-                                       feedInAlertContent: String,
-                                       strategyStatus: String
-                                     )
+  case class AlphaEssFeedInControl(
+                                    batteryReserveSoc: Double,
+                                    batteryFeedCutoffSoc: Double,
+                                    enabled: Boolean,
+                                    feedStrategy: List[FeedStrategyVO],
+                                    vppSign: String,
+                                    preChargeEn: Boolean,
+                                    feedInPowerLimit: Double
+                                  )
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   case class FeedStrategyVO(
-                             id: Long,
-                             sysSn: String,
-                             start: String, // "HH:mm"
-                             end: String, // "HH:mm"
-                             feedPower: Int,
-                             sort: Int
+                             startTime: String,
+                             endTime: String,
+                             feedPower: Double
                            )
+
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   final case class AlphaESSCycleStrategy(

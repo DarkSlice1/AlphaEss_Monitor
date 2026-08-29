@@ -1,13 +1,13 @@
 package api.forecast.solar
 
 
+import api.alpha.AlphaObjectMapper.{AlphaESSFeedStrategyList, FeedStrategyVO}
 import api.alpha.alpha
-import api.myenergi.{myenergi_eddie, myenergi_zappie}
 import com.typesafe.scalalogging.LazyLogging
 
 import java.util.Calendar
 
-class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, forecast:SolarForecast) extends LazyLogging {{}
+class SystemControl(alpha: alpha, forecast:SolarForecast) extends LazyLogging {{}
 
   private var gridDumpEnabled = false
   private var fitEnabled = false
@@ -39,10 +39,10 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
       logger.info("Battery charging Period 2 to - 02:00 - 05:59")
 
       //disable fit - default state
-     /* alpha.setFeedStrategy(UpdateFITConfig(0, 99, "00:00", "00:01", 500))
+      alpha.setFeedStrategy(UpdateFITConfig(0, 99, "00:00", "00:01", 500))
       fitEnabled = false
       logger.info("FIT Settings Disabled")
-      */
+
     }
     catch {
       case _:Exception =>  logger.error("Error in Reset Sync job")
@@ -103,7 +103,7 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
    * @param batteryPercentage
    * @return
    */
- /* def canWeDumpBatteryToGrid(batteryPercentage: Double) ={
+  def canWeDumpBatteryToGrid(batteryPercentage: Double) ={
     try {
       logger.info("Reviewing FIT Options")
       var startTime = "00:00"
@@ -172,12 +172,12 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
             enabled = 0; percentage = 99; startTime = "00:00"; endTime = "00:01"; watts = 500
       }
       if (enabled == 1) {
-      //  alpha.setFeedStrategy(UpdateFITConfig(enabled, percentage, startTime, endTime, watts))
+        alpha.setFeedStrategy(UpdateFITConfig(enabled, percentage, startTime, endTime, watts))
         logger.info("Updated FIT Options, battery charge = " + batteryPercentage + ", enabled =" + enabled + ", percentage = " + percentage + ", start time = " + startTime + ", end time = " + endTime + ", wattage = " + watts)
         fitEnabled = true
       }
       if(fitEnabled && enabled == 0) {
-    //    alpha.setFeedStrategy(UpdateFITConfig(enabled, percentage, startTime, endTime, watts))
+        alpha.setFeedStrategy(UpdateFITConfig(enabled, percentage, startTime, endTime, watts))
         logger.info("Updated FIT Options, battery charge = " + batteryPercentage + ", enabled =" + enabled + ", percentage = " + percentage + ", start time = " + startTime + ", end time = " + endTime + ", wattage = " + watts)
         fitEnabled = false
       }
@@ -187,9 +187,21 @@ class SystemControl(alpha: alpha, zappi:myenergi_zappie, eddi:myenergi_eddie, fo
     }
   }
 
-  def UpdateFITConfig(Enabled : Int, percentage :BigDecimal, start: String, end : String, FITPower:Int) : AlphaESSCycleStrategy= {
-    AlphaESSCycleStrategy(Enabled,percentage, alpha.systemId,  List(FeedStrategyVO.from(alpha.getFeedStrategyList.feedStrategyVOList.head).copy(start=start,end = end,feedPower = FITPower)), 0)
-  }
+  def UpdateFITConfig(Enabled : Int, percentage :BigDecimal, start: String, end : String, FITPower:Int) : AlphaESSFeedStrategyList = {
+    val base = alpha.getFeedStrategyList.feedInControl
 
-  */
+    AlphaESSFeedStrategyList(
+      feedInControl = base.copy(
+        enabled = Enabled == 1,
+        batteryFeedCutoffSoc = percentage.toDouble,
+        feedStrategy = List(
+          FeedStrategyVO(
+            startTime = start,
+            endTime = end,
+            feedPower = FITPower.toDouble
+          )
+        )
+      )
+    )
+  }
 }

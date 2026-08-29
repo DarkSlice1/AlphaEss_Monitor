@@ -76,7 +76,7 @@ object Main extends App with LazyLogging {
   val myenergi_zappi = new myenergi_zappie(conf2, reporterKamon)
   val myenergi_eddi = new myenergi_eddie(conf2, reporterKamon)
   val myenergi_harvi = new myenergi_harvi(conf2, reporterKamon)
-  val systemControl = new api.forecast.solar.SystemControl(alpha,myenergi_zappi,myenergi_eddi,forecast)
+  val systemControl = new api.forecast.solar.SystemControl(alpha,forecast)
 
   var now = LocalDateTime.now()
   var TenSecondCycle = new ScheduledThreadPoolExecutor(10)
@@ -86,8 +86,6 @@ object Main extends App with LazyLogging {
   //sync settings
   alpha.run()
   systemControl.ResetSync()
-
-
 
   val GatherRealTimeMetrics = new Runnable {
     override def run(): Unit = {
@@ -132,7 +130,7 @@ object Main extends App with LazyLogging {
       try {
         if (controlEnabled) {
           systemControl.canWeDumpExcessEnergyToGrid(alpha.getBatteryPercentage,alpha.getCurrentGridPull)
-          //systemControl.canWeDumpBatteryToGrid(alpha.getBatteryPercentage)
+          systemControl.canWeDumpBatteryToGrid(alpha.getBatteryPercentage)
         }
       }
       catch {
