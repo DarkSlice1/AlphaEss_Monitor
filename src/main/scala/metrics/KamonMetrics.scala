@@ -107,6 +107,41 @@ final class KamonMetrics() {
   object zappiEnergyUsageGauge extends Gauge {
     val name = "myenergy.zapiEnergyUsageGauge"
   }
+  object zappiVoltageGauge extends Gauge {
+    val name = "myenergy.zapiVoltageGauge"
+  }
+  object zappiVoltageFrequencyGauge extends Gauge {
+    val name = "myenergy.zapiVoltageFrequencyGauge"
+  }
+  object eddiEnergyUsageCounter extends Counter {
+    val name = "myenergy.eddiEnergyUsageCounter"
+  }
+  object eddiEnergyUsageGauge extends Gauge {
+    val name = "myenergy.eddiEnergyUsageGauge"
+  }
+  object eddiEnergyTemperature1 extends Gauge {
+    val name = "myenergy.eddiTemperature1"
+  }
+  object eddiEnergyTemperature2 extends Gauge {
+    val name = "myenergy.eddiTemperature2"
+  }
+
+  //MyHarvi
+  object harviEnergyUsageCounter extends Counter {
+    val name = "myenergy.harviEnergyUsageCounter"
+  }
+  object harviEnergyUsageGauge extends Gauge {
+    val name = "myenergy.harviEnergyUsageGauge"
+  }
+  object harviVoltageGauge extends Gauge {
+    val name = "myenergy.harviVoltageGauge"
+  }
+  object harviVoltageFrequencyGauge extends Gauge {
+    val name = "myenergy.harviVoltageFrequencyGauge"
+  }
+
+
+
 
   //Forecasting Solar Generation
   object forecasting_todaysGeneration extends Gauge {
@@ -359,6 +394,15 @@ final class KamonMetrics() {
   }
   object poc_meter_l3 extends Gauge {
     val name = "alpha.ess.poc_meter_l3"
+  }
+
+
+  //PieGraph
+  object pieEnergyUsageCounter extends Counter {
+    val name = "general.pieEnergyUsageCounter"
+  }
+  object pieEnergyUsageGauge extends Gauge {
+    val name = "general.pieEnergyUsageGauge"
   }
 
 }

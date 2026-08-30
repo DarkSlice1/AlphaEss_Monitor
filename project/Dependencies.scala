@@ -5,6 +5,7 @@ object Dependencies {
   private val kamon_core            = "io.kamon"                        %% "kamon-core"             % "2.3.1"
   private val kamon_scala           = "io.kamon"                        %% "kamon-scala"            % "0.6.7"
   private val kamon_datadog         = "io.kamon"                        %% "kamon-datadog"          % "2.3.1"
+  private val kamon_system          = "io.kamon"                        %% "kamon-system-metrics"   % "2.3.1"
   private val aspectj_weaver        = "org.aspectj"                     % "aspectjweaver"           % "1.8.9"
 
   private val scala_logger          = "com.typesafe.scala-logging"      %% "scala-logging"          % "3.1.0"
@@ -22,14 +23,14 @@ object Dependencies {
   private val squareup              = "com.squareup.okhttp"             % "okhttp"                  % "2.7.5"
   private val bouncycastle          = "org.bouncycastle"                % "bcprov-ext-jdk16"        % "1.46"
 
+  private val guava                 = "com.google.guava"                % "guava"                   % "31.1-jre"
 
-  private val kamonDeps = Seq(kamon_core, kamon_datadog, aspectj_weaver,kamon_scala)
+  private val kamonDeps = Seq(kamon_core, kamon_datadog, aspectj_weaver,kamon_scala,kamon_system)
   private val JSONDeps = Seq(jackson_core, jackson_databind, jackson_module, jackson_datatype_jdk8, json4s_base, json4s_jackson)
   private val logger = Seq(scala_logger,logback)
+  private val misc = Seq(guava)
 
-  val coreDependencies =  logger ++ kamonDeps ++ JSONDeps  ++ Seq(gson,apache_http,squareup,bouncycastle)
+  val coreDependencies =  logger ++ kamonDeps ++ JSONDeps ++ misc ++ Seq(gson,apache_http,squareup,bouncycastle)
 
   lazy val resolverSettings = Seq()
 }
-
-

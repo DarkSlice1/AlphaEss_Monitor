@@ -1,19 +1,24 @@
-import api.alpha.AlphaObjectMapper.AlphaESSSendSetting
+import api.alpha.AlphaObjectMapper._
+import api.alpha
 import api.alpha.alpha
+import api.common.FileIO.jsonMapper
+import api.common.Token
 import api.ember.ember
 import api.forecast.solar.SolarForecast
-import api.myenergi.myenergi_zappie
+import api.myenergi.MyEnergiObjectMapper.jstatusZReply
+import api.myenergi.{myenergi_eddie, myenergi_harvi, myenergi_zappie}
 import api.tapo.{Tapo, tapoMiddleMan}
 import com.typesafe.config.{Config, ConfigFactory}
 import kamon.Kamon
 import metrics.KamonMetrics
 
-import java.time.temporal.ChronoUnit
+import java.time.temporal.{ChronoUnit, TemporalUnit}
 import java.time.{Duration, Instant, LocalDateTime, OffsetDateTime, ZoneOffset}
 import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
 import com.typesafe.scalalogging.LazyLogging
 
 import java.util.Calendar
+import scala.concurrent.duration.MINUTES
 
 
 object Main extends App with LazyLogging {
@@ -59,7 +64,8 @@ object Main extends App with LazyLogging {
   }
 
   var applicationStartTime: Instant = Instant.now()
-
+  var lastMetricCheckTime = applicationStartTime
+  var lastHourlyRunCheckTime = applicationStartTime
   startKamon(conf1.withFallback(conf2).resolve())
   val reporterKamon = new KamonMetrics()
 
@@ -67,30 +73,79 @@ object Main extends App with LazyLogging {
   val ember = new ember(conf2, reporterKamon)
   val tapo = new tapoMiddleMan(new Tapo(), conf2, reporterKamon)
   val forecast = new SolarForecast(conf2, reporterKamon)
-  val myenergi = new myenergi_zappie(conf2, reporterKamon)
+  val myenergi_zappi = new myenergi_zappie(conf2, reporterKamon)
+  val myenergi_eddi = new myenergi_eddie(conf2, reporterKamon)
+  val myenergi_harvi = new myenergi_harvi(conf2, reporterKamon)
   val systemControl = new api.forecast.solar.SystemControl(alpha,forecast)
+
+  var now = LocalDateTime.now()
+  var TenSecondCycle = new ScheduledThreadPoolExecutor(10)
+  var OneHourCycle = new ScheduledThreadPoolExecutor(10)
+  var HeartBeatCycle = new ScheduledThreadPoolExecutor(10)
+
+  //sync settings
+  alpha.run()
+  systemControl.ResetSync()
 
   val GatherRealTimeMetrics = new Runnable {
     override def run(): Unit = {
+
       //run in a 10 second loop
       try {
-        if (alphaEnabled) {alpha.run()}
-        if (tapoEnabled) {tapo.Run()}
-        if (emberEnabled) {ember.Run()}
-        if (myEnergiEnabled) {myenergi.Run()}
-        if(controlEnabled) {systemControl.canWeTurnOffNightCharging(alpha.getCurrentGridPull())}
-        logger.info("All Metrics Gathered : " + Calendar.getInstance().getTime)
+        if (alphaEnabled) {
+          alpha.run()
+        }
       }
       catch {
-        case ex: Exception => logger.info("ERROR Running - cleaning token, Exception : " + ex.toString);
+        case ex: Exception =>
+          alpha.token = Token.empty() //it appears that the token should last 2 years , but we get a 401 after a few hours....
+          logger.error("ERROR Running alphaEss - cleaning token, Exception : " + ex.printStackTrace());
       }
+      try {
+        if (tapoEnabled) {
+          tapo.Run()
+        }
+      }
+      catch {
+        case ex: Exception => logger.error("ERROR Running tapo - cleaning token, Exception : " + ex.printStackTrace());
+      }
+      try {
+        if (emberEnabled) {
+          ember.Run()
+        }
+      }
+      catch {
+        case ex: Exception => logger.error("ERROR Running ember - cleaning token, Exception : " + ex.printStackTrace());
+      }
+      try {
+        if (myEnergiEnabled) {
+          myenergi_zappi.Run()
+          myenergi_eddi.Run()
+          myenergi_harvi.Run()
+        }
+      }
+      catch {
+        case ex: Exception => logger.error("ERROR Running myEnergi - cleaning token, Exception : " + ex.printStackTrace());
+      }
+      try {
+        if (controlEnabled) {
+          systemControl.canWeDumpExcessEnergyToGrid(alpha.getBatteryPercentage,alpha.getCurrentGridPull)
+          systemControl.canWeDumpBatteryToGrid(alpha.getBatteryPercentage)
+        }
+      }
+      catch {
+        case ex: Exception => logger.error("ERROR Running SystemControl - cleaning token, Exception : " + ex.printStackTrace());
+      }
+
+      lastMetricCheckTime = Instant.now()
+      logger.info("All Metrics Gathered : " + Calendar.getInstance().getTime)
     }
   }
 
   def PublishSolarForecastNightlySummaryMetrics()= {
       try {
         //make sure we have a full days set of data first
-        if (applicationStartTime.until(Instant.now(), ChronoUnit.HOURS) > 24) {
+        if (applicationStartTime.until(Instant.now(), ChronoUnit.HOURS) > 12) {
           //what was today's solar generation as a percentage of forecasted
           forecast.RunNightlySummaryMetrics(alpha.reporter.DailySolarGeneration)
           logger.info("Publish Daily forecasting Metrics")
@@ -105,32 +160,130 @@ object Main extends App with LazyLogging {
       }
   }
 
-  val HourlyRun = new Runnable {
+  val HeatBeatCheck = new Runnable {
     override def run(): Unit = {
-      logger.info("running hourly Check")
-      Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match
+      logger.info("Running HeartBeatCheck")
+
+      if(Instant.now().isAfter(lastMetricCheckTime.plus(1, ChronoUnit.MINUTES)))
       {
-        //what do we want to run at what hour
-        case 1  if(forecastEnabled && controlEnabled) => systemControl.setSystemSettingsBasedOnGeneratedForecast()
-        case 2  if(myEnergiEnabled) => myenergi.DoNightBoost(21,"0500")
-        case 6  if(forecastEnabled && controlEnabled) => systemControl.EnableBatteryNightCharging()
-        case 16 if(forecastEnabled) => forecast.getTomorrowForcast()
-        case 23 if(forecastEnabled) => PublishSolarForecastNightlySummaryMetrics() // get most up to date metrics before we set battery charge %
-        case x:Any => logger.info("current hour is '"+x+"' nothing planned to run")
+        logger.error("We've stopped collecting metric data...")
+        logger.info("Stopping... ")
+        TenSecondCycle.shutdown()
+        logger.info("Starting up again... ")
+        TenSecondCycle = new ScheduledThreadPoolExecutor(10)
+        TenSecondCycle.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
+        logger.info("Running again... ")
+      }
+
+      if(Instant.now().isAfter(lastHourlyRunCheckTime.plus(1, ChronoUnit.HOURS).plus(1, ChronoUnit.MINUTES)))
+      {
+        logger.error("Hourly Run has stopped...")
+        logger.info("Stopping... ")
+        OneHourCycle.shutdown()
+        logger.info("Starting up again... ")
+        now = LocalDateTime.now()
+        OneHourCycle = new ScheduledThreadPoolExecutor(10)
+        OneHourCycle.scheduleAtFixedRate(HourlyRun, Duration.between(now, now.plusHours(1).truncatedTo(ChronoUnit.HOURS)).toMillis+1000, TimeUnit.HOURS.toMillis(1), TimeUnit.MILLISECONDS)
+        HourlyRun.run()
+        logger.info("Running again... ")
       }
     }
   }
 
-  val now = LocalDateTime.now()
-  val ex = new ScheduledThreadPoolExecutor(3)
+
+  val HourlyRun = new Runnable {
+      override def run(): Unit = {
+      logger.info("running hourly Check")
+
+
+
+      Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match
+      {
+        //what do we want to run at what hour/
+        case 1  if(forecastEnabled && controlEnabled) => systemControl.setSystemSettingsBasedOnGeneratedForecast()
+        case 2  => Handle2amCalls()
+        case 6  => Handle6amCalls()
+        case 7  => Handle7amCalls()
+        case 8  => Handle8amCalls()
+        case 9  => Handle9amCalls()
+        case 16 if(forecastEnabled) => forecast.getTomorrowForcast()
+        case 23 => Handle23amCalls()
+        case x:Any => logger.info("current hour is '"+x+"' nothing planned to run")
+      }
+
+      lastHourlyRunCheckTime = Instant.now()
+    }
+  }
+
+  def Handle2amCalls(): Unit =
+  {
+    if(myEnergiEnabled) {
+      myenergi_zappi.DoNightBoost(28,"0600")
+      myenergi_zappi.DoNightBoost(28,"0600")
+      myenergi_zappi.DoNightBoost(28,"0600") //hasn't run in 3 days - but api call is fine, guessing issues is on the myenregi side
+      myenergi_eddi.SetNormalMode()
+      myenergi_eddi.SetNormalMode()
+      myenergi_eddi.SetNormalMode()
+    }
+  }
+
+  def Handle6amCalls(): Unit =
+  {
+    if(forecastEnabled && controlEnabled) {
+      //systemControl.EnableBatteryNightCharging()
+    }
+    if(myEnergiEnabled) {
+      myenergi_zappi.SetStopMode()
+      myenergi_eddi.SetStopMode()
+    }
+  }
+
+  def Handle7amCalls(): Unit =
+  {//still seeing eddi turned on at this time, a lot of failed events
+    if(myEnergiEnabled) {
+      myenergi_zappi.SetStopMode()
+      myenergi_eddi.SetStopMode()
+    }
+  }
+
+  def Handle8amCalls(): Unit =
+  {//still seeing eddi turned on at this time, a lot of failed events
+    if(myEnergiEnabled) {
+      myenergi_zappi.SetStopMode()
+      myenergi_eddi.SetStopMode()
+    }
+  }
+
+  def Handle9amCalls(): Unit =
+  {//still seeing eddi turned on at this time, a lot of failed events
+    if(myEnergiEnabled) {
+      myenergi_zappi.SetStopMode()
+      myenergi_eddi.SetStopMode()
+    }
+  }
+
+  def Handle23amCalls(): Unit =
+    {
+      //always make sure this is enabled for the night charging - seen issue where it gets missed
+      if(forecastEnabled){
+        PublishSolarForecastNightlySummaryMetrics() // get most up to date metrics before we set battery charge %
+      }
+    }
+
+
   // run Every 10 seconds
-  ex.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
+  TenSecondCycle.scheduleAtFixedRate(GatherRealTimeMetrics, 1, 10, TimeUnit.SECONDS)
+
+  // run Every 30 seconds
+  HeartBeatCycle.scheduleAtFixedRate(HeatBeatCheck, 1, 30, TimeUnit.SECONDS)
+
   // run at the top of every hour
-  ex.scheduleAtFixedRate(HourlyRun, Duration.between(now, now.plusHours(1).truncatedTo(ChronoUnit.HOURS)).toMillis+1000, TimeUnit.HOURS.toMillis(1), TimeUnit.MILLISECONDS)
+  OneHourCycle.scheduleAtFixedRate(HourlyRun, Duration.between(now, now.plusHours(1).truncatedTo(ChronoUnit.HOURS)).toMillis+1000, TimeUnit.HOURS.toMillis(1), TimeUnit.MILLISECONDS)
 
 
   private def startKamon(config: Config) = {
     logger.info("Starting Kamon reporters...." + config.getStringList("kamon.reporters").toString)
+    Kamon.loadModules()
     Kamon.init(config)
   }
 }

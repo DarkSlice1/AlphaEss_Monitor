@@ -1,6 +1,7 @@
 
 
 ##### Table of Contents  
+- [Requirments](#overview)
 - [Overview](#overview)   
 - [Getting Setup](#getting-setup)   
 - [Generated Alpha ESS Metrics](#generated-alpha-ess-metrics)   
@@ -11,6 +12,16 @@
 - [Ember Heat Tracking](#ember-heat-tracking)
 - [Zappi Tracking](#zappi-tracking)
 - [Forecasting](#forecasting)
+
+# Requirements
+IDE = IntelliJ  
+jdk = 1.8.0_211  
+SBT = 13.15  
+Scala = 2.11.12  
+IDE config  
+Set -> build Tool -> sbt -> VM Parameters  -XX:MaxHeapSize=512m
+To compile = "sbt assembly"
+
 
 # Overview
    

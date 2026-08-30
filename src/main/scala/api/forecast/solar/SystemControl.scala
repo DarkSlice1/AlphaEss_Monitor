@@ -1,68 +1,207 @@
 package api.forecast.solar
 
-import api.alpha.AlphaObjectMapper.AlphaESSSendSetting
+
+import api.alpha.AlphaObjectMapper.{AlphaESSFeedStrategyList, FeedStrategyVO}
 import api.alpha.alpha
 import com.typesafe.scalalogging.LazyLogging
+
 import java.util.Calendar
 
-class SystemControl(alpha: alpha,forecast:SolarForecast) extends LazyLogging {
+class SystemControl(alpha: alpha, forecast:SolarForecast) extends LazyLogging {{}
 
-  private var batteryChargeEnabled = true
+  private var gridDumpEnabled = false
+  private var fitEnabled = false
 
-  def setSystemSettingsBasedOnGeneratedForecast(): Unit ={
+  def ResetSync() ={
+
+    try {
+      //disable grid dump - default state
+      val base = alpha.getSystemSettings
+
+      val updatedBase = base.copy(
+        residential = base.residential.copy(
+          customMode = base.residential.customMode.copy(
+            rangeList = base.residential.customMode.rangeList.map {
+              case range if range.strategy == "Charge" =>
+                range.copy(
+                  startTime = "02:00",
+                  endTime   = "05:59"
+                )
+              case range => range
+            }
+          )
+        )
+      )
+
+      alpha.setSystemSettings(updatedBase)
+
+      gridDumpEnabled = false
+      logger.info("Battery charging Period 2 to - 02:00 - 05:59")
+
+      //disable fit - default state
+      alpha.setFeedStrategy(UpdateFITConfig(0, 99, "00:00", "00:01", 500))
+      fitEnabled = false
+      logger.info("FIT Settings Disabled")
+
+    }
+    catch {
+      case _:Exception =>  logger.error("Error in Reset Sync job")
+    }
+  }
+
+  def setSystemSettingsBasedOnGeneratedForecast(): Unit = {
     val todaysForecast = forecast.getTodaysForcast()
     forecast.publishTodaysForcast(todaysForecast)
     logger.info("Publish forecasting Metrics")
-
-    todaysForecast match
-    {
-      case x if x>15000 => alpha.setSystemSettings(SetBatteryToX(30))
-      case x if(x<15000 && x>10000) => alpha.setSystemSettings(SetBatteryToX(50))
-      case x if(x<10000 && x>6000) => alpha.setSystemSettings(SetBatteryToX(80))
-      case x if x<6000 => alpha.setSystemSettings(SetBatteryToX(95))
-      case _ =>  alpha.setSystemSettings(SetBatteryToX(95))
-    }
   }
 
-  def canWeTurnOffNightCharging(CurrentGridPull:Double)={
-    logger.info("Battery Control charge value ="+CurrentGridPull)
-    areWeInTheChargingWindow(Calendar.getInstance())
-    if(batteryChargeEnabled && CurrentGridPull > 0.0 && CurrentGridPull < 1000.0) { //are we pulling a little bit from the grid
-      if (areWeInTheChargingWindow(Calendar.getInstance())) {
-        //stop using the grid for power - switch to the battery
-        alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 0))
-        batteryChargeEnabled = false
-        logger.info("Battery charging Disabled")
+
+
+  def canWeDumpExcessEnergyToGrid(batteryPercentage: Double, CurrentGridPull:Double)= {
+    //only disable charging battery if - Battery is above 96% and we are not pulling from the grid
+    if(!gridDumpEnabled && batteryPercentage >= 96.0 && CurrentGridPull <= 400.0 && CurrentGridPull != 0.0) //required SOC to be 95%
+      {
+        //disable changing at send excess to grid by setting now as the changing window
+        val base = alpha.getSystemSettings
+
+        val lastDischargeIndex =
+          base.residential.customMode.rangeList.lastIndexWhere(_.strategy == "Charge")
+
+        if (lastDischargeIndex >= 0) {
+          val updatedBase = base.copy(
+            residential = base.residential.copy(
+              customMode = base.residential.customMode.copy(
+                rangeList = base.residential.customMode.rangeList.updated(
+                  lastDischargeIndex,
+                  base.residential.customMode.rangeList(lastDischargeIndex).copy(
+                    startTime = "07:00",
+                    endTime   = "23:59"
+                  )
+                )
+              )
+            )
+          )
+          alpha.setSystemSettings(updatedBase)
+        }
+        gridDumpEnabled = true
+        logger.info("Battery charging Period 2 to - 07:00 - 23:59 - battery at "+batteryPercentage+"%, so dumping excess to grid")
+      }
+    //if we pull from the grid - stop and use the battery
+    if(gridDumpEnabled && (CurrentGridPull > 400.0))
+      {
+        //enable normal battery use by clearing this changing window
+        ResetSync()
+      }
+  }
+
+  /**
+   * We want to dump the batter to the Grid in a Safe manner
+   * we have 22k to work with at a 5kw per hour drain
+   * battery charging starts at 2am and drops to a max of 10%
+   * Starting at 23:00 we can start dumping depending on % percentage.
+   * Let's review every few seconds and adjust to maximize drain before 2am but maintain enough charge for usagae
+   * @param batteryPercentage
+   * @return
+   */
+  def canWeDumpBatteryToGrid(batteryPercentage: Double) ={
+    try {
+      logger.info("Reviewing FIT Options")
+      var startTime = "00:00"
+      var endTime = "00:00"
+      var percentage = 99
+      var enabled = 0
+      var watts = 1
+
+      Calendar.getInstance().get(Calendar.HOUR_OF_DAY) match {
+        case 23 =>
+          //at 11pm
+          batteryPercentage match {
+            case batteryPercentage if (batteryPercentage < 100 && batteryPercentage > 91) =>
+              enabled = 1; percentage = 90; startTime = "23:00"; endTime = "23:59"; watts = 5000
+
+            case batteryPercentage if (batteryPercentage < 91 && batteryPercentage > 81) =>
+              enabled = 1; percentage = 80; startTime = "23:00"; endTime = "23:59"; watts = 4000
+
+            case batteryPercentage if (batteryPercentage < 81 && batteryPercentage > 71) =>
+              enabled = 1; percentage = 70; startTime = "23:00"; endTime = "23:59"; watts = 3000
+
+            case batteryPercentage if (batteryPercentage < 71 && batteryPercentage > 61) =>
+              enabled = 1; percentage = 60; startTime = "23:00"; endTime = "23:59"; watts = 2000
+
+            case batteryPercentage if (batteryPercentage < 61 && batteryPercentage > 51) =>
+              enabled = 1; percentage = 50; startTime = "23:00"; endTime = "23:59"; watts = 2000
+
+            case _ =>
+              enabled = 0; percentage = 99; startTime = "00:00"; endTime = "00:01"; watts = 500
+          }
+        case 0 =>
+          //at 00:00
+          batteryPercentage match {
+
+            case batteryPercentage if (batteryPercentage < 100 && batteryPercentage > 41) =>
+              enabled = 1; percentage = 40; startTime = "00:00"; endTime = "00:59"; watts = 3000
+
+            case _ =>
+              enabled = 0; percentage = 99; startTime = "00:00"; endTime = "00:01"; watts = 500
+          }
+        case 1 =>
+          Calendar.getInstance().get(Calendar.MINUTE) match {
+            case minute if minute < 30 =>
+              //at 01:00
+              batteryPercentage match {
+                case batteryPercentage if (batteryPercentage < 100 && batteryPercentage > 31) =>
+                  enabled = 1; percentage = 30; startTime = "01:00"; endTime = "01:30"; watts = 5000
+
+                case _ =>
+                  enabled = 0; percentage = 99; startTime = "00:00"; endTime = "00:01"; watts = 500
+              }
+            case _ =>
+              //at 01:30+
+              batteryPercentage match {
+                case batteryPercentage if (batteryPercentage < 100 && batteryPercentage > 21) =>
+                  enabled = 1; percentage = 20; startTime = "01:30"; endTime = "01:59"; watts = 5000
+
+                case batteryPercentage if (batteryPercentage < 21 && batteryPercentage > 11) =>
+                  enabled = 1; percentage = 10; startTime = "01:30"; endTime = "01:59"; watts = 1000
+
+                case _ =>
+                  enabled = 0; percentage = 99; startTime = "00:00"; endTime = "00:01"; watts = 500
+              }
+          }
+        case _ =>
+            enabled = 0; percentage = 99; startTime = "00:00"; endTime = "00:01"; watts = 500
+      }
+      if (enabled == 1) {
+        alpha.setFeedStrategy(UpdateFITConfig(enabled, percentage, startTime, endTime, watts))
+        logger.info("Updated FIT Options, battery charge = " + batteryPercentage + ", enabled =" + enabled + ", percentage = " + percentage + ", start time = " + startTime + ", end time = " + endTime + ", wattage = " + watts)
+        fitEnabled = true
+      }
+      if(fitEnabled && enabled == 0) {
+        alpha.setFeedStrategy(UpdateFITConfig(enabled, percentage, startTime, endTime, watts))
+        logger.info("Updated FIT Options, battery charge = " + batteryPercentage + ", enabled =" + enabled + ", percentage = " + percentage + ", start time = " + startTime + ", end time = " + endTime + ", wattage = " + watts)
+        fitEnabled = false
       }
     }
-  }
-
-  def EnableBatteryNightCharging()={
-    if(!batteryChargeEnabled) {
-      alpha.setSystemSettings(AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(grid_charge = 1))
-      batteryChargeEnabled = true
-      logger.info("Battery charging Enabled")
+    catch {
+      case ex:Exception =>  logger.error("Error in managing FIT "+ex.printStackTrace())
     }
   }
 
-  def SetBatteryToX(batteryPercentage : Int): AlphaESSSendSetting =
-  {
-    val newBatterySettings  =  AlphaESSSendSetting.from(alpha.getSystemSettings()).copy(bat_high_cap=""+batteryPercentage)
-    logger.info("Battery percent will be: "+batteryPercentage+"%")
-    newBatterySettings
-  }
+  def UpdateFITConfig(Enabled : Int, percentage :BigDecimal, start: String, end : String, FITPower:Int) : AlphaESSFeedStrategyList = {
+    val base = alpha.getFeedStrategyList.feedInControl
 
-  def areWeInTheChargingWindow(now :Calendar): Boolean = {
-    val ChargingWindowStart = Calendar.getInstance()
-    ChargingWindowStart.set(Calendar.HOUR_OF_DAY,2)
-    ChargingWindowStart.set(Calendar.MINUTE,5)
-    ChargingWindowStart.set(Calendar.SECOND,0)
-
-    val ChargingWindowEnd = Calendar.getInstance
-    ChargingWindowEnd.set(Calendar.HOUR_OF_DAY,4)
-    ChargingWindowEnd.set(Calendar.MINUTE,55)
-    ChargingWindowEnd.set(Calendar.SECOND,0)
-
-    (now.getTime.after(ChargingWindowStart.getTime) && now.getTime.before(ChargingWindowEnd.getTime))
+    AlphaESSFeedStrategyList(
+      feedInControl = base.copy(
+        enabled = Enabled == 1,
+        batteryFeedCutoffSoc = percentage.toDouble,
+        feedStrategy = List(
+          FeedStrategyVO(
+            startTime = start,
+            endTime = end,
+            feedPower = FITPower.toDouble
+          )
+        )
+      )
+    )
   }
 }
